@@ -1,0 +1,43 @@
+.instruments{
+    border-right: 5px solid  #FFDB8B;
+}
+
+/* Заголовок для группы разделов биобанка */
+/* Надо будет убрать */
+.name_instruments {
+    color: green;
+    font-size: 20px;
+    margin-top: 40px;
+    margin-left: 10px;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* Стили для списка разделов биобанка */
+.instruments ul {
+    list-style: none;
+    padding: 0; /* Сбрасываем внутренние отступы списка */
+    margin-top: 10px; /* Уменьшенный отступ сверху */
+    margin-left: 10px;
+    color:#fff
+}
+
+/* Стили для текстовых пунктов внутри списка */
+.instruments ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* Задается цвет текста при наведении на него, а также его увеличение */
+.instruments ul li:hover, .instruments ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+}
+
+.instruments-link {
+    color: white;
+    text-decoration: none;
+}

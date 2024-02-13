@@ -1,0 +1,68 @@
+{% load static %} {#Указываю, что будут использоваться статические файлы#}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title%}{% endblock %}</title>
+<!--    Подключаем все стили с boostrap-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+<!--    Подлючаем статистические файлы(css, js, img)-->
+    <link rel="stylesheet" href="{% static 'css/biobank.css' %}">
+    <link rel="stylesheet" href="{% static 'css/storage.css' %}">
+    {%block add_static %}{%endblock%}
+
+</head>
+
+<body>
+<!--Создание отдельного блока для расположения логотипа платформы"-->
+<div class="header">
+    <div class="logo">
+        <img src="{% static 'img/nimc_logo.png' %}" alt="Логотип платформы">
+        <a href="{% url 'biobank_home'%}">SIB NIMC Biobank</a>
+    </div>
+    <!-- Выделение блока под регистрацию/вход или имя пользователя, а также проверка на него -->
+    <div class="login">
+        {%if user.is_authenticated%}
+            <span id="username">{{ user.get_username }}</span>
+            <!-- Отображение кнопок "Профиль" и "Выход". НЕРАБОЧИЕ -->
+            <div class="user-actions hidden">
+                <a href="{%url 'user_profile'%}">Профиль</button>
+                <a href="{%url 'logout'%}"></style>Выйти</a>
+            </div>
+    
+        <!-- Если клиент не авторизирован - ссылка на вход/регистрацию -->
+        {% else %}
+        <a class="login" href="{% url 'login'%}">Вход/регистрация</a>
+        {% endif %}
+        </div>
+</div>
+
+    <!--Создаем левый боковой блок-->
+    <aside>
+        <!--Создание отдельного блока для надписи Панель инструментов. Необходимо убрать-->
+        <!--Подключаем блок разделов биообанка-->
+        <div class="instruments">
+            <p><span class="name_instruments">Разделы биобанка </span></p>
+            <ul>
+                <a href="{% url 'list_laboratories'%}"><li><i class="bi bi-search"></i>Лаборатории</li></a>
+                <a href="{% url 'list_individs'%}"><li><i class="fa-regular fa-house"></i>Индивиды</li></a>
+                <a href="{% url 'get_list_samples'%}"><li><i class="fa-regular fa-house"></i>Образцы</li></a>
+                <a href="{% url 'list_freezers'%}"><li><i class="fa-regular fa-house"></i>Хранилище</li></a>
+                <a href="{% url 'list_families'%}"><li><i class="fa-solid fa-phone"></i>Семьи</li></a>
+            </ul>
+            <!--Отключаем подчеркивание у элементов списка-->
+            <style>
+                a {
+              text-decoration: none;
+                    }
+            </style>
+        </div>
+    </aside>
+    <main>
+<!--        Создаем отдельный основной блок для контента страницы-->
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
