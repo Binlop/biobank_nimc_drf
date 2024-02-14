@@ -3,9 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
-import "./laboratory.css"
+import "./family.css"
 
-export default function LabUpdate() {
+
+export default function FamilyUpdate() {
     const { id } = useParams();
     const [laboratoryDetail, setLaboratoryDetail] = useState(null);
     const navigate = useNavigate();

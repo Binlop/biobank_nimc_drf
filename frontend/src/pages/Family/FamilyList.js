@@ -1,13 +1,13 @@
 import Modal from "../Modal";
 import axios from "axios";
-import "./laboratory.css"
+import "./family.css"
 import { Routes,     BrowserRouter as Router,
   Route, Outlet, Link } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 
-export default function LabList() {
+export default function FamilyList() {
     const [viewCompleted, setViewCompleted] = useState(false);
-    const [laboratoryList, setLaboratoryList] = useState([]);
+    const [familyList, setLaboratoryList] = useState([]);
     const [modal, setModal] = useState(false);
     const [activeItem, setActiveItem] = useState({
         name: '',
@@ -16,12 +16,12 @@ export default function LabList() {
 
     useEffect(() => {
         refreshList()
-        document.title = 'Лаборатории';
+        document.title = 'Семьи';
       }, []);
 
     const handleDelete = (item) => {
         axios
-          .delete(`/api/laboratory/${item.id}/`)
+          .delete(`/api/family/${item.id}/`)
           .then((res) => refreshList());
       };
 
@@ -31,7 +31,7 @@ export default function LabList() {
 
     const refreshList = () => {
         axios
-          .get("/api/laboratory/")
+          .get("/api/family/")
           .then((res) => {
             setLaboratoryList(res.data)
         })
@@ -42,12 +42,12 @@ export default function LabList() {
         toggle();
         if (item.id) {
           axios
-            .put(`/api/laboratory/${item.id}/`, item)
+            .put(`/api/family/${item.id}/`, item)
             .then((res) => refreshList());
           return;
         }
         axios
-          .post("/api/laboratory/", item)
+          .post("/api/family/", item)
           .then((res) => refreshList());
       };
     
@@ -70,9 +70,9 @@ export default function LabList() {
         <main className="container">
             <div className="title_object">
                 <p>
-                    <span className="larger-text">Лаборатории </span>
-                    <Link to="/laboratories/create" className="btn btn-primary">
-                        Добавить лабораторию
+                    <span className="larger-text">Семьи </span>
+                    <Link to="/families/create" className="btn btn-primary">
+                        Добавить семью
                     </Link> 
                 </p>
             </div>
@@ -86,17 +86,11 @@ export default function LabList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {laboratoryList && laboratoryList.map(item => (
+                        {familyList && familyList.map(item => (
                             <tr key={item.id}>
-                                <td className="table_list_value"><Link to={`/laboratories/${item.id}`} className="link-style">{item.name}</Link></td>
+                                <td className="table_list_value"><Link to={`/families/${item.id}`} className="link-style">{item.name}</Link></td>
                                 <td className="table_list_value">{item.description}</td>
                                 <td className="table_list_value">
-                                    <button
-                                        className="btn btn-primary mr-2"
-                                        onClick={() => editItem(item)}
-                                    >
-                                        Изменить
-                                    </button>
                                     <button
                                         className="btn btn-danger"
                                         onClick={() => handleDelete(item)}
@@ -113,7 +107,7 @@ export default function LabList() {
                 <Modal
                     activeItem={activeItem}
                     toggle={toggle}
-                    onSave={handleSubmit} // Вызов handleSubmit здесь. Необходимо определить эту функцию.
+                    onSave={handleSubmit}
                 />
             ) : null}
         </main>

@@ -73,8 +73,16 @@ table td {
 
 .link-style {
     color: white;
-    text-decoration: none; /* Убираем подчеркивание */
+    text-decoration: none;
+    transition: transform .6s ease;
+
   }
+
+.link-style:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+}
 
 /* Стиль названия раздела биобанка*/
 .title_object p {
@@ -103,3 +111,4 @@ table td {
     align-items: center;
     margin-left: 100px;
 }
+
