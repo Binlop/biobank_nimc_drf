@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import "./family.css"
-
+import React, { useState, useEffect } from "react";
+import Multiselect from 'react-select'
 
 export default function FamilyUpdate() {
     const { id } = useParams();
-    const [laboratoryDetail, setLaboratoryDetail] = useState(null);
+    const [family, setFamily] = useState(null);
     const navigate = useNavigate();
     const [errors, setError] = useState(null); // Состояние для сообщения об ошибке
+    const [formData, setFormData] = useState({
+      name: '',
+      description: '',
+      laboratory: []
+    });
+    const [allLaboratories, setAllLaboratories] = useState([]);
     
     useEffect(() => {
         refreshLaboratoryData();
@@ -26,9 +32,9 @@ export default function FamilyUpdate() {
     
     const refreshLaboratoryData = () => {
       axios
-          .get(`/api/laboratory/${id}`)
+          .get(`/api/family/${id}`)
           .then((res) => {
-              setLaboratoryDetail(res.data);
+            setFamily(res.data);
           })
           .catch((err) => console.log(err));
     };   
@@ -36,10 +42,10 @@ export default function FamilyUpdate() {
     const handleSubmit = (event) => {
         event.preventDefault();
         axios
-          .put(`/api/laboratory/${id}/update/`, laboratoryDetail)
+          .put(`/api/family/${id}/update/`, laboratoryDetail)
           .then(() => {
             console.log("Отправленный объект", laboratoryDetail);
-            navigate('/laboratories');
+            navigate('/families');
           })
           .catch((error) => {
             if (error.response) {
@@ -51,19 +57,19 @@ export default function FamilyUpdate() {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setLaboratoryDetail({
-            ...laboratoryDetail,
+        setFamily({
+            ...family,
             [name]: value
         });
     };
 
     return (
         <div className="features">
-          {/* {error && <div className="error-message">{error}</div>} */}
-          {laboratoryDetail && (
+          {family && (
           <div className="user_form">
-            <h2>Изменить направление</h2>
+            <h2>Изменить семью</h2>
             <form onSubmit={handleSubmit}>
+
               <div className="form-group">
                 <label htmlFor="name">Название:</label>
                 <input
@@ -71,13 +77,14 @@ export default function FamilyUpdate() {
                   id="name"
                   name="name"
                   className="form-control mr-sm-2"
-                  value={laboratoryDetail.name}
+                  value={family.name}
                   onChange={handleChange}
                 />
                 {errors && errors.name &&
                     <div className="alert alert-danger mt-3 mb-0">{errors.name}</div>
                 }
               </div>
+
               <div className="form-group">
                 <label htmlFor="description">Описание:</label>
                 <input
@@ -85,19 +92,29 @@ export default function FamilyUpdate() {
                   id="description"
                   name="description"
                   className="form-control mr-sm-2"
-                  value={laboratoryDetail.description}
+                  value={family.description}
                   onChange={handleChange}
                 />
                 {errors && errors.description &&
                   <div className="alert alert-danger mt-3 mb-0">{errors.description}</div>
                 }
               </div>
+
+              <div className="form-group">
+                <label>Лаборатории:</label>
+                  <select name="laboratory" multiple value={formData.laboratory} onChange={handleChange}>
+                    {allLaboratories.map(lab => (
+                        <option className="form-control mr-sm-2" key={lab.id} value={lab.id}>{lab.name}</option>
+                    ))}
+                  </select>
+                {errors && errors.name &&
+                    <div className="alert alert-danger mt-3 mb-0">{errors.laboratory}</div>
+                }
+              </div>
+
               <button type="submit" className="btn btn-primary">
                 Добавить
               </button>
-              { errors && errors.apiError &&
-                            <div className="alert alert-danger mt-3 mb-0">{errors.apiError?.message}</div>
-                        }
             </form>
             </div>
           )}

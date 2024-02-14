@@ -15,10 +15,17 @@ export default function FamilyList() {
       });
 
     useEffect(() => {
+        const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
+        axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
         refreshList()
         document.title = 'Семьи';
       }, []);
-
+    
+    const getCSRFToken = (name) => {
+        const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return cookieValue ? cookieValue.pop() : '';
+      }
+    
     const handleDelete = (item) => {
         axios
           .delete(`/api/family/${item.id}/`)
