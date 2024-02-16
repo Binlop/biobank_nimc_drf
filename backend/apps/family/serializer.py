@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Family
 from laboratory.serializers import LaboratorySerializer
-from .services import FamilyCreateService
+from .services import FamilyCreateService, FamilyUpdateService
 
 class FamilySerializerOutput(serializers.ModelSerializer):
     laboratory = LaboratorySerializer(read_only=True, many=True)
@@ -22,6 +22,10 @@ class FamilySerializerInput(serializers.ModelSerializer):
     def create(self, validated_data):
         service = FamilyCreateService()
         return service.create_family(validated_data=validated_data)
+    
+    def update(self, instance, validated_data):
+        service = FamilyUpdateService()
+        return service.update_family(instance, validated_data)
     
     def validate_name(self, value):
         if len(value) < 2:

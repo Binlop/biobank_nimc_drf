@@ -10,4 +10,5 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('api/laboratory/', include('laboratory.urls')),
     path('api/family/', include('family.urls')),
+    path('api/individ/', include('individ.urls')),
 ]

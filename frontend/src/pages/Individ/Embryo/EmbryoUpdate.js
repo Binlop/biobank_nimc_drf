@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import "./family.css"
+import "../individ.css"
 import React, { useState, useEffect } from "react";
 import Multiselect from 'react-select'
 
@@ -56,7 +56,7 @@ export default function FamilyUpdate() {
     const handleSubmit = (event) => {
         event.preventDefault();
         axios
-          .put(`/api/family/${id}/update/`, formData)
+          .put(`/api/individ/${formData.individ_type}/${id}/update/`, formData)
           .then(() => {
             navigate('/families');
           })
@@ -89,7 +89,7 @@ export default function FamilyUpdate() {
         <div className="features">
           {formData && (
           <div className="user_form">
-            <h2>Изменить семью</h2>
+            <h2>Изменить эмбриона</h2>
             <form onSubmit={handleSubmit}>
 
               <div className="form-group">

@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import { useForm } from "react-hook-form";
-import "./laboratory.css"
+import React, { useState, useEffect } from "react";
+import Multiselect from 'react-select'
 
-export default function LabUpdate() {
+export default function FamilyUpdate() {
     const { id } = useParams();
-    const [laboratoryDetail, setLaboratoryDetail] = useState(null);
     const navigate = useNavigate();
-    const [errors, setError] = useState(null); // Состояние для сообщения об ошибке
+    const [errors, setError] = useState(null);
+    const [formData, setFormData] = useState({
+      name: '',
+      description: '',
+      laboratory: []
+    });
+    const [allLaboratories, setAllLaboratories] = useState([]);
     
     useEffect(() => {
         refreshLaboratoryData();
+        fetchLaboratories();
         document.title = 'Изменить направление';
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
         axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
@@ -25,43 +30,67 @@ export default function LabUpdate() {
     
     const refreshLaboratoryData = () => {
       axios
-          .get(`/api/laboratory/${id}`)
+          .get(`/api/family/${id}`)
           .then((res) => {
-              setLaboratoryDetail(res.data);
+            setFormData(res.data);
+            const laboratoryIds = res.data.laboratory.map(lab => lab.id);
+            setFormData(prevState => ({
+              ...prevState,
+              laboratory: laboratoryIds
+            }));            
           })
           .catch((err) => console.log(err));
-    };   
+    };
+      
+
+    const fetchLaboratories = () => {
+      axios
+          .get(`/api/laboratory`)
+          .then((res) => {
+            setAllLaboratories(res.data);
+          })
+          .catch((err) => console.log(err));
+      };  
     
     const handleSubmit = (event) => {
         event.preventDefault();
         axios
-          .put(`/api/laboratory/${id}/update/`, laboratoryDetail)
+          .put(`/api/family/${id}/update/`, formData)
           .then(() => {
-            console.log("Отправленный объект", laboratoryDetail);
-            navigate('/laboratories');
+            navigate('/families');
           })
           .catch((error) => {
             if (error.response) {
-              console.log(error.response.data.description[0])
               setError(error.response.data);
             }
         });
     };
 
     const handleChange = (event) => {
-        const { name, value } = event.target;
-        setLaboratoryDetail({
-            ...laboratoryDetail,
-            [name]: value
-        });
+      const { name, value, checked } = event.target;
+      if (name === 'laboratory') {
+        const labId = parseInt(value);
+        let updatedLaboratories;
+        if (checked) {
+          updatedLaboratories = [...formData.laboratory, labId];
+        } else {
+          updatedLaboratories = formData.laboratory.filter(id => id !== labId);
+        }
+        setFormData(prevFormData => ({ ...prevFormData, laboratory: updatedLaboratories }));
+      } else {
+        setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
+      }
     };
+    
+    
 
     return (
         <div className="features">
-          {laboratoryDetail && (
+          {formData && (
           <div className="user_form">
-            <h2>Изменить направление</h2>
+            <h2>Изменить семью</h2>
             <form onSubmit={handleSubmit}>
+
               <div className="form-group">
                 <label htmlFor="name">Название:</label>
                 <input
@@ -69,13 +98,14 @@ export default function LabUpdate() {
                   id="name"
                   name="name"
                   className="form-control mr-sm-2"
-                  value={laboratoryDetail.name}
+                  value={formData.name}
                   onChange={handleChange}
                 />
                 {errors && errors.name &&
                     <div className="alert alert-danger mt-3 mb-0">{errors.name}</div>
                 }
               </div>
+
               <div className="form-group">
                 <label htmlFor="description">Описание:</label>
                 <input
@@ -83,19 +113,37 @@ export default function LabUpdate() {
                   id="description"
                   name="description"
                   className="form-control mr-sm-2"
-                  value={laboratoryDetail.description}
+                  value={formData.description}
                   onChange={handleChange}
                 />
                 {errors && errors.description &&
                   <div className="alert alert-danger mt-3 mb-0">{errors.description}</div>
                 }
               </div>
+
+              <div className="form-group">
+                <label>Лаборатории:</label>
+                {allLaboratories.map(lab => (
+                  <div key={lab.id} className="form-check">
+                <input
+                  type="checkbox"
+                  id={`lab-${lab.id}`}
+                  name="laboratory"
+                  value={lab.id}
+                  onChange={handleChange}
+                  className="form-check-input"
+                  checked={formData.laboratory.includes(lab.id)}
+                />
+                  <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
+                  </div>
+                ))}
+                {errors && errors.laboratory &&
+                  <div className="alert alert-danger mt-3 mb-0">{errors.laboratory}</div>
+                }
+              </div>
               <button type="submit" className="btn btn-primary">
                 Добавить
               </button>
-              { errors && errors.apiError &&
-                            <div className="alert alert-danger mt-3 mb-0">{errors.apiError?.message}</div>
-                        }
             </form>
             </div>
           )}

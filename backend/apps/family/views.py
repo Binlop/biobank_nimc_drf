@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .serializer import FamilySerializerOutput, FamilySerializerInput
 from .selectors import FamilyListSelector, FamilyDetailSelector
-from .services import FamilyCreateService
 
 class FamilyListView(APIView):
 

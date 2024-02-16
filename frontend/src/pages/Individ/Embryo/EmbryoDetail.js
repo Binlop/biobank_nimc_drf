@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import "./family.css"
+import "../individ.css"
 
-export default function FamilyDetail() {
+export default function EmbryoDetail() {
     const { id } = useParams();
-    const [familyDetail, setFamilyDetail] = useState(null);
+    const [embryoDetail, setEmbryoDetail] = useState(null);
 
     useEffect(() => {
         refreshList();
@@ -13,47 +13,49 @@ export default function FamilyDetail() {
 
     const refreshList = () => {
         axios
-            .get(`/api/family/${id}`)
+            .get(`/api/individ/embryo/${id}`)
             .then((res) => {
-                setFamilyDetail(res.data);
-                console.log(res.data)
+                setEmbryoDetail(res.data);
                 if (res.data) {
-                    document.title = res.data.name;
+                    document.title = res.data.family_member.name;
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err)});
     };   
+
+    console.log('Содержимое useParams:', useParams());
 
     return (
         <main className="container">
             <div className="title_object">
                 <p>
-                    {familyDetail && (
+                    {embryoDetail && (
                         <>
-                        <span className="larger-text">{familyDetail.name}</span>
-                        <Link to={`/families/${id}/update`} className="btn btn-primary">
-                            Изменить лабораторию
+                        <span className="larger-text">{embryoDetail.name}</span>
+                        <Link to={`/individ/embryo/${id}/update`} className="btn btn-primary">
+                            Изменить индивида
                         </Link>
                         </>
                     )}
                 </p>
             </div>
             <div className="features">
-                {familyDetail && (
+                {embryoDetail && (
                     <table>
                         <tbody>
                             <tr>
                                 <td className="table_detail_property">Название</td>
-                                <td className="table_detail_value">{familyDetail.name}</td>
+                                <td className="table_detail_value">{embryoDetail.name}</td>
                             </tr>
                             <tr>
                                 <td className="table_detail_property">Описание</td>
-                                <td className="table_detail_value">{familyDetail.description}</td>
+                                <td className="table_detail_value">{embryoDetail.description}</td>
                             </tr>
                             <tr>
                                 <td className="table_detail_property">Лаборатории</td>
                                 <td className="table_detail_value">
-                                    {familyDetail.laboratory && familyDetail.laboratory.map(item => (
+                                    {embryoDetail.laboratory && embryoDetail.laboratory.map(item => (
                                         <Link to={`/laboratories/${item.id}`} className="link-style">{item.name}<br></br></Link>
                                     ))}
                                 </td>
