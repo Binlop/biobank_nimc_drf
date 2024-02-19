@@ -1,23 +1,22 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import IndividList from './IndividList';
 import EmbryoDetail from './Embryo/EmbryoDetail';
-import FamilyUpdate from './FamilyUpdate';
-import NestedMenu from './IndividList'
 import EmbryoCreate from './Embryo/EmbryoCreate';
+import EmbryoUpdate from './Embryo/EmbryoUpdate';
 
-function Family() {
+function Individ() {
   return (
       <main className="container">
         <Routes>
-          <Route path="/" element={<NestedMenu />} />
+          <Route path="/" element={<IndividList />} />
 
           <Route path="/embryo/:id" element={<EmbryoDetail />} />
           <Route path="/embryo/create" element={<EmbryoCreate />} />
-          <Route path="/embryo/:id/update" element={<FamilyUpdate />} />
+          <Route path="/embryo/:id/update" element={<EmbryoUpdate />} />
 
         </Routes>
       </main>
   );
 }
 
-export default Family;
+export default Individ;

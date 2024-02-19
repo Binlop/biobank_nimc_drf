@@ -5,8 +5,8 @@ from ..embryo import views
 urlpatterns = [
     path('create/', views.EmbryoCreateView.as_view()),
     path('<int:pk>/', views.EmbryoDetailView.as_view()),
-    path('<int:pk>/update', views.EmbryoDetailView.as_view()),
-    path('<int:pk>/delete', views.EmbryoDetailView.as_view()),
+    path('<int:pk>/update/', views.EmbryoUpdateView.as_view()),
+    path('<int:pk>/delete/', views.EmbryoDetailView.as_view()),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+# urlpatterns = format_suffix_patterns(urlpatterns)

@@ -7,7 +7,7 @@ from .father.models import Father
 from .mother.models import Mother
 from django.db.models import Q
 from typing import Union
-
+from itertools import chain
 
 class FamilyMemberListSelector:
     """
@@ -20,11 +20,11 @@ class FamilyMemberListSelector:
         
         individ_q = Q(laboratory__in=user_laboratory_ids)
         
-        embryo_qs = Embryo.objects.filter(individ_q)
-        father_qs = Father.objects.filter(individ_q)
-        mother_qs = Mother.objects.filter(individ_q)
+        embryo_qs = Embryo.objects.filter(individ_q).distinct()
+        father_qs = Father.objects.filter(individ_q).distinct()
+        mother_qs = Mother.objects.filter(individ_q).distinct()
         
-        individ_list = embryo_qs.union(father_qs, mother_qs)
+        individ_list = list(chain(embryo_qs, father_qs, mother_qs))
         
         return individ_list
 

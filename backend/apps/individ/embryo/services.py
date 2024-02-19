@@ -16,3 +16,14 @@ class EmbryoService():
             embryo.family = family_service.create_family(validated_data={'name': 'Семья', 'laboratory': laboratory})
         embryo.save()
         return embryo
+    
+    @transaction.atomic
+    def update_embryo(self, instance: Embryo, validated_data: dict):
+        laboratory_data = validated_data.pop('laboratory')
+        print('Валидные данные в put service: ', validated_data)
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+            
+        instance.laboratory.set(laboratory_data)
+        instance.save()
+        return instance

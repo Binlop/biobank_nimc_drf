@@ -5,15 +5,18 @@ import "../individ.css"
 import React, { useState, useEffect } from "react";
 import Multiselect from 'react-select'
 
-export default function FamilyUpdate() {
+export default function EmbryoUpdate() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [errors, setError] = useState(null);
     const [formData, setFormData] = useState({
-      name: '',
-      description: '',
-      laboratory: []
+      laboratory: [],
     });
+    // const [formData, setFormData] = useState({
+    //   name: '',
+    //   description: '',
+    //   laboratory: []
+    // });
     const [allLaboratories, setAllLaboratories] = useState([]);
     
     useEffect(() => {
@@ -31,7 +34,7 @@ export default function FamilyUpdate() {
     
     const refreshLaboratoryData = () => {
       axios
-          .get(`/api/family/${id}`)
+          .get(`/api/individ/embryo/${id}`)
           .then((res) => {
             setFormData(res.data);
             const laboratoryIds = res.data.laboratory.map(lab => lab.id);
@@ -58,7 +61,7 @@ export default function FamilyUpdate() {
         axios
           .put(`/api/individ/${formData.individ_type}/${id}/update/`, formData)
           .then(() => {
-            navigate('/families');
+            navigate('/individs');
           })
           .catch((error) => {
             if (error.response) {
@@ -119,6 +122,36 @@ export default function FamilyUpdate() {
                 />
                 {errors && errors.description &&
                   <div className="alert alert-danger mt-3 mb-0">{errors.description}</div>
+                }
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">Тестовое поле:</label>
+                <input
+                  type="text"
+                  id="description"
+                  name="description"
+                  className="form-control mr-sm-2"
+                  value={formData.test_field}
+                  onChange={handleChange}
+                />
+                {errors && errors.test_field &&
+                  <div className="alert alert-danger mt-3 mb-0">{errors.test_field}</div>
+                }
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">Дата получения:</label>
+                <input
+                  type="text"
+                  id="description"
+                  name="description"
+                  className="form-control mr-sm-2"
+                  value={formData.date_of_receipt}
+                  onChange={handleChange}
+                />
+                {errors && errors.date_of_receipt &&
+                  <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
                 }
               </div>
 

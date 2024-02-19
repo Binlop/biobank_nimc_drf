@@ -33,7 +33,7 @@ export default function EmbryoDetail() {
                     {embryoDetail && (
                         <>
                         <span className="larger-text">{embryoDetail.name}</span>
-                        <Link to={`/individ/embryo/${id}/update`} className="btn btn-primary">
+                        <Link to={`/individs/embryo/${id}/update`} className="btn btn-primary">
                             Изменить индивида
                         </Link>
                         </>
