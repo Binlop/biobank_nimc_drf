@@ -15,6 +15,7 @@ import Laboratory from "./pages/Laboratory/Laboratory";
 import LoginPage from './pages/LoginPage/LoginPage';
 import Family from "./pages/Family/Family";
 import Individ from "./pages/Individ/Individ";
+import Sample from "./pages/Sample/Sample";
 
 import "./App.css"; // Подключаем стили
 import PrivateRoute from './utils/PrivateRoute'
@@ -33,6 +34,7 @@ function App() {
                         <Route path="/laboratories/*" element={<PrivateRoute><Laboratory/></PrivateRoute>} />
                         <Route path="/families/*" element={<PrivateRoute><Family/></PrivateRoute>} />
                         <Route path="/individs/*" element={<PrivateRoute><Individ/></PrivateRoute>} />
+                        <Route path="/samples/*" element={<PrivateRoute><Sample/></PrivateRoute>} />
 
                     </Routes>
             </AuthProvider>

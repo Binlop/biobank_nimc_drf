@@ -13,7 +13,7 @@ export default function EmbryoDetail() {
 
     const refreshList = () => {
         axios
-            .get(`/api/individ/embryo/${id}`)
+            .get(`/api/individ/${id}`)
             .then((res) => {
                 setEmbryoDetail(res.data);
                 if (res.data) {

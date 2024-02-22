@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import Multiselect from 'react-select'
 import "../individ.css"
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useDropzone } from 'react-dropzone';
-import { UploadDropzone } from "@bytescale/upload-widget-react";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 
 export default function EmbryoCreate() {
   const [formData, setFormData] = useState({
@@ -22,6 +22,7 @@ export default function EmbryoCreate() {
   const [date_of_receipt, setDate_of_receipt] = useState(new Date());
   const [last_menstruation, setLast_menstruation] = useState(new Date()); // Стейт для хранения выбранной даты
   const [errors, setError] = useState(null); // Состояние для сообщения об ошибке
+  const [file, setFile] = useState(null);
 
 
   useEffect(() => {
@@ -62,12 +63,22 @@ export default function EmbryoCreate() {
           setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
       }
   };
-  
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        await axios.post('/api/individ/embryo/create/', formData);
+        const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
+        // Формируем заголовок Content-Type с указанием разделителя
+        const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
+
+        const formEmbryo = makeEmbryoForm();
+
+        // Выполняем POST запрос с использованием axios
+        await axios.post(`/api/individ/embryo/create/`, formEmbryo, {
+            headers: {
+                "Content-Type": contentTypeHeader,
+            },
+        });
         navigate('/individs');
     } catch (error) {
         console.error('Ошибка с отправкой семьи:', error);
@@ -76,6 +87,21 @@ export default function EmbryoCreate() {
     }
 };
 
+
+const makeEmbryoForm = () => {
+  const formEmbryo = new FormData();
+  formData.name && formEmbryo.append('name', formData.name);
+  formData.description && formEmbryo.append('description', formData.description);
+  formData.scan_directions && formEmbryo.append('scan_directions', formData.scan_directions);
+  formData.family_number && formEmbryo.append('family_number', formData.family_number);
+  formData.abortus_id && formEmbryo.append('abortus_id', formData.abortus_id);
+  formData.abortus_id_in_family && formEmbryo.append('abortus_id_in_family', formData.abortus_id_in_family);
+  formData.laboratory && formEmbryo.append('laboratory', formData.laboratory);
+  formData.test_field && formEmbryo.append('test_field', formData.test_field);
+  formData.date_of_receipt && formEmbryo.append('date_of_receipt', formData.date_of_receipt);
+
+  return formEmbryo
+}
 
   const handleChangeLaboratory = (e) => {
     const { name, value, checked } = e.target;
@@ -106,105 +132,69 @@ export default function EmbryoCreate() {
     }
   };
   
-  const handleImageChange = (e) => {
-    setFormData(prevFormData => ({ ...prevFormData, scan_directions: e.target.files[0] }));
-  };
-  const handleUploadFile = ({ uploadedFiles }) => {
-    console.log(uploadedFiles); // Вывод информации о загруженных файлах в консоль
-
-    // Обновление данных формы после загрузки файла
-    if (uploadedFiles.length > 0) {
-      // const fileUrl = uploadedFiles[0].fileUrl; // Получение URL загруженного файла
-      // setUploadedFile(fileUrl); // Сохранение URL в состоянии
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        scan_directions: uploadedFiles[0].fileUrl // Обновление данных формы
-      }));
-    }
-  };
+    const handleImageChange = (e) => {
+      let updatedFormData = { ...formData };
+      updatedFormData["scan_directions"] = e.target.files[0];
+      setFormData(updatedFormData)
   
+      setFile(e.target.files[0]);
+  };
 
-
-
-  // const { getRootProps, getInputProps, isDragActive } = useDropzone({
-  //   accept: 'image/*, .pdf, .doc, .docx',
-  //   multiple: true,
-  // });
-
+  
   const handleChangeСheckmark = (e) => {
     const { name, checked } = e.target;
     
     setFormData({ ...formData, [name]: checked });
 
   }
-  const options = {
-    apiKey: "free", // Get API key: https://www.bytescale.com/get-started
-    maxFileCount: 1,
-    showFinishButton: true,
-    styles: {
-      colors: {
-        primary: "#377dff"
-      }
-    }
-  };
-
   return (
     <div className="features">
       <div className="user_form">
         <h2>Добавить эмбриона</h2>
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label>Название:</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  className="form-control mr-sm-2"
-                  value={formData.name} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.name &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.name}</div>
-                }
-              </div>
-              <div className="form-group">
-              <UploadDropzone
-                options={options}
-                onUpdate={handleUploadFile}
-                // onComplete={files => alert(files.map(x => x.fileUrl).join("\n"))}
-                onComplete={handleUploadFile}
-                width="600px"
-                height="375px"
+          
+          <CharFieldWithError
+                label="Название:"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                errors={errors}
               />
-                {errors && errors.scan_directions &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.scan_directions}</div>
-                }
-            </div>
             <div className="form-group">
-                <label>Описание:</label>
+            <label>Сканы направления:</label>
                 <input 
-                  type="text" 
-                  name="description" 
-                  className="form-control mr-sm-2"
-                  value={formData.description} 
-                  onChange={handleChange} 
+                    type="file"
+                    name="scan_directions"
+                    className="form-control mr-sm-2"
+                    accept="image/jpeg,image/png,image/gif"
+                    onChange={(e) => {
+                        handleImageChange(e);
+                    }}
                 />
-                {errors && errors.description &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.description}</div>
-                }
+              {errors && errors.scan_directions && (
+                  <div className="alert alert-danger mt-3 mb-0">
+                      <ul>
+                          {errors.scan_directions.map((error, index) => (
+                              <li key={index}>{error}</li>
+                          ))}
+                      </ul>
+                  </div>
+              )}
               </div>
-            <div className="form-group">
-                <label>Тестовое поле:</label>
-                <input 
-                  type="text" 
-                  name="test_field" 
-                  className="form-control mr-sm-2"
-                  value={formData.test_field} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.test_field &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.test_field}</div>
-                }
-              </div>
+            <CharFieldWithError
+                label="Описание:"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Тестовое поле:"
+                name="test_field"
+                value={formData.test_field}
+                onChange={handleChange}
+                errors={errors}
+              />                              
               <div className="form-group">
                 <label>Лаборатории:</label>
                 {allLaboratories.map(lab => (
@@ -220,9 +210,15 @@ export default function EmbryoCreate() {
                   <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
                   </div>
                 ))}
-                {errors && errors.laboratory &&
-                  <div className="alert alert-danger mt-3 mb-0">{errors.laboratory}</div>
-                }
+                  {errors && errors.laboratory && (
+                      <div className="alert alert-danger mt-3 mb-0">
+                          <ul>
+                              {errors.laboratory.map((error, index) => (
+                                  <li key={index}>{error}</li>
+                              ))}
+                          </ul>
+                      </div>
+                  )}
               </div>
               <div className="form-group">
                 <label>Создать семью:</label>
@@ -244,45 +240,28 @@ export default function EmbryoCreate() {
                   <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
                 }
             </div>
-            <div className="form-group">
-                <label>Номер семьи:</label>
-                <input 
-                  type="text" 
-                  name="family_number" 
-                  className="form-control mr-sm-2"
-                  value={formData.family_number} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.family_number &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.family_number}</div>
-                }
-              </div>
-            <div className="form-group">
-                <label>ID семьи:</label>
-                <input 
-                  type="text" 
-                  name="abortus_id" 
-                  className="form-control mr-sm-2"
-                  value={formData.abortus_id} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.abortus_id &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.abortus_id}</div>
-                }
-              </div>
-            <div className="form-group">
-                <label>ID абортуса в семье:</label>
-                <input 
-                  type="text" 
-                  name="abortus_id_in_family" 
-                  className="form-control mr-sm-2"
-                  value={formData.abortus_id_in_family} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.abortus_id &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.abortus_id_in_family}</div>
-                }
-            </div>
+            <CharFieldWithError
+                label="Номер семьи"
+                name="family_number"
+                value={formData.family_number}
+                onChange={handleChange}
+                errors={errors}
+              />
+              <CharFieldWithError
+                label="ID абортуса"
+                name="abortus_id"
+                value={formData.abortus_id}
+                onChange={handleChange}
+                errors={errors}
+              />
+
+              <CharFieldWithError
+                label="ID абортуса в семье"
+                name="abortus_id_in_family"
+                value={formData.abortus_id_in_family}
+                onChange={handleChange}
+                errors={errors}
+              />
               <div className="form-group">
               <label htmlFor="diagnosis">Диагноз:</label>
               <select id="diagnosis" name="diagnosis" value={formData.diagnosis} onChange={handleChange} className="form-control">
@@ -324,19 +303,13 @@ export default function EmbryoCreate() {
                     <div className="alert alert-danger mt-3 mb-0">{errors.period_pregnancy_by_date}</div>
                 }
             </div>
-            <div className="form-group">
-                <label>Срок беременности по УЗИ:</label>
-                <input 
-                  type="text" 
-                  name="period_pregnancy_by_USI" 
-                  className="form-control mr-sm-2"
-                  value={formData.period_pregnancy_by_USI} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.period_pregnancy_by_USI &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.period_pregnancy_by_USI}</div>
-                }
-            </div>
+            <CharFieldWithError
+                label="Срок беременности по УЗИ"
+                name="period_pregnancy_by_USI"
+                value={formData.period_pregnancy_by_USI}
+                onChange={handleChange}
+                errors={errors}
+              />
             <div className="form-group">
               <label htmlFor="diagnosis">Зачатие:</label>
               <select id="conception" name="conception" value={formData.conception} onChange={handleChange} className="form-control">
@@ -367,169 +340,77 @@ export default function EmbryoCreate() {
                     <div className="alert alert-danger mt-3 mb-0">{errors.twins}</div>
                 }
             </div>
-            <div className="form-group">
-                <label>Размеры 1 плодного мешка по x:</label>
-                <input 
-                  type="text" 
-                  name="dimensions_fetal_sac_x_1" 
-                  className="form-control mr-sm-2"
-                  value={formData.dimensions_fetal_sac_x_1} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.dimensions_fetal_sac_x_1 &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.dimensions_fetal_sac_x_1}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Размеры 1 плодного мешка по y:</label>
-                <input 
-                  type="text" 
-                  name="dimensions_fetal_sac_y_1" 
-                  className="form-control mr-sm-2"
-                  value={formData.dimensions_fetal_sac_y_1} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.dimensions_fetal_sac_y_1 &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.dimensions_fetal_sac_y_1}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Размеры 2 плодного мешка по x:</label>
-                <input 
-                  type="text" 
-                  name="dimensions_fetal_sac_x_2" 
-                  className="form-control mr-sm-2"
-                  value={formData.dimensions_fetal_sac_x_2} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.dimensions_fetal_sac_x_2 &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.dimensions_fetal_sac_x_2}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Размеры 2 плодного мешка по y:</label>
-                <input 
-                  type="text" 
-                  name="dimensions_fetal_sac_y_2" 
-                  className="form-control mr-sm-2"
-                  value={formData.dimensions_fetal_sac_y_2} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.dimensions_fetal_sac_y_2 &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.dimensions_fetal_sac_y_2}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>КТР:</label>
-                <input 
-                  type="text" 
-                  name="ktr" 
-                  className="form-control mr-sm-2"
-                  value={formData.ktr} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.ktr &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.ktr}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Особенности эмбриона:</label>
-                <input 
-                  type="text" 
-                  name="features_embryo" 
-                  className="form-control mr-sm-2"
-                  value={formData.features_embryo} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.features_embryo &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.features_embryo}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Особенности хориона:</label>
-                <input 
-                  type="text" 
-                  name="features_chorion" 
-                  className="form-control mr-sm-2"
-                  value={formData.features_chorion} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.features_chorion &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.features_chorion}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Особенности желточного мешка:</label>
-                <input 
-                  type="text" 
-                  name="features_yolk_sac" 
-                  className="form-control mr-sm-2"
-                  value={formData.features_yolk_sac} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.features_yolk_sac &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.features_yolk_sac}</div>
-                }
-            </div>
-            <div className="form-group">
-                <label>Особенности амниотической оболочки:</label>
-                <input 
-                  type="text" 
-                  name="features_amniotic_membrane" 
-                  className="form-control mr-sm-2"
-                  value={formData.features_amniotic_membrane} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.features_amniotic_membrane &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.features_amniotic_membrane}</div>
-                }
-            </div>
+            <CharFieldWithError
+                label="Размеры 1 плодного мешка по x"
+                name="dimensions_fetal_sac_x_1"
+                value={formData.dimensions_fetal_sac_x_1}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Размеры 1 плодного мешка по y:"
+                name="dimensions_fetal_sac_y_1"
+                value={formData.dimensions_fetal_sac_y_1}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Размеры 2 плодного мешка по x:"
+                name="dimensions_fetal_sac_x_2"
+                value={formData.dimensions_fetal_sac_x_2}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Размеры 2 плодного мешка по y:"
+                name="dimensions_fetal_sac_y_2"
+                value={formData.dimensions_fetal_sac_y_2}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="КТР:"
+                name="ktr"
+                value={formData.ktr}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Особенности эмбриона:"
+                name="features_embryo"
+                value={formData.features_embryo}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Особенности хориона:"
+                name="features_chorion"
+                value={formData.features_chorion}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Особенности желточного мешка:"
+                name="features_yolk_sac"
+                value={formData.features_yolk_sac}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Особенности амниотической оболочки:"
+                name="features_amniotic_membrane"
+                value={formData.features_amniotic_membrane}
+                onChange={handleChange}
+                errors={errors}
+              />
+            <CharFieldWithError
+                label="Примечание:"
+                name="note"
+                value={formData.note}
+                onChange={handleChange}
+                errors={errors}
+              />
             {/* <div className="form-group">
-                <label>Сканы направления:</label>
-                <input type="file" 
-                  name="scan_directions"
-                  accept="image/jpeg,image/png,image/gif"
-                  onChange={(e) => {handleImageChange(e)}}
-                /> */}
-                {/* <input 
-                  type="text" 
-                  name="features_amniotic_membrane" 
-                  className="form-control mr-sm-2"
-                  value={formData.scan_directions} 
-                  onChange={handleChange} 
-                /> */}
-                {/* {errors && errors.scan_directions &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.scan_directions}</div>
-                }
-            </div> */}
-            {/* <div className="form-group">
-      <div {...getRootProps()} style={dropzoneStyle}>
-        <input {...getInputProps()} />
-        {isDragActive ?
-          <p>Перетащите файлы сюда...</p> :
-          <p>Перетащите файлы сюда или нажмите, чтобы выбрать файлы</p>
-        }
-      </div>
-      {uploadedFile && (
-        <div>
-          <p>Загружен файл: {uploadedFile.name}</p>
-        </div>
-      )}
-    </div> */}
-            <div className="form-group">
-                <label>Примечание:</label>
-                <input 
-                  type="text" 
-                  name="note" 
-                  className="form-control mr-sm-2"
-                  value={formData.note} 
-                  onChange={handleChange} 
-                />
-                {errors && errors.note &&
-                    <div className="alert alert-danger mt-3 mb-0">{errors.note}</div>
-                }
-            </div>
-            <div className="form-group">
                 <label>Кариотип:</label>
                 <input 
                   type="text" 
@@ -753,7 +634,7 @@ export default function EmbryoCreate() {
                 {errors && errors.essence_conflict &&
                     <div className="alert alert-danger mt-3 mb-0">{errors.essence_conflict}</div>
                 }
-            </div>
+            </div> */}
           <button type="submit" className="btn btn-primary">
           Добавить
         </button>

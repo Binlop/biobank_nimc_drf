@@ -1,10 +1,8 @@
 from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
-from .models import Family
+from .models import Individ
 from django.shortcuts import get_object_or_404
-from .embryo.models import Embryo
-from .father.models import Father
-from .mother.models import Mother
+from .models import Embryo, Father, Mother
 from django.db.models import Q
 from typing import Union
 from itertools import chain
@@ -28,11 +26,24 @@ class FamilyMemberListSelector:
         
         return individ_list
 
+class FamilyMemberDetailSelector:
+    """
+    Класс отвечает за получение индивида и проверку доступа юзера к нему
+    """
+    def check_user_acces_to_family_member(self, member: Individ, user: User) -> Union[Embryo, Father, Mother]:
+        if member.content_object.get_individ_laboratories() & user.profile.get_user_laboratories():
+            return member.content_object
+        else: return None
+
+    def get_individ_detail(self, user: User, pk: int) -> Individ:
+        member = get_object_or_404(Individ, pk=pk)
+        return self.check_user_acces_to_family_member(member=member, user=user)
+
+
 class FamilyMemberCheckingPermission:
-    """
-    Класс отвечает за проверку доступа юзера к индивиду
-    """
+
     def check_user_acces_to_family_member(self, member: Union[Embryo, Father, Mother], user: User) -> Union[Embryo, Father, Mother]:
         if member.get_individ_laboratories() & user.profile.get_user_laboratories():
             return member
         else: return None
+

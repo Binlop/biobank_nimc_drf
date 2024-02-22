@@ -1,8 +1,10 @@
-from .models import FamilyMember
+from django.db import transaction
+from .models import Individ
 
 class FamilyMemberService():
 
-    def create_family_member(self, validated_data: dict):
-        print('Валидированные данные в family_member', validated_data)
+    @transaction.atomic
+    def create_family_member(self, name: str) -> Individ:
+        return Individ.objects.create(name=name)
 
 

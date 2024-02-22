@@ -3,6 +3,7 @@ import IndividList from './IndividList';
 import EmbryoDetail from './Embryo/EmbryoDetail';
 import EmbryoCreate from './Embryo/EmbryoCreate';
 import EmbryoUpdate from './Embryo/EmbryoUpdate';
+import CreateMyModel from './Embryo/CreateMOdel';
 
 function Individ() {
   return (
