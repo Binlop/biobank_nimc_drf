@@ -30,3 +30,5 @@
 .backend/manage.py
 
 **migrations
+
+**media*

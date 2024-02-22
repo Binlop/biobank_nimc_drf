@@ -2,7 +2,7 @@ from rest_framework import serializers
 from laboratory.serializers import LaboratorySerializer
 from family.serializer import FamilySerializerOutput
 from .models import Embryo, Father, Mother
-
+from .services.embryo import EmbryoService
 
 class IndividSerializerOutput(serializers.Serializer):
     
@@ -20,25 +20,27 @@ class IndividSerializerOutput(serializers.Serializer):
 
         return serializer.data
 
-class FamilyMemberSerializerOutput(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    laboratory = LaboratorySerializer(read_only=True, many=True)
-    family = FamilySerializerOutput(read_only=True)
-    name = serializers.CharField(max_length=256)
-    count_blood = serializers.IntegerField()
-    count_dna = serializers.IntegerField()
-    count_chorion = serializers.IntegerField()
 
 
-class FamilyMemberSerializerInput(FamilyMemberSerializerOutput):
+class FamilyMemberSerializerInput(serializers.Serializer):
     laboratory = serializers.ListField(child=serializers.IntegerField(), write_only=True)
     create_family = serializers.BooleanField(required=False)
 
-    
+
     def validate_name(self, value):
         if len(value) < 2:
              raise serializers.ValidationError("Название более 2 символов")
         return value
+
+class FamilyMemberSerializerOutput(FamilyMemberSerializerInput):
+    id = serializers.IntegerField(read_only=True)
+    family = FamilySerializerOutput(read_only=True)
+    name = serializers.CharField(max_length=256)
+    individ_type = serializers.CharField(max_length=10)
+    count_blood = serializers.IntegerField(required=False)
+    count_dna = serializers.IntegerField(required=False)
+    count_chorion = serializers.IntegerField(required=False)
+
 
 class EmbryoSerializerOutput(FamilyMemberSerializerOutput):
 
@@ -114,7 +116,14 @@ class EmbryoSerializerOutput(FamilyMemberSerializerOutput):
 
 
 class EmbryoSerializerInput(EmbryoSerializerOutput):
-    pass
+    
+    def create(self, validated_data: dict):
+        service = EmbryoService()
+        return service.create_embryo(validated_data=validated_data)
+    
+    def update(self, instance: Embryo, validated_data: dict):
+        service = EmbryoService()
+        return service.update_embryo(instance, validated_data)
 
 class FatherSerializerOutput(serializers.ModelSerializer):
     family_member = FamilyMemberSerializerOutput(read_only=True, many=True)
