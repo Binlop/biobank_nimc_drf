@@ -28,35 +28,31 @@ const NestedMenu = () => {
         <div className='main_block'>
           <ul>
             <div onMouseEnter={() => handleMenuItemHover(1)} onMouseLeave={handleMenuItemLeave}>
-              Эмбриона
+              Умственная отсталость
               {activeMenuItem === 1 && (
                 <div className="sub_block" onMouseEnter={() => handleMenuItemHover(1)} onMouseLeave={handleMenuItemLeave}>
                   <ul>
-                <Link to={`/individs/embryo/create`} className="link-style">Эмбрион</Link>
+                    <li><Link to={`/individs/embryo/create`} className="link-style">Пробант</Link></li>
+                    <li><Link to={`/individs/father/create`} className="link-style">Отец</Link></li>
+                    <li><Link to={`/individs/mother/create`} className="link-style">Мать</Link></li>
+                    <li><Link to={`/individs/another_member/create`} className="link-style">Иной член семьи</Link></li>
                   </ul>
                 </div>
               )}
             </div>          
             <div onMouseEnter={() => handleMenuItemHover(2)} onMouseLeave={handleMenuItemLeave}>
-              Отца
+              Беременность
               {activeMenuItem === 2 && (
                 <div className="sub_block" onMouseEnter={() => handleMenuItemHover(2)} onMouseLeave={handleMenuItemLeave}>
                   <ul>
-                  <Link to={`/individs/father/create`} className="link-style">Отец</Link>
-                  </ul>
+                    <li><Link to={`/individs/embryo/create`} className="link-style">Пробант</Link></li>
+                    <li><Link to={`/individs/father/create`} className="link-style">Отец</Link></li>
+                    <li><Link to={`/individs/mother/create`} className="link-style">Мать</Link></li>
+                    <li><Link to={`/individs/another_member/create`} className="link-style">Иной член семьи</Link></li>            
+                </ul>
                 </div>
               )}
-            </div>          
-            <div onMouseEnter={() => handleMenuItemHover(3)} onMouseLeave={handleMenuItemLeave}>
-              Мать
-              {activeMenuItem === 3 && (
-                <div className="sub_block" onMouseEnter={() => handleMenuItemHover(3)} onMouseLeave={handleMenuItemLeave}>
-                  <ul>
-                  <Link to={`/individs/mother/create`} className="link-style">Мать</Link>
-                  </ul>
-                </div>
-              )}
-            </div>          
+            </div>                   
             </ul>
           </div>
         )}

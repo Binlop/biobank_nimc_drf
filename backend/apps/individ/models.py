@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import GenericRelation
 from laboratory.models import Laboratory
 from family.models import Family
+from file.models import File
 
 class Individ(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -54,13 +55,14 @@ class Embryo(FamilyMember):
     ]
 
     KARYOTYPE_CHOICES = [
+        ('none', 'Нет данных'),
         ('46,XX', '46,XX'),
         ('46,XY', '46,XY'),
         ('45,X', '45,X'),
-        ('sex chromosome trisomy', 'Трисомия по половым хромосомам'),
-        ('autosome trisomy', 'Трисомия аутосом'),
-        ('mosaic autosome trisomy', 'Трисомия аутосом MOS с нормальным клоном'),
-        ('double trisomy', 'Двойная трисомия'),
+        ('sex_chromosome_trisomy', 'Трисомия по половым хромосомам'),
+        ('autosome_trisomy', 'Трисомия аутосом'),
+        ('mosaic_autosome_trisomy', 'Трисомия аутосом MOS с нормальным клоном'),
+        ('double_trisomy', 'Двойная трисомия'),
         ('triploidy', 'Триплоидия'),
     ]
 
@@ -85,7 +87,8 @@ class Embryo(FamilyMember):
     features_chorion = models.CharField('Особенности хориона', max_length=256, null=True)
     features_yolk_sac = models.CharField('Особенности желточного мешка', max_length=256, null=True)
     features_amniotic_membrane = models.CharField('Особенности амниотической оболочки', max_length=256, null=True)
-    scan_directions = models.FileField('Cкан направления', upload_to='upload/embryo_files', null=True)
+    # scan_directions = models.FileField('Cкан направления', upload_to='upload/embryo_files', null=True)
+    scan_directions = models.OneToOneField(File, on_delete=models.CASCADE, null=True)
     note = models.CharField('Примечание', max_length=256, null=True)
     karyotype = models.CharField('Вероятный кариотип', max_length=20, null=True)
     karyotype_type = models.CharField(choices=KARYOTYPE_CHOICES, default='none', max_length=100)
@@ -94,7 +97,7 @@ class Embryo(FamilyMember):
     standard_karyotype = models.CharField('Стандартный кариотип', max_length=100, null=True)
     aCGH_karyotype = models.CharField('aCGH кариотип', max_length=256, null=True)
     CNV = models.CharField('CNV', max_length=256, null=True)
-    FISH = models.CharField('CNV', max_length=50, null=True)
+    FISH = models.CharField('FISH', max_length=256, null=True)
     FISH_mosaicism = models.BooleanField('FISH мозаицизм', default=False)
     CGH = models.CharField('CGH', max_length=256, null=True)
     STR = models.CharField('STR', max_length=256, null=True)
@@ -110,18 +113,92 @@ class Embryo(FamilyMember):
         verbose_name = 'эмбрион'
         verbose_name_plural = 'эмбрионы'
 
-class Father(FamilyMember): 
+class Adult(FamilyMember): 
+    """
+    Класс характеризует любого члена семьи кроме абортуса
+    """
+    family_number = models.IntegerField('№ семьи', null=True)
+    abortion_id = models.IntegerField('ID абортуса',  null=True)
+    last_name = models.CharField('Фамилия', max_length=100, null=True)
+    first_name = models.CharField('Имя', max_length=100, null=True)
+    patronymic = models.CharField('Отчество', max_length=100, null=True)
+    date_of_birth = models.DateField('Дата рождения', null=True)
+    age_at_sampling = models.IntegerField('Возраст на момент взятия, лет', null=True)
+    phone = models.CharField('телефон', max_length=15, null=True)
+    home_address = models.CharField('Домашний адрес', max_length=255, null=True)
+    nationality = models.CharField('Национальность', max_length=100, null=True)
+    place_of_birth = models.CharField('Место рождения', max_length=255,null=True)
+    hereditary_burden_in_the_family = models.CharField('Наследственная отягощенность в семье', max_length=255, null=True)
+
+    class Meta:
+        abstract = True
+
+class Father(Adult): 
     """Класс характеризует модель отец"""
+    father_id = models.IntegerField(null=True)
     test_field = models.CharField('Тестовое поле отец', max_length=250, null=True)
 
     class Meta: 
         verbose_name = 'отец'
         verbose_name_plural = 'отцы'
 
-class Mother(FamilyMember):
+
+class Mother(Adult):
     """Класс характеризует модель мать"""
+
+    MISCARRIAGE_CHOICES = [
+        ('none', 'Нет данных'),
+        ('fisrt', 'Первичное'),
+        ('second', 'Вторичное'),
+        ('no_PNB', 'Нет ПНБ'),
+    ]
     test_field = models.CharField('Тестовое поле мать', max_length=250, null=True)
+    mother_id = models.IntegerField('ID матери', null=True)
+    number_of_pregnancies = models.IntegerField('Число беременностей',null=True)
+    habitual_miscarriage = models.CharField('Привычное невынашивание', choices=MISCARRIAGE_CHOICES, default='none', max_length=100, null=True)
+    diagnosis_of_current_pregnancy = models.CharField('Настоящая беременность - диагноз', choices=Embryo.DIAGNOSIS_CHOICES, max_length=255, null=True)
+    note = models.TextField('Примечание', null=True)
+    mother_gynecological_diseases = models.TextField('Гинекологические заболевания матери', null=True)
+    mother_extragenital_diseases = models.TextField('Экстрагенитальные заболевания матери', null=True)
+    age_at_menarche = models.IntegerField('Возраст начала менструации, лет', null=True)
+    cycle_duration_days = models.IntegerField('Продолжительность цикла, дней', null=True)
+    menstrual_note = models.TextField('Примечание', null=True)
 
     class Meta:
-        verbose_name = 'мать'
-        verbose_name_plural = 'матери'
+        verbose_name = 'Мать'
+        verbose_name_plural = 'Матери'
+
+class MotherPregnancy(models.Model):
+    DIAGNOSIS_CHOICES = {
+        'none': 'Нет данных',
+        'spontaneous_abortion': 'Спонтанный аборт',
+        'blighted_ovum': 'Неразвивающаяся беременность',
+        'anembryonia': 'Анэмбриония',
+        'fetal_development_abnormalities': 'Пороки развития плода',
+        'medical_abortion': 'Медицинский аборт',
+        'ectopic_pregnancy': 'Внематочная беременность',
+        'stillbirth': 'Мертворожденный ребенок',
+        'live_birth': 'Живорожденный ребенок',
+        'child_with_developmental_defects': 'Ребенок с пороками развития',
+        'child_with_delayed_development': 'Ребенок с задержкой психо-речевого развития',
+    }
+
+    mother = models.ForeignKey(Mother, related_name='pregnancy', on_delete=models.CASCADE)
+    pregnancy_year = models.IntegerField('Год беременности')
+    diagnosis = models.CharField(choices=DIAGNOSIS_CHOICES, default='none', max_length=100)
+
+    class Meta:
+        verbose_name = 'Беременность матери'
+        verbose_name_plural = 'Беременности матерей'
+
+    def __str__(self):
+        return self.mother.name
+
+
+class AnotherFamilyMember(Adult):
+    """Класс характеризует иного возможного члена семьи"""
+    test_field = models.CharField('Тестовое поле иной член семьи', max_length=250, null=True)
+
+    class Meta: 
+        verbose_name = 'Иной член семьи'
+        verbose_name_plural = 'Иные члены семьи'

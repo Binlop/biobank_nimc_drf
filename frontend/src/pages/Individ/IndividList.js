@@ -42,15 +42,19 @@ export default function IndividList() {
                     <thead>
                         <tr>
                             <th className="table_list_property">Название</th>
-                            <th className="table_list_property">Описание</th>
+                            <th className="table_list_property">Кол-во ДНК</th>
+                            <th className="table_list_property">Кол-во хориона</th>
+                            <th className="table_list_property">Кол-во крови</th>
                             <th className="table_list_property">Действия</th>
                         </tr>
                     </thead>
                     <tbody>
                         {IndividList && IndividList.map(item => (
                             <tr key={item.id}>
-                                <td className="table_list_value"><Link to={`/individs/${item.individ_type}/${item.id}`} className="link-style">{item.name}</Link></td>
-                                <td className="table_list_value">{item.description}</td>
+                                <td className="table_list_value"><Link to={`/individs/${item.individ_type}/${item.individ.id}`} className="link-style">{item.name}</Link></td>
+                                <td className="table_list_value">{item.count_dna}</td>
+                                <td className="table_list_value">{item.count_chorion}</td>
+                                <td className="table_list_value">{item.count_blood}</td>
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"

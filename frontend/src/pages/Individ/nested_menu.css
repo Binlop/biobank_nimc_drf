@@ -1,9 +1,31 @@
-.main_block{
-    background-color: blue;
-}
+.main_block {
+    background: #333(0, 0, 255, 0.8); /* Темно-серый основной фон сайта */
+  }
 
-.sub_block{
-    background-color: red;
+  .sub_block {
+    background: #333(0, 0, 255, 0.8); /* Синий фон с 80% прозрачности */
     position: relative;
+  }
+
+.sub_block ul {
+    list-style-type: none;
+    padding: 0;
+    color: white;
 }
 
+.sub_block ul li {
+    display: block;
+    margin-bottom: 5px;
+    margin-left: 3px;
+}
+
+.sub_block ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.sub_block ul li a:hover {
+    color: lightgray;
+    transform: translateY(-1px);
+}
+  

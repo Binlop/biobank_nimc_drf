@@ -1,5 +1,6 @@
 from django.db import transaction
 from family.services import FamilyCreateService
+from file.services import FileService
 from ..models import Individ, Embryo
 
 class EmbryoService():
@@ -23,10 +24,12 @@ class EmbryoService():
     @transaction.atomic
     def update_embryo(self, instance: Embryo, validated_data: dict) -> Embryo:
         laboratory_data = validated_data.pop('laboratory')
-        print('Валидные данные в put service: ', validated_data)
+        scan_directions = validated_data.pop('scan_directions')
         for field, value in validated_data.items():
             setattr(instance, field, value)
             
         instance.laboratory.set(laboratory_data)
+        file_service = FileService()
+        instance.scan_directions = file_service.save_file(data={scan_directions})
         instance.save()
         return instance
