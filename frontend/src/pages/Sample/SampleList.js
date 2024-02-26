@@ -43,8 +43,8 @@ export default function SampleList() {
                     <tbody>
                         {IndividList && IndividList.map(item => (
                             <tr key={item.id}>
-                                <td className="table_list_value"><Link to={`/individs/${item.individ_type}/${item.id}`} className="link-style">{item.name}</Link></td>
-                                <td className="table_list_value">{item.description}</td>
+                                <td className="table_list_value"><Link to={`/samples/${item.type}/${item.id}`} className="link-style">{item.name}</Link></td>
+                                <td className="table_list_value"><Link to={`/individs/${item.individ.individ_type}/${item.individ.id}`} className="link-style">{item.individ.name}</Link></td>
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"

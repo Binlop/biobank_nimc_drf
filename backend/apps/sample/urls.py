@@ -1,9 +1,11 @@
 from django.urls import path, include
-from .views import SampleListView
+from . import views
 
 urlpatterns = [
-    path('', SampleListView.as_view()),
-    path('dna/', include('sample.dna.urls')),
-    path('blood/', include('sample.dna.urls')),
-    path('chorion/', include('sample.dna.urls')),
+    path('', views.SampleListView.as_view()),
+
+    path('dna/<int:pk>/', views.DNADetailView.as_view()),
+    path('dna/create', views.DNACreateView.as_view()),
+    path('dna/<int:pk>/update', views.DNAUpdateView.as_view()),
+
 ]

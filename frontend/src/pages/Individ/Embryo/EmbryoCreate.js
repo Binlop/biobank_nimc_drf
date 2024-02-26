@@ -20,7 +20,7 @@ export default function EmbryoCreate() {
 
 
   useEffect(() => {
-    document.title = 'Добавить семью';
+    document.title = 'Добавить пробанта';
     const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
     fetchLaboratories();
@@ -497,7 +497,7 @@ export default function EmbryoCreate() {
           label="Конфликт между методами:"
           name="сonflict_between_different_methods"
           value={formData.сonflict_between_different_methods}
-          onChange={handleChange}
+          onChange={handleChangeСheckmark}
           errors={errors}
           />
           <CharFieldWithError

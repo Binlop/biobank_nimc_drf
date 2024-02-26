@@ -2,11 +2,11 @@ from rest_framework import serializers
 from laboratory.serializers import LaboratorySerializer
 from family.serializer import FamilySerializerOutput
 from .models import Individ, Embryo, Father, Mother, AnotherFamilyMember, MotherPregnancy
-from .services.embryo import EmbryoService
+from .services import embryo, mother, father
 from file.serializer import FileSerializer
 
 class IndividSerializerOutput(serializers.Serializer):
-    
+
     def to_representation(self, value):
         """
         Serialize bookmark instances using a bookmark serializer,
@@ -28,7 +28,7 @@ class IndividSerializerOutput(serializers.Serializer):
 class IndividSerializerInput(serializers.ModelSerializer):
     class Meta:
         model = Individ
-        fields = ['id']
+        fields = ['id', 'name', 'individ_type']
 
 
 class FamilyMemberSerializerOutput(serializers.Serializer):
@@ -89,7 +89,7 @@ class EmbryoSerializerOutput(FamilyMemberSerializerOutput):
         ('triploidy', 'Триплоидия'),
     ]
 
-    scan_directions = FileSerializer(required=False)
+    scan_directions = serializers.FileField(required=False)
 
     test_field = serializers.CharField(max_length=256)
     family_number = serializers.IntegerField()
@@ -135,13 +135,14 @@ class EmbryoSerializerInput(EmbryoSerializerOutput):
     create_family = serializers.BooleanField(required=False)
     laboratory = serializers.ListField(child=serializers.IntegerField(), write_only=True)
 
+    scan_directions = serializers.FileField(required=False)
+
     def create(self, validated_data: dict):
-        service = EmbryoService()
+        service = embryo.EmbryoService()
         return service.create_embryo(validated_data=validated_data)
     
     def update(self, instance: Embryo, validated_data: dict):
-        print('валидированние данные в update:', validated_data)
-        service = EmbryoService()
+        service = embryo.EmbryoService()
         return service.update_embryo(instance, validated_data)
 
 class AdultSerializerOutput(FamilyMemberSerializerOutput):
@@ -149,7 +150,7 @@ class AdultSerializerOutput(FamilyMemberSerializerOutput):
     Класс описывает общие своства для всех взрослых членов семьи
     """
     family_number = serializers.IntegerField()
-    abortion_id = serializers.IntegerField()
+    abortion_id = serializers.IntegerField(required=False)
     last_name = serializers.CharField(max_length=100)
     first_name = serializers.CharField(max_length=100)
     patronymic = serializers.CharField(max_length=100)
@@ -169,46 +170,15 @@ class FatherSerializerOutput(AdultSerializerOutput):
 
 class FatherSerializerInput(FatherSerializerOutput):
     create_family = serializers.BooleanField(required=False)
+    laboratory = serializers.ListField(child=serializers.IntegerField(), write_only=True)
 
     def create(self, validated_data: dict):
-        service = EmbryoService()
-        return service.create_embryo(validated_data=validated_data)
+        service = father.FatherService()
+        return service.create_father(validated_data=validated_data)
     
-    def update(self, instance: Embryo, validated_data: dict):
-        service = EmbryoService()
-        return service.update_embryo(instance, validated_data)
-
-
-class MotherSerializerOutput(AdultSerializerOutput):
-    test_field = serializers.CharField(max_length=250, required=False)
-    mother_id = serializers.IntegerField()
-    number_of_pregnancies = serializers.IntegerField()
-    habitual_miscarriage = serializers.CharField(max_length=250, required=False)
-    diagnosis_of_current_pregnancy = serializers.ChoiceField(choices=Embryo.DIAGNOSIS_CHOICES, default='none')
-    note = serializers.CharField(max_length=256, required=False)
-    mother_gynecological_diseases = serializers.CharField(max_length=256, required=False)
-    mother_extragenital_diseases = serializers.CharField(max_length=256, required=False)
-    age_at_menarche = serializers.IntegerField()
-    cycle_duration_days = serializers.IntegerField()
-    menstrual_note = serializers.CharField(max_length=256, required=False)
-    pregnancy = serializers.SerializerMethodField()
-
-    def get_pregnancy(self, obj):
-        pregnancies = obj.pregnancy.all()
-        serializer = MotherPregnancySerializer(pregnancies, many=True)
-        return serializer.data
-
-class MotherSerializerInput(MotherSerializerOutput):
-    create_family = serializers.BooleanField(required=False)
-
-    def create(self, validated_data: dict):
-        service = EmbryoService()
-        return service.create_embryo(validated_data=validated_data)
-    
-    def update(self, instance: Embryo, validated_data: dict):
-        service = EmbryoService()
-        return service.update_embryo(instance, validated_data)
-
+    def update(self, instance: Father, validated_data: dict):
+        service = father.FatherService()
+        return service.update_father(instance, validated_data)
 
 class MotherPregnancySerializer(serializers.Serializer):
     DIAGNOSIS_CHOICES = {
@@ -225,8 +195,44 @@ class MotherPregnancySerializer(serializers.Serializer):
         'child_with_delayed_development': 'Ребенок с задержкой психо-речевого развития',
     }
     diagnosis = serializers.ChoiceField(choices=DIAGNOSIS_CHOICES, default='none')
-    pregnancy_year = serializers.IntegerField()
+    pregnancy_year = serializers.IntegerField(required=False)
+
+class MotherSerializerOutput(AdultSerializerOutput):
+    test_field = serializers.CharField(max_length=250, required=False)
+    mother_id = serializers.IntegerField()
+    number_of_pregnancies = serializers.IntegerField(required=False)
+    habitual_miscarriage = serializers.CharField(max_length=250, required=False)
+    diagnosis_of_current_pregnancy = serializers.ChoiceField(choices=Embryo.DIAGNOSIS_CHOICES, default='none')
+    note = serializers.CharField(max_length=256, required=False)
+    mother_gynecological_diseases = serializers.CharField(max_length=256, required=False)
+    mother_extragenital_diseases = serializers.CharField(max_length=256, required=False)
+    age_at_menarche = serializers.IntegerField(required=False)
+    cycle_duration_days = serializers.IntegerField(required=False)
+    menstrual_note = serializers.CharField(max_length=256, required=False)
+    # pregnancy = serializers.SerializerMethodField()
+
+    # def get_pregnancy(self, obj):
+    #     return obj
+
+class MotherSerializerInput(MotherSerializerOutput):
+    create_family = serializers.BooleanField(required=False)
+    laboratory = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    
+    # pregnancy = serializers.SerializerMethodField(required=False)
+
+    # def get_pregnancy(self, obj):
+    #     print(obj)
+    #     return obj
+    
+    def create(self, validated_data: dict):
+        service = mother.MotherService()
+        return service.create_mother(validated_data=validated_data)
+    
+    def update(self, instance: Embryo, validated_data: dict):
+        service = mother.MotherService()
+        return service.update_mother(instance, validated_data)
 
 
 class AnotherSerializerInput(FatherSerializerInput):
+    
     pass

@@ -58,20 +58,7 @@ export default function EmbryoUpdate() {
           })
           .catch((err) => console.log(err));
       };  
-    
-    // const handleSubmit = (event) => {
-    //     event.preventDefault();
-    //     axios
-    //       .put(`/api/individ/${formData.individ_type}/${id}/update/`, formData)
-    //       .then(() => {
-    //       navigate('/individs');
-    //       })
-    //       .catch((error) => {
-    //         if (error.response) {
-    //           setError(error.response.data);
-    //         }
-    //     });
-    // };
+
 
   const handleSubmit = async (e) => {
       e.preventDefault();
@@ -187,9 +174,11 @@ export default function EmbryoUpdate() {
                   handleImageChange(e);
                 }}
                 />
-                {formData.scan_directions && (
-                  <p>На данный момент загружен файл: {formData.scan_directions.original_file_name}</p>
-                )}
+              {formData.scan_directions && typeof formData.scan_directions === 'object' ? (
+                <p>На данный момент загружен файл: {formData.scan_directions.name}</p>
+              ) : (
+                <p>На данный момент загружен файл: {formData.scan_directions ? formData.scan_directions : 'Данные загружаются...'}</p>              )}
+
                 {errors && errors.scan_directions.file && (
                   <div className="alert alert-danger mt-3 mb-0">
                     <ul>

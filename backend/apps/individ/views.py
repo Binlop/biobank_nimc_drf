@@ -16,7 +16,8 @@ class FamilyMemberListView(APIView):
 class FamilyMemberDeleteView(APIView):
     
     def delete(self, request, pk):
-        member = FamilyMemberDetailSelector.get_individ_detail(user=request.user, pk=pk, delete=True)
+        selector = FamilyMemberDetailSelector()
+        member = selector.get_individ_detail(user=request.user, pk=pk)
         member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -25,8 +26,6 @@ class FamilyMemberDetail(APIView):
     def get(self, request, pk):
         selector = FamilyMemberDetailSelector()
         member = selector.get_individ_detail(user=request.user, pk=pk)
-        member_individ = member.individ.first()
-        print(member_individ)
         serializer = base_serializer.IndividSerializerOutput(member)
         return Response(serializer.data)
     
@@ -36,14 +35,14 @@ class FamilyMemberCreateView(APIView):
     Базовый класс для создания семейных участников.
     """ 
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
+        serializer = self.get_serializer_class(request.data)
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_serializer(self):
-        return base_serializer.AnotherSerializerInput
+    def get_serializer_class(self, requested_data):
+        return base_serializer.AnotherSerializerInput(requested_data)
 
 class FamilyMemberUpdateView(APIView):
     """
@@ -54,43 +53,43 @@ class FamilyMemberUpdateView(APIView):
         selector = FamilyMemberDetailSelector()
         member = selector.get_individ_detail(user=request.user, pk=pk)
         serializer = self.get_serializer(instance=member, data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def get_serializer(self):
-        return base_serializer.AnotherSerializerInput
+    def get_serializer_class(self, requested_data):
+        return base_serializer.AnotherSerializerInput(requested_data)
 
 class EmbryoCreateView(FamilyMemberCreateView):
-    def get_serializer(self, data=None):
-        return base_serializer.EmbryoSerializerInput(data=data)
+    def get_serializer_class(self, requested_data):
+        return base_serializer.EmbryoSerializerInput(requested_data)
 
 class EmbryoUpdateView(FamilyMemberUpdateView):
-    def get_serializer(self, instance, data):
-        return base_serializer.EmbryoSerializerInput(instance=instance, data=data)
+    def get_serializer_class(self, instance, requested_data):
+        return base_serializer.EmbryoSerializerInput(instance, requested_data)
 
 class FatherCreateView(FamilyMemberCreateView):
-    def get_serializer(self, data):
-        return base_serializer.FatherSerializerInput(data=data)
+    def get_serializer_class(self, requested_data):
+        return base_serializer.FatherSerializerInput(requested_data)
     
 class FatherUpdateView(FamilyMemberUpdateView):
-    def get_serializer(self, member, data):
-        return base_serializer.FatherSerializerInput(member=member, data=data)
+    def get_serializer_class(self, instance, requested_data):
+        return base_serializer.FatherSerializerInput(instance, requested_data)
     
 class MotherCreateView(FamilyMemberCreateView):
-    def get_serializer(self, data):
-        return base_serializer.MotherSerializerInput(data=data)
+    def get_serializer_class(self, requested_data):
+        return base_serializer.MotherSerializerInput(requested_data)
     
 class MotherUpdateView(FamilyMemberUpdateView):
-    def get_serializer(self, member, data):
-        return base_serializer.MotherSerializerInput(member=member, data=data)
+    def get_serializer_class(self, instance, requested_data):
+        return base_serializer.MotherSerializerInput(instance, requested_data)
     
 class AnotherFamilyCreateView(FamilyMemberCreateView):
-    def get_serializer(self, data):
-        return base_serializer.AnotherSerializerInput(data=data)
+    def get_serializer_class(self, requested_data):
+        return base_serializer.AnotherSerializerInput(requested_data)
     
 class AnotherFamilyUpdateView(FamilyMemberUpdateView):
-    def get_serializer(self, member, data):
-        return base_serializer.AnotherSerializerInput(member=member, data=data)
+    def get_serializer_class(self, instance, requested_data):
+        return base_serializer.AnotherSerializerInput(instance, requested_data)

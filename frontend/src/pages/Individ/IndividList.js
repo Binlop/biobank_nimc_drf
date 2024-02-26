@@ -21,7 +21,7 @@ export default function IndividList() {
     
     const handleDelete = (item) => {
         axios
-          .delete(`/api/individ/${item.id}/`)
+          .delete(`/api/individ/${item.individ.id}/delete`)
           .then((res) => refreshList());
       };
 

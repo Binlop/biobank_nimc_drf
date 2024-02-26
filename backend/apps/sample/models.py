@@ -1,14 +1,27 @@
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 from individ.models import Individ
 
+
+class Sample(models.Model):
+    name = models.CharField('Имя образца', max_length=256)
+    sample_type = models.CharField('Тип образца', max_length=10) #e.g днк, кровь, хорион
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 class CustomSampleType(models.Model):
     """
     Абстрактный класс для описания общих свойств образца
     """
-    name = models.CharField('Название типа образца', max_length=150) # e.g кровь Василия Пупкина
+    sample = GenericRelation(Sample, on_delete=models.CASCADE)
+    name = models.CharField('Название образца', max_length=150) # e.g кровь Василия Пупкина
+    sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
     barcode = models.CharField('Баркод', max_length=150, null=True)
+    
     # location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_sample') # Место хранения образца
 
     
@@ -18,7 +31,7 @@ class CustomSampleType(models.Model):
         verbose_name_plural = 'образцы'
 
     def get_sample_laboratories(self):
-        return self.individ.get_individ_laboratories()
+        return self.individ.content_object.get_individ_laboratories()
 
     def __str__(self):
         return str(self.name)

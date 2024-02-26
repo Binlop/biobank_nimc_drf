@@ -7,6 +7,8 @@ from family.models import Family
 from file.models import File
 
 class Individ(models.Model):
+    name = models.CharField('Имя индивида', max_length=256)
+    individ_type = models.CharField('Тип индивида', max_length=10) #e.g эмбрион, отец, мать
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -17,7 +19,7 @@ class FamilyMember(models.Model):
     """
     individ = GenericRelation(Individ, on_delete=models.CASCADE)
     name = models.CharField('Имя индивида', max_length=256)
-    individ_type = models.CharField('Тип индивида', max_length=10) #e.g эмбрион, отец, мать
+    individ_type = models.CharField('Тип индивида', max_length=10)
     laboratory = models.ManyToManyField(Laboratory)
     family = models.ForeignKey(Family, on_delete=models.CASCADE, null=True)
     count_blood = models.IntegerField('Кол-во крови', default=0)
@@ -87,8 +89,8 @@ class Embryo(FamilyMember):
     features_chorion = models.CharField('Особенности хориона', max_length=256, null=True)
     features_yolk_sac = models.CharField('Особенности желточного мешка', max_length=256, null=True)
     features_amniotic_membrane = models.CharField('Особенности амниотической оболочки', max_length=256, null=True)
-    # scan_directions = models.FileField('Cкан направления', upload_to='upload/embryo_files', null=True)
-    scan_directions = models.OneToOneField(File, on_delete=models.CASCADE, null=True)
+    scan_directions = models.FileField('Cкан направления', upload_to='upload/embryo_files', null=True)
+    # scan_directions = models.OneToOneField(File, on_delete=models.CASCADE, null=True)
     note = models.CharField('Примечание', max_length=256, null=True)
     karyotype = models.CharField('Вероятный кариотип', max_length=20, null=True)
     karyotype_type = models.CharField(choices=KARYOTYPE_CHOICES, default='none', max_length=100)
