@@ -16,7 +16,8 @@ class CustomSampleType(models.Model):
     """
     Абстрактный класс для описания общих свойств образца
     """
-    sample = GenericRelation(Sample, on_delete=models.CASCADE)
+    # sample = GenericRelation(Sample, on_delete=models.CASCADE)
+    sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
     name = models.CharField('Название образца', max_length=150) # e.g кровь Василия Пупкина
     sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)

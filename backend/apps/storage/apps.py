@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DnaConfig(AppConfig):
+class StorageConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'sample.dna'
+    name = 'storage'

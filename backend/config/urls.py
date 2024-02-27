@@ -14,5 +14,6 @@ urlpatterns = [
     path('api/family/', include('family.urls')),
     path('api/individ/', include('individ.urls')),
     path('api/sample/', include('sample.urls')),
+    path('api/storage/', include('storage.urls')),
 
 ] + static(base.STATIC_ROOT, document_root=base.MEDIA_ROOT)

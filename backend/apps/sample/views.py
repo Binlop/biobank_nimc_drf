@@ -13,23 +13,31 @@ class SampleViewBase(APIView):
 class SampleListView(SampleViewBase):
 
     def get(self, request, format=None):
-        samples = SampleListSelector.get_samples_list(user=request.user)      
-        serializer = serializers.SampleSerializerOutput(samples, many=True)
+        selector = SampleListSelector()
+        samples = selector.get_samples_list(user=request.user)      
+        serializer = serializers.CustomSampleSerializerOutput(samples, many=True)
         return Response(serializer.data)
-    
+
+class IndividSampleList(SampleViewBase):
+
+    def get(self, request, pk):
+        selector = SampleListSelector()
+        samples = selector.get_individ_samples(user=request.user, individ_id=pk)      
+        serializer = serializers.CustomSampleSerializerOutput(samples, many=True)
+        return Response(serializer.data)
+
 class SampleDetailView(SampleViewBase):
 
     def get(self, request, pk):
         selector = SampleDetailSelector()
         sample = selector.get_sample_detail(user=request.user, pk=pk)
-        serializer = self.get_serializer_class()(sample)
+        serializer = serializers.SampleSerializerBase(sample)
         return Response(serializer.data)
-
 
 class SampleCreateView(SampleViewBase):
     
     def post(self, request):
-        serializer = self.get_serializer_class(data=request.data)
+        serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -48,7 +56,15 @@ class SampleUpdateView(SampleViewBase):
             return Response(serializer.data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SampleDeleteView(SampleViewBase):
     
+    def delete(self, request, pk):
+        selector = SampleDetailSelector()
+        member = selector.get_sample_detail(user=request.user, pk=pk, delete=True)
+        member.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class DNADetailView(SampleDetailView):
     serializer = serializers.DNAOutputSerializer
     

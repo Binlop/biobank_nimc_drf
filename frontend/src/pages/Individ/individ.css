@@ -121,3 +121,8 @@ table td {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+.add_sample{
+    position: relative;
+    margin-left: 23%;
+}

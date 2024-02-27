@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import "./nested_menu.css"
 import { Link } from 'react-router-dom';
 
-const NestedMenu = () => {
+const NestedMenu = ({individ_id}) => {
   const [showMenu, setShowMenu] = useState(false);
   const [activeMenuItem, setActiveMenuItem] = useState(null);
 
@@ -22,13 +22,13 @@ const NestedMenu = () => {
   return (
     <div className="title_object">
       <p>
-        <span className="larger-text">Образцы </span>
-        <button onClick={handleMenuClick}>Добавить</button>
+        <span className="larger-text"> </span>
+        <button className="btn btn-primary" onClick={handleMenuClick}>Добавить образец</button>
         {showMenu && (
         <div className='main_block'>
           <ul>
             <div onMouseEnter={() => handleMenuItemHover(1)} onMouseLeave={handleMenuItemLeave}>
-            <Link to={`/samples/dna/create`} className="link-style">ДНК</Link>
+            <Link to={`/samples/dna/create?individ_id=${individ_id}`} className="link-style">ДНК</Link>
             </div>          
             <div onMouseEnter={() => handleMenuItemHover(2)} onMouseLeave={handleMenuItemLeave}>
             <Link to={`/individs/father/create`} className="link-style">Кровь</Link>

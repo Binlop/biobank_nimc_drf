@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SampleList from './SampleList';
 import DNACreate from './DNA/DNACreate';
-
+import DNADetail from './DNA/DNADetail';
+import DNAUpdate from './DNA/DNAUpdate';
 
 export default function Sample() {
     return (
@@ -9,10 +10,10 @@ export default function Sample() {
         <Routes>
           <Route path="/" element={<SampleList />} />
 
-          <Route path="/dna/create" element={<DNACreate />} />
+          <Route path="/dna/create/" element={<DNACreate />} />
+          <Route path="/dna/:id/" element={<DNADetail />} />
+          <Route path="/dna/:id/update/" element={<DNAUpdate />} />
 
-          {/* <Route path="/embryo/:id" element={<EmbryoDetail />} />
-          <Route path="/embryo/:id/update" element={<EmbryoUpdate />} /> */}
 
         </Routes>
       </main>

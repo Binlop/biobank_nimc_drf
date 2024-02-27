@@ -11,7 +11,7 @@ class SampleListSelector:
     Класс отвечает за получение списка индивидов из бд
     """
 
-    def get_samples_list(user: User, filters=None) -> QuerySet[DNA, Chorion]:
+    def get_samples_list(self, user: User, filters=None) -> QuerySet[DNA, Chorion]:
         user_laboratories = user.profile.get_user_laboratories()
         user_laboratory_ids = user_laboratories.values_list('id', flat=True)
 
@@ -26,6 +26,14 @@ class SampleListSelector:
                 samples_list.remove(sample)
 
         return samples_list
+    
+    def get_individ_samples(self, user: User, individ_id: int):
+        dna_qs = DNA.objects.filter(individ_id=individ_id)
+        chorion_qs = Chorion.objects.filter(individ_id=individ_id)
+        samples_list = list(chain(dna_qs, chorion_qs))
+
+        return samples_list
+
 
 class SampleDetailSelector:
     """
@@ -36,6 +44,7 @@ class SampleDetailSelector:
         if sample.content_object.get_sample_laboratories() & user.profile.get_user_laboratories():
             if delete:
                 return sample
+            print('возвращаем: ', sample.content_object)
             return sample.content_object
         else: return None
 

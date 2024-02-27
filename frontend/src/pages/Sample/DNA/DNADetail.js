@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import "../individ.css"
+import "../sample.css"
 
-export default function FatherDetail() {
+export default function DNADetail() {
     const { id } = useParams();
-    const [individDetail, setIndividDetail] = useState(null);
+    const [sampleDetail, setSampleDetail] = useState(null);
 
     useEffect(() => {
         refreshList();
@@ -13,9 +13,9 @@ export default function FatherDetail() {
 
     const refreshList = () => {
         axios
-            .get(`/api/individ/${id}`)
+            .get(`/api/sample/${id}`)
             .then((res) => {
-                setIndividDetail(res.data);
+                setSampleDetail(res.data);
                 if (res.data) {
                     document.title = res.data.name;
                 }
@@ -26,43 +26,46 @@ export default function FatherDetail() {
 
     return (
         <main className="container">
+        {sampleDetail && (
+        <div>
             <div className="title_object">
-                <p>
-                    {individDetail && (
-                        <>
-                        <span className="larger-text">{individDetail.name}</span>
-                        <Link to={`/individs/mother/${id}/update`} className="btn btn-primary">
-                            Изменить индивида
-                        </Link>
-                        </>
-                    )}
-                </p>
+              <p>
+                <>
+                  <span className="larger-text">{sampleDetail.name}</span>
+                  <Link to={`/samples/dna/${id}/update`} className="btn btn-primary">
+                    Изменить образец
+                  </Link>
+                </>
+              </p>
             </div>
-            <div className="features">
-                {individDetail && (
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td className="table_detail_property">Название</td>
-                                <td className="table_detail_value">{individDetail.name}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Описание</td>
-                                <td className="table_detail_value">{individDetail.description}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Лаборатории</td>
-                                <td className="table_detail_value">
-                                    {individDetail.laboratory && individDetail.laboratory.map(item => (
-                                        <Link to={`/laboratories/${item.id}`} className="link-style">{item.name}<br></br></Link>
-                                    ))}
-                                </td>
+      
+          <div className="features">
+            <table>
+              <tbody>
+                <tr>
+                  <td className="table_detail_property">Название</td>
+                  <td className="table_detail_value">{sampleDetail.name}</td>
+                </tr>
+                <tr>
+                  <td className="table_detail_property">Индивид</td>
+                  <td className="table_list_value">
+                    <Link to={`/individs/${sampleDetail.individ.individ_type}/${sampleDetail.individ.individ.id}`} className="link-style">{sampleDetail.individ.name}</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="table_detail_property">Место хранения</td>
+                  <td className="table_list_value"></td>
+                </tr>
+                <tr>
+                  <td className="table_detail_property">Количество</td>
+                  <td className="table_list_value">{sampleDetail.volume}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        )}
 
-                            </tr>
-                        </tbody>
-                    </table>
-                )}
-            </div>
         </main>
-    );
+      );      
 }

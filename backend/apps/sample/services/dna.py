@@ -1,4 +1,6 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
+from individ.models import Individ
 from ..models import Sample, DNA
 
 class DNAService():
@@ -7,11 +9,15 @@ class DNAService():
     def create_dna(self, validated_data: dict) -> DNA:
         dna = DNA.objects.create(**validated_data)
         dna.sampletype = 'dna'
-        dna.save()
+        if validated_data.get('individ_id', None):
+            individ = get_object_or_404(Individ, id=validated_data['individ_id'])
+            dna.individ = individ
+            dna.save()
 
-        sample = Sample(content_object=dna, name=dna.name)
-        sample.save()
-        return dna
+            sample = Sample(content_object=dna, name=dna.name, sample_type='dna')
+            sample.save()
+            return dna
+        return KeyError(f'Individ_id does not exist in validated data')
     
     @transaction.atomic
     def update_dna(self, instance: DNA, validated_data: dict) -> DNA:

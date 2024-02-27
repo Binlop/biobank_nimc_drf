@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import "../sample.css"
 import "react-datepicker/dist/react-datepicker.css";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
@@ -9,7 +10,9 @@ export default function DNACreate() {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const [errors, setError] = useState(null); 
-
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const individId = searchParams.get('individ_id');
 
   useEffect(() => {
     document.title = 'Добавить ДНК';
@@ -59,6 +62,8 @@ export default function DNACreate() {
         }
       }
     }
+    console.log('это individ_id', individId)
+    formSample.append('individ_id', individId)
     return formSample;
   };
 

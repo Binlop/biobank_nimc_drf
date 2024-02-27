@@ -6,9 +6,11 @@ import "../individ.css"
 export default function EmbryoDetail() {
     const { id } = useParams();
     const [embryoDetail, setEmbryoDetail] = useState(null);
+    const [samplesList, seSampleList] = useState([]);
 
     useEffect(() => {
         refreshList();
+        getIndividSamples();
     }, []);
 
     const refreshList = () => {
@@ -24,7 +26,21 @@ export default function EmbryoDetail() {
                 console.log(err)});
     };   
 
-    console.log('Содержимое useParams:', useParams());
+    const getIndividSamples = () => {
+        axios
+        .get(`/api/sample/individ_${id}_samples/`)
+        .then((res) => {
+            seSampleList(res.data);
+        })
+        .catch((err) => {
+            console.log(err)});
+        };   
+
+    const handleDelete = (item) => {
+            axios
+              .delete(`/api/sample/${item.sample.id}/delete`)
+              .then((res) => refreshList());
+        };
 
     return (
         <main className="container">
@@ -33,7 +49,7 @@ export default function EmbryoDetail() {
                     {embryoDetail && (
                         <>
                         <span className="larger-text">{embryoDetail.name}</span>
-                        <Link to={`/individs/embryo/${id}/update`} className="btn btn-primary">
+                        <Link to={`/individs/embryo/${id}/update/`} className="btn btn-primary">
                             Изменить индивида
                         </Link>
                         </>
@@ -63,6 +79,38 @@ export default function EmbryoDetail() {
                             </tr>
                         </tbody>
                     </table>
+                )}
+            </div>
+            <div className="features">
+            {samplesList && (
+                <div>
+                <h5>Образцы</h5>
+                <table>
+                    <thead>
+                        <th className="table_list_property">Название</th>
+                        <th className="table_list_property">Место хранения</th>
+                        <th className="table_list_property">Количество</th>
+                        <th className="table_list_property">Действия</th>
+                    </thead>
+                    <tbody>
+                    {samplesList.map(item => (
+                            <tr key={item.id}>
+                                <td className="table_list_value"><Link to={`/samples/${item.sampletype}/${item.sample.id}/`} className="link-style">{item.name}</Link></td>
+                                <td className="table_list_value"></td>
+                                <td className="table_list_value">{item.volume}</td>
+                                <td className="table_list_value">
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleDelete(item)}
+                                    >
+                                        Удалить
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                </div>
                 )}
             </div>
         </main>

@@ -52,15 +52,15 @@ class FamilyMemberUpdateView(APIView):
         print(request.data)
         selector = FamilyMemberDetailSelector()
         member = selector.get_individ_detail(user=request.user, pk=pk)
-        serializer = self.get_serializer(instance=member, data=request.data)
+        serializer = self.get_serializer_class(member, request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def get_serializer_class(self, requested_data):
-        return base_serializer.AnotherSerializerInput(requested_data)
+
+    def get_serializer_class(self, instance, requested_data):
+        return base_serializer.AnotherSerializerInput(instance, requested_data)
 
 class EmbryoCreateView(FamilyMemberCreateView):
     def get_serializer_class(self, requested_data):
