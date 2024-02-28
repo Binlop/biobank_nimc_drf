@@ -9,6 +9,7 @@ import MotherUpdate from './Mother/MotherUpdate';
 
 import FatherDetail from './Father/FatherDetail';
 import FatherCreate from './Father/FatherCreate';
+import FatherUpdate from './Father/FatherUpdate';
 
 function Individ() {
   return (
@@ -26,7 +27,7 @@ function Individ() {
 
           <Route path="/father/:id/" element={<FatherDetail />} />
           <Route path="/father/create/" element={<FatherCreate />} />
-          {/* <Route path="/mother/:id/update" element={<MotherUpdate />} /> */}
+          <Route path="/father/:id/update/" element={<FatherUpdate />} />
 
         </Routes>
       </main>

@@ -4,7 +4,6 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
-    Outlet,
 } from "react-router-dom";
 import { AuthProvider } from './context/AuthContext'
 
@@ -16,6 +15,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import Family from "./pages/Family/Family";
 import Individ from "./pages/Individ/Individ";
 import Sample from "./pages/Sample/Sample";
+import Storage from "./pages/Storage/Storage";
 
 import "./App.css"; // Подключаем стили
 import PrivateRoute from './utils/PrivateRoute'
@@ -35,6 +35,7 @@ function App() {
                         <Route path="/families/*" element={<PrivateRoute><Family/></PrivateRoute>} />
                         <Route path="/individs/*" element={<PrivateRoute><Individ/></PrivateRoute>} />
                         <Route path="/samples/*" element={<PrivateRoute><Sample/></PrivateRoute>} />
+                        <Route path="/storage/*" element={<PrivateRoute><Storage/></PrivateRoute>} />
 
                     </Routes>
             </AuthProvider>

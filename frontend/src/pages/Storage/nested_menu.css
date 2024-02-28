@@ -1,0 +1,15 @@
+.add_object{
+    position: relative;
+}
+
+.main_block{
+    background-color: blue;
+    position: relative;
+    width: 'auto';
+}
+
+.sub_block{
+    background-color: red;
+    position: relative;
+}
+

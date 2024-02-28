@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
 
-export default function MotherUpdate() {
+export default function FatherUpdate() {
     const { id } = useParams();
 
   const [formData, setFormData] = useState({
@@ -79,9 +79,9 @@ export default function MotherUpdate() {
       const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
       const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
 
-      const formEmbryo = makeEmbryoForm();
+      const formFather = makeFatherForm();
 
-      await axios.put(`/api/individ/${formData.individ_type}/${id}/update/`, formEmbryo, {
+      await axios.put(`/api/individ/${formData.individ_type}/${id}/update/`, formFather, {
       headers: {
       "Content-Type": contentTypeHeader,
       },
@@ -93,17 +93,17 @@ export default function MotherUpdate() {
         setError(error.response.data);
       }
   };
-  const makeEmbryoForm = () => {
-    const formEmbryo = new FormData();
+  const makeFatherForm = () => {
+    const formFather = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
         const value = formData[key];
         if (value) {
-          formEmbryo.append(key, value);
+          formFather.append(key, value);
         }
       }
     }
-    return formEmbryo;
+    return formFather;
   };
 
   const handleChangeLaboratory = (e) => {
@@ -118,60 +118,17 @@ export default function MotherUpdate() {
     setFormData({ ...formData, [name]: updatedLaboratories });
   };
 
-  const handleAddFieldPregnancy = () => {
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      pregnancy: [...prevFormData.pregnancy, []] // Добавляем новое пустое поле
-    }));
-  };
-
-  const handleChangePregnancy = (index, event) => {
-    const { name, value } = event.target;
-    const newPregnancy = formData.pregnancy.map((item, i) => {
-      if (i === index) {
-        const newValue = value.split(','); // Разделяем строку на пары значений (год и диагноз)
-        return [parseInt(newValue[0]), newValue[1]]; // Преобразуем год в целое число
-      } else {
-        return item;
-      }
-    });
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      pregnancy: newPregnancy
-    }));
-  };
-
   const handleChangeDate = (date) => {
     const formattedDate = date.toISOString().split('T')[0];
     setFormData(prevFormData => ({ ...prevFormData, date_of_birth: formattedDate }));    
     setDatebirth(date)
   };
 
-  const handleChangeСheckmark = (e) => {
-    const { name, checked } = e.target;
-    setFormData({ ...formData, [name]: checked });
-  }
-
   return (
     <div className="features">
       <div className="user_form">
-      <h2>Добавить мать</h2>
+      <h2>Изменить отца</h2>
         <form onSubmit={handleSubmit}>
-        {/* <div className="form-group">
-        <label>Беременности</label>
-        {formData.pregnancy.map((item, index) => (
-      <div key={index}>
-        <input
-          type="text"
-          name="pregnancy"
-          placeholder="Год, Диагноз"
-          value={`${item[0]},${item[1]}`} // Объединяем год и диагноз в строку с разделителем
-          onChange={(event) => handleChangePregnancy(index, event)}
-        />
-      </div>
-    ))}
-    <button onClick={(e) => { e.preventDefault(); handleAddFieldPregnancy(); }}>Добавить поле для беременности</button>      
-    </div> */}
           <CharFieldWithError
             label="Название:"
             name="name"
@@ -186,36 +143,23 @@ export default function MotherUpdate() {
             onChange={handleChange}
             errors={errors}
           />                              
-        <div className="form-group">
-        <label>Лаборатории:</label>
-        {allLaboratories.map(lab => (
-        <div key={lab.id} className="form-check">
-        <input
-        type="checkbox"
-        id={`lab-${lab.id}`}
-        name="laboratory"
-        value={lab.id}
-        onChange={handleChangeLaboratory}
-        className="form-check-input"
-        checked={formData.laboratory.includes(lab.id)}
-        />
-        <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
-        </div>
-        ))}
-        </div>
-          {/* <div className="form-group">
-          <label>Создать семью:</label>
+          <div className="form-group">
+          <label>Лаборатории:</label>
+          {allLaboratories.map(lab => (
+          <div key={lab.id} className="form-check">
           <input
           type="checkbox"
-          id="create_family"
-          name="create_family"
-          onChange={handleChange}
-          className="form-control mr-sm-2"
+          id={`lab-${lab.id}`}
+          name="laboratory"
+          value={lab.id}
+          onChange={handleChangeLaboratory}
+          className="form-check-input"
+          checked={formData.laboratory.includes(lab.id)}
           />
-          {errors && errors.create_family &&
-          <div className="alert alert-danger mt-3 mb-0">{errors.create_family}</div>
-          }
-          </div>   */}
+          <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
+          </div>
+          ))}
+          </div>
           <CheckMarkWithError
             label="Создать семью:"
             name="create_family"

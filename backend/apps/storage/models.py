@@ -5,7 +5,7 @@ class Freezer(models.Model):
     name = models.CharField('Название морозилки', max_length=255)
     freezer_type = models.CharField('Тип морозилки', max_length=50, null=True)
     floor = models.IntegerField('Этаж')
-    id_freezer = models.IntegerField('Номер холодильника')
+    id_freezer = models.IntegerField('Номер морозильника')
     laboratory = models.ManyToManyField(Laboratory)
 
     class Meta:
@@ -19,7 +19,7 @@ class Freezer(models.Model):
         return self.laboratory.all()
 
 
-class FreezerDrawer(models.Model):
+class Drawer(models.Model):
     freezer = models.ForeignKey(Freezer, on_delete=models.CASCADE, related_name='drawer')
     name = models.CharField('Название', max_length=255)
     
@@ -30,11 +30,11 @@ class FreezerDrawer(models.Model):
     def __str__(self):
         return self.name
     
-    def get_drawer_laboratories(self):
+    def get_freezer_laboratories(self):
         return self.freezer.get_freezer_laboratories()
 
 class Shelf(models.Model):
-    drawer = models.ForeignKey(FreezerDrawer, on_delete=models.CASCADE, related_name='shelf')
+    drawer = models.ForeignKey(Drawer, on_delete=models.CASCADE, related_name='shelf')
     name = models.CharField('Название', max_length=255, null=True)
     count_boxes = models.IntegerField('Макс. кол-во коробок', default=0)
     count_rows = models.IntegerField('Кол-во строк полки', default=0)
@@ -47,7 +47,7 @@ class Shelf(models.Model):
     def __str__(self):
         return self.name
     
-    def get_shelf_laboratories(self):
+    def get_freezer_laboratories(self):
         return self.drawer.freezer.get_freezer_laboratories()
 
 class Box(models.Model):
@@ -64,7 +64,7 @@ class Box(models.Model):
     def __str__(self):
         return self.name
     
-    def get_boxes_laboratories(self):
+    def get_freezer_laboratories(self):
         return self.shelf.drawer.freezer.get_freezer_laboratories()
 
 class SamplesMap(models.Model):
@@ -81,5 +81,5 @@ class SamplesMap(models.Model):
     def __str__(self):
         return self.name
     
-    def get_sample_laboratories(self):
+    def get_freezer_laboratories(self):
         return self.box.shelf.drawer.freezer.get_freezer_laboratories()

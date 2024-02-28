@@ -22,16 +22,16 @@ class StorageListView(StorageViewBase):
 
     def get(self, request):
         selector = self.get_selector_class()
-        objects = selector.get_storage_list(user=request.user)
-        serializer = self.get_serializer_class()(objects, many=True)
+        objs = selector.get_storage_list(user=request.user)
+        serializer = self.get_serializer_class()(objs, many=True)
         return Response(serializer.data)
 
 class StorageDetailView(StorageViewBase):
 
     def get(self, request, pk):
         selector = self.get_selector_class()
-        object = selector.get_storage_detail(user=request.user, pk=pk)
-        serializer = self.get_serializer_class()(object)
+        obj = selector.get_storage_detail(user=request.user, pk=pk)
+        serializer = self.get_serializer_class()(obj)
         return Response(serializer.data)
 
 class StorageCreateView(StorageViewBase):
@@ -44,12 +44,12 @@ class StorageCreateView(StorageViewBase):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SampleUpdateView(StorageViewBase):
+class StorageUpdateView(StorageViewBase):
 
     def put(self, request, pk):
-        selector = SampleDetailSelector()
-        sample = selector.get_sample_detail(user=request.user, pk=pk)
-        serializer = self.get_serializer_class()(sample, data=request.data)
+        selector = self.get_selector_class()
+        obj = selector.get_storage_detail(user=request.user, pk=pk)
+        serializer = self.get_serializer_class()(obj, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -73,4 +73,19 @@ class FreezerDetailView(StorageDetailView):
     selector_class = selectors.FreezerDetailSelector
 
 class FreezerCreateView(StorageCreateView):
-    serializer_class = serializers.FreezerOutputSerializer
+    serializer_class = serializers.FreezerInputSerializer
+
+class FreezerUpdateView(StorageUpdateView):
+    serializer_class = serializers.FreezerInputSerializer
+    selector_class = selectors.FreezerDetailSelector
+
+class DrawerDetailView(StorageDetailView):
+    serializer_class = serializers.DrawerSerializerOutput
+    selector_class = selectors.DrawerDetailSelector
+
+class DrawerCreateView(StorageCreateView):
+    serializer_class = serializers.DrawerSrializerInput
+
+class DrawerUpdateView(StorageUpdateView):
+    serializer_class = serializers.DrawerSrializerInput
+    selector_class = selectors.DrawerDetailSelector

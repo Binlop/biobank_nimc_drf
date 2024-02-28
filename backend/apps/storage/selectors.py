@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
-from .models import Freezer, FreezerDrawer, Shelf, Box, SamplesMap
+from .models import Freezer, Drawer, Shelf, Box, SamplesMap
 
 class StorageListSelector:
     """
@@ -20,7 +20,7 @@ class StorageListSelector:
 
         return freezer_qs
 
-T = TypeVar('T', Freezer, FreezerDrawer, Shelf, Box, SamplesMap)
+T = TypeVar('T', Freezer, Drawer, Shelf, Box, SamplesMap)
 
 class StorageDetailSelector:
     """
@@ -28,7 +28,7 @@ class StorageDetailSelector:
     """
     model = None
 
-    def check_user_acces_to_sample(self, storage_object: Union[Freezer, FreezerDrawer, Shelf, Box, SamplesMap], user: User) -> T:
+    def check_user_acces_to_sample(self, storage_object: Union[Freezer, Drawer, Shelf, Box, SamplesMap], user: User) -> T:
         if storage_object.get_freezer_laboratories() & user.profile.get_user_laboratories():
             return storage_object
         else: return None
@@ -42,3 +42,6 @@ class StorageDetailSelector:
 
 class FreezerDetailSelector(StorageDetailSelector):
     model = Freezer
+
+class DrawerDetailSelector(StorageDetailSelector):
+    model = Drawer

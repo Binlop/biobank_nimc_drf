@@ -98,39 +98,11 @@ export default function FatherCreate() {
     setFormData({ ...formData, [name]: updatedLaboratories });
   };
 
-  const handleAddFieldPregnancy = () => {
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      pregnancy: [...prevFormData.pregnancy, []] // Добавляем новое пустое поле
-    }));
-  };
-
-  const handleChangePregnancy = (index, event) => {
-    const { name, value } = event.target;
-    const newPregnancy = formData.pregnancy.map((item, i) => {
-      if (i === index) {
-        const newValue = value.split(','); // Разделяем строку на пары значений (год и диагноз)
-        return [parseInt(newValue[0]), newValue[1]]; // Преобразуем год в целое число
-      } else {
-        return item;
-      }
-    });
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      pregnancy: newPregnancy
-    }));
-  };
-
   const handleChangeDate = (date) => {
     const formattedDate = date.toISOString().split('T')[0];
     setFormData(prevFormData => ({ ...prevFormData, date_of_birth: formattedDate }));    
     setDatebirth(date)
   };
-
-  const handleChangeСheckmark = (e) => {
-    const { name, checked } = e.target;
-    setFormData({ ...formData, [name]: checked });
-  }
 
   return (
     <div className="features">

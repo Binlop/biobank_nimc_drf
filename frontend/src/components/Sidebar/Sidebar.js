@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css"
-import { FaHouseChimney, FaChildren, FaPerson, FaFlask} from "react-icons/fa6";
+import { FaHouseChimney, FaChildren, FaPerson, FaFlask, FaGift} from "react-icons/fa6";
 
 class AsideBar extends Component {
   render() {
@@ -11,14 +11,11 @@ class AsideBar extends Component {
         <div className="instruments">
           <p><span className="name_instruments">Разделы биобанка</span></p>
           <ul>
-          <li><Link to="/laboratories" className="instruments-link"><FaHouseChimney /> Лаборатории</Link></li>
-          <li><Link to="/families" className="instruments-link"><FaChildren /> Семьи</Link></li>
-          <li><Link to="/individs" className="instruments-link"><FaPerson />Индивиды</Link></li>
-          <li><Link to="/samples" className="instruments-link"><FaFlask />Образцы</Link></li>
-
-            {/* <li><Link to="/list_individs"><i className="fa-regular fa-house"></i>Индивиды</Link></li>
-            <li><Link to="/get_list_samples"><i className="fa-regular fa-house"></i>Образцы</Link></li>
-            <li><Link to="/list_freezers"><i className="fa-regular fa-house"></i>Хранилище</Link></li>*/}
+          <li><Link to="/laboratories/" className="instruments-link"><FaHouseChimney /> Лаборатории</Link></li>
+          <li><Link to="/families/" className="instruments-link"><FaChildren /> Семьи</Link></li>
+          <li><Link to="/individs/" className="instruments-link"><FaPerson />Индивиды</Link></li>
+          <li><Link to="/samples/" className="instruments-link"><FaFlask />Образцы</Link></li>
+          <li><Link to="/storage/" className="instruments-link"><FaGift />Хранилище</Link></li>
           </ul>
         </div>
       </aside>
