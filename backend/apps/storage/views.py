@@ -89,3 +89,28 @@ class DrawerCreateView(StorageCreateView):
 class DrawerUpdateView(StorageUpdateView):
     serializer_class = serializers.DrawerSrializerInput
     selector_class = selectors.DrawerDetailSelector
+
+class ShelfrDetailView(StorageDetailView):
+    serializer_class = serializers.ShelfSerializerOutput
+    selector_class = selectors.ShelfDetailSelector
+
+class ShelfCreateView(StorageCreateView):
+    serializer_class = serializers.ShelfSerializerInput
+
+class ShelfUpdateView(StorageUpdateView):
+    serializer_class = serializers.ShelfSerializerInput
+    selector_class = selectors.ShelfDetailSelector
+
+class BoxDetailView(StorageDetailView):
+    serializer_class = serializers.BoxSerializerOutput
+    selector_class = selectors.BoxDetailSelector
+
+class BoxCreateView(StorageCreateView):
+    serializer_class = serializers.BoxSerializerInput
+
+class BoxUpdateView(StorageUpdateView):
+    serializer_class = serializers.BoxSerializerInput
+    selector_class = selectors.BoxDetailSelector
+
+class SampleMapCreateView(StorageCreateView):
+    serializer_class = serializers.SamplesSerializerInput

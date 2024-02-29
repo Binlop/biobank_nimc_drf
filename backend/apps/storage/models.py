@@ -36,7 +36,6 @@ class Drawer(models.Model):
 class Shelf(models.Model):
     drawer = models.ForeignKey(Drawer, on_delete=models.CASCADE, related_name='shelf')
     name = models.CharField('Название', max_length=255, null=True)
-    count_boxes = models.IntegerField('Макс. кол-во коробок', default=0)
     count_rows = models.IntegerField('Кол-во строк полки', default=0)
     count_col = models.IntegerField('Кол-во столбцов полки', default=0) 
     
@@ -53,9 +52,9 @@ class Shelf(models.Model):
 class Box(models.Model):
     shelf = models.ForeignKey(Shelf, on_delete=models.CASCADE, related_name='box')
     name = models.CharField('Название', max_length=255, null=True)
-    count_samples = models.IntegerField('Макс. кол-во образцов', default=0)
     count_rows = models.IntegerField('Кол-во строк коробки', default=0)
     count_col = models.IntegerField('Кол-во столбцов коробки', default=0) 
+    count_boxes = models.IntegerField('Макс. кол-во коробок', default=0)
 
     class Meta:
         verbose_name = 'коробка  морозильника'
@@ -73,7 +72,8 @@ class SamplesMap(models.Model):
     state_location = models.CharField('Состояние хранения', max_length=10, default='free')
     sample_type = models.CharField('Тип биологического образца', max_length=20, null=True)
     sample_id = models.BigIntegerField('ID образца', null=True) 
-    
+    count_samples = models.IntegerField('Макс. кол-во образцов', default=0)
+
     class Meta:
         verbose_name = 'образцы  коробки'
         verbose_name_plural = 'образцы коробки'

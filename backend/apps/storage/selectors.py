@@ -45,3 +45,9 @@ class FreezerDetailSelector(StorageDetailSelector):
 
 class DrawerDetailSelector(StorageDetailSelector):
     model = Drawer
+
+class ShelfDetailSelector(StorageDetailSelector):
+    model = Shelf
+
+class BoxDetailSelector(StorageDetailSelector):
+    model = Box

@@ -11,5 +11,15 @@ urlpatterns = [
     path('drawer/<int:pk>/', views.DrawerDetailView.as_view()),
     path('drawer/create/', views.DrawerCreateView.as_view()),
     path('drawer/<int:pk>/update/', views.DrawerUpdateView.as_view()),
+
+    path('shelf/<int:pk>/', views.ShelfrDetailView.as_view()),
+    path('shelf/create/', views.ShelfCreateView.as_view()),
+    path('shelf/<int:pk>/update/', views.ShelfUpdateView.as_view()),
+
+    path('box/<int:pk>/', views.BoxDetailView.as_view()),
+    path('box/create/', views.BoxCreateView.as_view()),
+    path('box/<int:pk>/update/', views.BoxUpdateView.as_view()),
     
+    path('sample_map/create/', views.SampleMapCreateView.as_view()),
+
 ]

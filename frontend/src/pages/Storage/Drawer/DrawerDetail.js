@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "../storage.css"
 
-export default function FreezerDetail() {
+export default function DrawerDetail() {
     const { id } = useParams();
     const [storageDetail, setStorageDetail] = useState(null);
 
@@ -13,7 +13,7 @@ export default function FreezerDetail() {
 
     const refreshList = () => {
         axios
-            .get(`/api/storage/freezer/${id}`)
+            .get(`/api/storage/drawer/${id}`)
             .then((res) => {
                 setStorageDetail(res.data);
                 if (res.data) {
@@ -32,8 +32,8 @@ export default function FreezerDetail() {
               <p>
                 <>
                   <span className="larger-text">{storageDetail.name} </span>
-                  <Link to={`/storage/freezer/${id}/update`} className="btn btn-primary">
-                    Изменить морозильник
+                  <Link to={`/storage/drawer/${id}/update`} className="btn btn-primary">
+                    Изменить ящик
                   </Link>
                 </>
               </p>
@@ -47,12 +47,9 @@ export default function FreezerDetail() {
                   <td className="table_detail_value">{storageDetail.name}</td>
                 </tr>
                 <tr>
-                  <td className="table_detail_property">Этаж</td>
-                  <td className="table_list_value">{storageDetail.floor}</td>
-                </tr>
-                <tr>
-                  <td className="table_detail_property">Номер</td>
-                  <td className="table_list_value">{storageDetail.id_freezer}</td>
+                  <td className="table_detail_property">Морозильник</td>
+                  <td className="table_list_value"><Link to={`/storage/freezer/${storageDetail.freezer.id}/`} className="btn btn-primary">
+                    {storageDetail.freezer.name}</Link></td>
                 </tr>
               </tbody>
             </table>
@@ -61,19 +58,19 @@ export default function FreezerDetail() {
           <table class="my-table">
               <thead>
                   <tr>
-                      <th>Верхушка морозилки</th>
+                      <th>Верхушка ящика</th>
                   </tr>
               </thead>
               <tbody>
-              {storageDetail.drawers.map(drawer => (
-                  <tr key={drawer.id}>
+              {storageDetail.shelf.map(shelf => (
+                  <tr key={shelf.id}>
                       <td className="green-bg">
-                      <Link to={`/storage/drawer/${drawer.id}`}>{drawer.name}</Link>
+                      <Link to={`/storage/shelf/${shelf.id}`}>{shelf.name}</Link>
                       </td>
                   </tr>
               ))}
               <tr>
-                <th>Низ морозилки</th>
+                <th>Низ ящика</th>
             </tr>
           </tbody>
           </table>
