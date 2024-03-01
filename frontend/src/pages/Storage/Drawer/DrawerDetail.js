@@ -31,9 +31,12 @@ export default function DrawerDetail() {
             <div className="title_object">
               <p>
                 <>
-                  <span className="larger-text">{storageDetail.name} </span>
-                  <Link to={`/storage/drawer/${id}/update`} className="btn btn-primary">
+                  <span className="larger-text mr-2">{storageDetail.name}</span>
+                  <Link to={`/storage/drawer/${id}/update`} className="btn btn-primary mr-2">
                     Изменить ящик
+                  </Link>
+                  <Link to={`/storage/shelf/create/?drawer_id=${id}`} className="btn btn-primary">
+                    Добавить полку
                   </Link>
                 </>
               </p>
@@ -48,7 +51,7 @@ export default function DrawerDetail() {
                 </tr>
                 <tr>
                   <td className="table_detail_property">Морозильник</td>
-                  <td className="table_list_value"><Link to={`/storage/freezer/${storageDetail.freezer.id}/`} className="btn btn-primary">
+                  <td className="table_list_value"><Link to={`/storage/freezer/${storageDetail.freezer.id}/`} className="link-style">
                     {storageDetail.freezer.name}</Link></td>
                 </tr>
               </tbody>

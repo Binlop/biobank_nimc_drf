@@ -54,7 +54,9 @@ export default function DNADetail() {
                 </tr>
                 <tr>
                   <td className="table_detail_property">Место хранения</td>
-                  <td className="table_list_value"></td>
+                  <td className="table_list_value">
+                  <Link to={`/storage/box/${sampleDetail.location.box}/`} className="link-style">{sampleDetail.location.name}</Link>
+                  </td>
                 </tr>
                 <tr>
                   <td className="table_detail_property">Количество</td>

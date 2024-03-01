@@ -10,7 +10,7 @@ export default function DNAUpdate() {
   const navigate = useNavigate();
   const [errors, setError] = useState(null); 
   const { id } = useParams();
-
+  const [samplePlaces, setSamplePlaces] = useState([]); 
 
   useEffect(() => {
     refreshSampleData();
@@ -33,10 +33,22 @@ export default function DNAUpdate() {
     axios
         .get(`/api/sample/${id}/`)
         .then((res) => {
-          setFormData(res.data);           
+          setFormData(res.data);     
+          fetchSamplePlaces();      
         })
         .catch((err) => console.log(err));
   };
+
+  const fetchSamplePlaces = () => {
+    axios
+      .get(`/api/storage/sample_map/${id}`)
+      .then((res) => {
+        setSamplePlaces(res.data);
+      console.log(res.data)
+    })
+      .catch((err) => console.log(err));
+  };   
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -45,7 +57,7 @@ export default function DNAUpdate() {
       const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
 
       const formSample = makeSampleForm();
-
+      console.log(formSample)
       await axios.put(`/api/sample/dna/${id}/update/`, formSample, {
       headers: {
       "Content-Type": contentTypeHeader,
@@ -96,7 +108,20 @@ export default function DNAUpdate() {
           value={formData.volume}
           onChange={handleChange}
           errors={errors}
-        />                              
+        /> 
+        <div className="form-group">
+        <label>Лаборатории:</label>
+        <select
+          className="form-control"
+          // value={selectedValue} // Предположим, что selectedValue - это состояние, хранящее выбранное значение
+          onChange={handleChange}
+          name ="sample_place"
+        >
+          {samplePlaces.map((place) => (
+            <option key={place.id} value={place.id}>{place.name}</option>
+          ))}
+        </select>
+        </div>                       
         <button type="submit" className="btn btn-primary">
         Добавить
         </button>

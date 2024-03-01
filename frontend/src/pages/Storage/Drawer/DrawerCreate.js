@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import "../storage.css"
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 
@@ -10,13 +10,14 @@ export default function DrawerCreate() {
         });  
   const navigate = useNavigate();
   const [errors, setError] = useState(null); 
-  const [allLaboratories, setAllLaboratories] = useState([]);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const parentStorageId = searchParams.get('freezer_id');
 
   useEffect(() => {
-    document.title = 'Добавить морозильник';
+    document.title = 'Добавить ящик';
     const csrftoken = getCSRFToken('csrftoken'); 
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
-    fetchLaboratories();
     }, []);
 
   const getCSRFToken = (name) => {
@@ -27,16 +28,6 @@ export default function DrawerCreate() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
-  };
-
-  const fetchLaboratories = () => {
-    axios
-      .get(`/api/laboratory`)
-      .then((res) => {
-      setAllLaboratories(res.data);
-      console.log(res.data)
-    })
-      .catch((err) => console.log(err));
   };   
 
   const handleSubmit = async (e) => {
@@ -48,48 +39,37 @@ export default function DrawerCreate() {
 
       const formStorage = makeStorageForm();
 
-      await axios.post(`/api/storage/freezer/create/`, formStorage, {
+      await axios.post(`/api/storage/drawer/create/`, formStorage, {
       headers: {
       "Content-Type": contentTypeHeader,
       },
       });
-      navigate('/storage/');
+      navigate(`/storage/freezer/${parentStorageId}`);
     } 
     catch (error) {
-        console.error('Ошибка с отправкой образца:', error);
+        console.error('Ошибка с отправкой ящика:', error);
         setError(error.response.data);
       }
   };
 
-  const handleChangeLaboratory = (e) => {
-    const { name, value, checked } = e.target;
-    const labId = parseInt(value);
-    let updatedLaboratories;
-    if (checked) {
-      updatedLaboratories = [...formData.laboratory, labId];
-    } else {
-      updatedLaboratories = formData.laboratory.filter(id => id !== labId);
-    }
-    setFormData({ ...formData, [name]: updatedLaboratories });
-  };
-
   const makeStorageForm = () => {
-    const formSample = new FormData();
+    const formStorage = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
         const value = formData[key];
         if (value) {
-          formSample.append(key, value);
+          formStorage.append(key, value);
         }
       }
     }
-    return formSample;
+    formStorage.append('freezer_id', parentStorageId)
+    return formStorage;
   };
 
   return (
     <div className="features">
       <div className="user_form">
-      <h2>Добавить морозильник</h2>
+      <h2>Добавить ящик</h2>
         <form onSubmit={handleSubmit}>
           <CharFieldWithError
             label="Название:"
@@ -97,37 +77,7 @@ export default function DrawerCreate() {
             value={formData.name}
             onChange={handleChange}
             errors={errors}
-          />
-          <CharFieldWithError
-            label="Этаж:"
-            name="floor"
-            value={formData.floor}
-            onChange={handleChange}
-            errors={errors}
-          />                              
-          <CharFieldWithError
-            label="Номер морозильника:"
-            name="id_freezer"
-            value={formData.id_freezer}
-            onChange={handleChange}
-            errors={errors}
-          />     
-        <div className="form-group">
-          <label>Лаборатории:</label>
-          {allLaboratories.map(lab => (
-          <div key={lab.id} className="form-check">
-          <input
-          type="checkbox"
-          id={`lab-${lab.id}`}
-          name="laboratory"
-          value={lab.id}
-          onChange={handleChangeLaboratory}
-          className="form-check-input"
-          />
-          <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
-          </div>
-          ))}
-          </div>                         
+          />                           
           <button type="submit" className="btn btn-primary">
           Добавить
           </button>

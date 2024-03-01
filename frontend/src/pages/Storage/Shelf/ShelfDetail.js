@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "../storage.css"
 
-export default function FreezerDetail() {
+export default function ShelfDetail() {
     const { id } = useParams();
     const [storageDetail, setStorageDetail] = useState(null);
 
@@ -13,7 +13,7 @@ export default function FreezerDetail() {
 
     const refreshList = () => {
         axios
-            .get(`/api/storage/freezer/${id}`)
+            .get(`/api/storage/shelf/${id}`)
             .then((res) => {
                 setStorageDetail(res.data);
                 if (res.data) {
@@ -30,15 +30,15 @@ export default function FreezerDetail() {
         <div>
             <div className="title_object">
               <p>
-                <div className="add_change">
-                  <span className="larger-text">{storageDetail.name} </span>
-                  <Link to={`/storage/freezer/${id}/update`} className="btn btn-primary mr-2">
-                    Изменить морозильник
+                <>
+                  <span className="larger-text mr-2">{storageDetail.name}</span>
+                  <Link to={`/storage/shelf/${id}/update`} className="btn btn-primary mr-2">
+                    Изменить полку
                   </Link>
-                  <Link to={`/storage/drawer/create/?freezer_id=${id}`} className="btn btn-primary">
-                    Добавить ящик
+                  <Link to={`/storage/box/create/?shelf_id=${id}`} className="btn btn-primary">
+                    Добавить коробки
                   </Link>
-                </div>
+                </>
               </p>
             </div>
       
@@ -50,12 +50,9 @@ export default function FreezerDetail() {
                   <td className="table_detail_value">{storageDetail.name}</td>
                 </tr>
                 <tr>
-                  <td className="table_detail_property">Этаж</td>
-                  <td className="table_list_value">{storageDetail.floor}</td>
-                </tr>
-                <tr>
-                  <td className="table_detail_property">Номер</td>
-                  <td className="table_list_value">{storageDetail.id_freezer}</td>
+                  <td className="table_detail_property">Ящик</td>
+                  <td className="table_list_value"><Link to={`/storage/drawer/${storageDetail.drawer.id}/`} className="link-style">
+                    {storageDetail.drawer.name}</Link></td>
                 </tr>
               </tbody>
             </table>
@@ -64,19 +61,19 @@ export default function FreezerDetail() {
           <table class="my-table">
               <thead>
                   <tr>
-                      <th>Верхушка морозилки</th>
+                      <th>В глубь полки</th>
                   </tr>
               </thead>
               <tbody>
-              {storageDetail.drawers.map(drawer => (
-                  <tr key={drawer.id}>
+              {storageDetail.box.map(box => (
+                  <tr key={box.id}>
                       <td className="green-bg">
-                      <Link to={`/storage/drawer/${drawer.id}`}>{drawer.name}</Link>
+                      <Link to={`/storage/box/${box.id}`}>{box.name}</Link>
                       </td>
                   </tr>
               ))}
               <tr>
-                <th>Низ морозилки</th>
+                <th>К началу полки</th>
             </tr>
           </tbody>
           </table>

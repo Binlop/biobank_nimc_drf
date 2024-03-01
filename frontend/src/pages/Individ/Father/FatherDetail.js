@@ -82,7 +82,74 @@ export default function FatherDetail() {
                                         <Link to={`/laboratories/${item.id}`} className="link-style">{item.name}<br></br></Link>
                                     ))}
                                 </td>
-
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Семья</td>
+                                <td className="table_detail_value">{individDetail.family ? individDetail.family.name : 'Нет данных'}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Кол-во крови</td>
+                                <td className="table_detail_value">{individDetail.count_blood}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Кол-во ДНК</td>
+                                <td className="table_detail_value">{individDetail.count_dna}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Кол-во хориона</td>
+                                <td className="table_detail_value">{individDetail.count_chorion}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Кол-во хориона</td>
+                                <td className="table_detail_value">{individDetail.count_chorion}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">№ Семьи</td>
+                                <td className="table_detail_value">{individDetail.family_number}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">ID отца</td>
+                                <td className="table_detail_value">{individDetail.father_id}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Фамилия</td>
+                                <td className="table_detail_value">{individDetail.last_name}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Имя</td>
+                                <td className="table_detail_value">{individDetail.first_name}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Отчество</td>
+                                <td className="table_detail_value">{individDetail.patronymic}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Дата рождения</td>
+                                <td className="table_detail_value">{individDetail.date_of_birth}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Возраст на момент взятия лет</td>
+                                <td className="table_detail_value">{individDetail.age_at_sampling}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Телефон</td>
+                                <td className="table_detail_value">{individDetail.phone}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Домашний адрес</td>
+                                <td className="table_detail_value">{individDetail.home_address}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Национальность</td>
+                                <td className="table_detail_value">{individDetail.nationality}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Место рождения</td>
+                                <td className="table_detail_value">{individDetail.place_of_birth}</td>
+                            </tr>
+                            <tr>
+                                <td className="table_detail_property">Наследственная отягощенность в семье</td>
+                                <td className="table_detail_value">{individDetail.hereditary_burden_in_the_family}</td>
                             </tr>
                         </tbody>
                     </table>

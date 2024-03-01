@@ -153,3 +153,63 @@ table td {
     text-decoration: none; /* Убираем подчеркивание для всех ссылок внутри td */
     color: inherit; /* Наследование цвета текста от родителя */
 }
+
+.samples {
+    width: 600px;
+}
+
+
+
+.sample-statistic{
+    position: absolute;
+    width: 170px;
+    margin-top: 20px;
+}
+
+.sample-statistic th, .sample-statistic td {
+    border: 1px solid #000; /* Добавление обводки для всех ячеек */
+    padding: 5px; /* Добавление отступов внутри ячеек */
+}
+
+.storage-cell {
+    width: 50px;
+    padding: 5px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.storage-cell::before {
+    content: "";
+    display: block;
+    padding-top: 100%; /* Это соотношение сторон (100% ширины относительно высоты), что делает ячейку квадратной */
+}
+
+.green-circle {
+    width: 90%;
+    height: 90%;
+    background-color: green;
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.red-circle {
+    width: 90%;
+    height: 90%;
+    background-color: red; /* or red for .red-circle */
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.red-circle a {
+    color: white; /* Set text color as needed */
+    text-decoration: none; 
+}
