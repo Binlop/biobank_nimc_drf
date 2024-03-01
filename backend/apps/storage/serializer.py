@@ -51,9 +51,9 @@ class FreezerOutputSerializer(FreezerInputSerializer):
         return serializer.data
 
 class DrawerSrializerInput(StorageSerializerOutput):
-    freezer_id = serializers.IntegerField()
+    freezer_id = serializers.IntegerField(required=False)
 
-    class Model:
+    class Meta:
         model = Drawer
         fields = ['name', 'freezer_id']
 
@@ -65,7 +65,7 @@ class DrawerSrializerInput(StorageSerializerOutput):
         service = DrawerService()
         return service.update_storage_object(instance, validated_data)
 
-class DrawerSerializerOutput(DrawerSrializerInput):
+class DrawerSerializerOutput(StorageSerializerOutput):
     freezer = FreezerOutputSerializer(fields=('id', 'name'))
     shelf = serializers.SerializerMethodField()
 
@@ -79,11 +79,11 @@ class DrawerSerializerOutput(DrawerSrializerInput):
         return serializer.data  
 
 class ShelfSerializerInput(StorageSerializerOutput):
-    drawer_id = serializers.IntegerField()
+    drawer_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Shelf
-        fields = ['drawer_id', 'name', 'count_boxes', 'count_rows', 'count_col']
+        fields = ['drawer_id', 'name', 'len_row', 'len_col']
 
     def create(self, validated_data: dict):
         service = ShelfService()
@@ -99,7 +99,7 @@ class ShelfSerializerOutput(ShelfSerializerInput):
 
     class Meta:
         model = Shelf
-        fields = ['id', 'name', 'count_rows', 'count_col', 'drawer', 'box']
+        fields = ['id', 'name', 'drawer', 'box', 'len_row', 'len_col']
 
     def get_box(self, obj):
         boxes =  obj.box.all()
@@ -108,11 +108,11 @@ class ShelfSerializerOutput(ShelfSerializerInput):
     
 class BoxSerializerInput(StorageSerializerOutput):
     shelf_id = serializers.IntegerField()
-    count_boxes = serializers.IntegerField()
+    count_boxes = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Box
-        fields = ['shelf_id', 'name', 'count_boxes', 'count_rows', 'count_col']
+        fields = ['shelf_id', 'name', 'count_boxes', 'len_row', 'len_col']
 
     def create(self, validated_data: dict):
         service = BoxService()
@@ -128,12 +128,14 @@ class BoxSerializerOutput(BoxSerializerInput):
 
     class Meta:
         model = Box
-        fields = ['id', 'name', 'count_rows', 'count_col', 'shelf', 'samples']
+        fields = ['id', 'name', 'len_row', 'len_col', 'shelf', 'samples']
 
     def get_samples(self, obj):
-        shelfs =  obj.samples_map.all()
-        serializer = SamplesSerializerOutut(shelfs, many=True, fields=('id', 'name'))
-        return serializer.data  
+        sample_places =  obj.samples_map.all()
+        serializer = SamplesSerializerOutut(sample_places, many=True)
+        test = serializer.data
+        samples_map = [test[i:i+obj.len_col] for i in range(0, len(test), obj.len_col)]
+        return samples_map
     
 class SamplesSerializerInput(StorageSerializerOutput):
     box_id = serializers.IntegerField()
@@ -154,4 +156,4 @@ class SamplesSerializerInput(StorageSerializerOutput):
 class SamplesSerializerOutut(StorageSerializerOutput):
     class Meta:
         model = SamplesMap
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'state_location', 'sample_type', 'sample_id', 'box']

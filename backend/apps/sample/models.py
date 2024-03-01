@@ -3,14 +3,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import GenericRelation
 from individ.models import Individ
+from storage.models import SamplesMap
 
 
 class Sample(models.Model):
     name = models.CharField('Имя образца', max_length=256)
-    sample_type = models.CharField('Тип образца', max_length=10) #e.g днк, кровь, хорион
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
+    location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_sample') # Место хранения образца
 
 class CustomSampleType(models.Model):
     """
@@ -22,9 +23,6 @@ class CustomSampleType(models.Model):
     sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
     barcode = models.CharField('Баркод', max_length=150, null=True)
-    
-    # location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_sample') # Место хранения образца
-
     
     class Meta:
         abstract = True

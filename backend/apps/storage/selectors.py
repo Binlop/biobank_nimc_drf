@@ -19,6 +19,15 @@ class StorageListSelector:
         freezer_qs = Freezer.objects.filter(freezer_q)
 
         return freezer_qs
+    
+    def get_free_sample_places(self, user: User, pk: int) -> QuerySet[SamplesMap]:   
+        user_laboratories = user.profile.get_user_laboratories()
+        user_laboratory_ids = user_laboratories.values_list('id', flat=True)
+
+        sample_place_q = Q(box__shelf__drawer__freezer__laboratory__in=user_laboratory_ids) & (Q(state_location="free") | Q(sample_id=pk)) # pk aliquot и sample может совпасть
+        sample_place_qs = SamplesMap.objects.filter(sample_place_q)
+
+        return sample_place_qs
 
 T = TypeVar('T', Freezer, Drawer, Shelf, Box, SamplesMap)
 

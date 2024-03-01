@@ -114,3 +114,11 @@ class BoxUpdateView(StorageUpdateView):
 
 class SampleMapCreateView(StorageCreateView):
     serializer_class = serializers.SamplesSerializerInput
+
+class SampleMapListView(StorageCreateView):
+    
+    def get(self, request, pk):
+        selector = selectors.StorageListSelector()
+        objs = selector.get_free_sample_places(user=request.user, pk=pk)
+        serializer = serializers.SamplesSerializerOutut(objs, many=True)
+        return Response(serializer.data)

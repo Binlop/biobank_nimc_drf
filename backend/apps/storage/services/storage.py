@@ -69,22 +69,14 @@ class ShelfService(StorageService):
 class BoxService(StorageService):
     model = Box
 
-    @staticmethod
-    def make_location_path_to_box(shelf: Shelf) -> str:
-        freezer_name = shelf.drawer.freezer.name
-        drawer_name = shelf.drawer.name
-        shelf_name = shelf.name
-        return f'{freezer_name}_{drawer_name}_{shelf_name}'
-
     @transaction.atomic
     def create_boxes(self, validated_data: dict) -> Box:
-        shelf_id = validated_data.pop('shelf_id', None)
+        shelf_id = validated_data.get('shelf_id', None)
         shelf = get_object_or_404(Shelf, id=shelf_id)
         
         count_boxes = validated_data.pop('count_boxes', 1)
-        location_path = self.make_location_path_to_box(shelf=shelf)
         for i in range(count_boxes):
-            box = Box(name=f'{location_path}_коробка_{i}')
+            box = self.create_storage_object(validated_data=validated_data)
             box.shelf = shelf
             box.save()
         return box
@@ -92,15 +84,22 @@ class BoxService(StorageService):
 class SampleMapService(StorageService):
     model = SamplesMap
 
+    def make_location_path_to_box(self, box: Box) -> str:
+        freezer_name = box.shelf.drawer.freezer.name
+        drawer_name = box.shelf.drawer.name
+        shelf_name = box.shelf.name
+        return f'{freezer_name}_{drawer_name}_{shelf_name}_{box.name}'
+
     @transaction.atomic
     def create_samples_map(self, validated_data: dict):
         box_id = validated_data.pop('box_id', None)
         box = get_object_or_404(Box, id=box_id)
 
         count_samples = validated_data.pop('count_samples', 1)
-        location_path = f'{BoxService.make_location_path_to_box(box.shelf)}_{box.name}'
+        sample_name = validated_data.pop('name', '')
+        location_path = self.make_location_path_to_box(box=box)
         for i in range(count_samples):
-            sample_place = SamplesMap(name=f'{location_path}_образец_{i}')
+            sample_place = SamplesMap(name=f'{location_path}_{sample_name}_{i}')
             sample_place.box = box
             sample_place.save()
         return sample_place

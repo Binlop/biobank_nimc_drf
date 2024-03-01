@@ -2,6 +2,7 @@ from rest_framework import serializers
 from individ.serializer import IndividSerializerInput
 from individ.serializer import EmbryoSerializerOutput, FatherSerializerOutput, MotherSerializerOutput, AdultSerializerOutput
 from individ.models import Individ, Embryo, Father, Mother, AnotherFamilyMember
+from storage.serializer import SamplesSerializerOutut
 from .services import dna, chorion
 from .models import Sample, DNA, Chorion
 
@@ -33,6 +34,7 @@ class CustomSampleSerializerOutput(serializers.Serializer):
     sampletype = serializers.CharField(max_length=10) #e.g Кровь, ДНК, хорион
     volume = serializers.IntegerField(required=False)
     sample = SampleSerializerOutput()
+    location = serializers.SerializerMethodField()
 
     def get_individ(self, obj):
         individ = obj.individ.content_object
@@ -49,11 +51,17 @@ class CustomSampleSerializerOutput(serializers.Serializer):
 
         return serializer.data
 
+    def get_location(self, obj):
+        location = obj.sample.location
+        serializer = SamplesSerializerOutut(location, fields=('id', 'name', 'box'))
+        return serializer.data
+
 class CustomSampleSerializerInput(serializers.Serializer):
     name = serializers.CharField(max_length=150)
     barcode = serializers.CharField(max_length=150, required=False)
     volume = serializers.IntegerField(required=False)
     individ_id = serializers.IntegerField()
+    sample_place = serializers.IntegerField(required=False)
 
 
 class DNAOutputSerializer(CustomSampleSerializerOutput):

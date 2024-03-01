@@ -21,5 +21,6 @@ urlpatterns = [
     path('box/<int:pk>/update/', views.BoxUpdateView.as_view()),
     
     path('sample_map/create/', views.SampleMapCreateView.as_view()),
+    path('sample_map/<int:pk>', views.SampleMapListView.as_view()),
 
 ]
