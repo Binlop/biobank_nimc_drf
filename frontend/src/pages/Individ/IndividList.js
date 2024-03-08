@@ -3,6 +3,121 @@ import "./individ.css"
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import NestedMenu from './NestedMenu'; // Импортируем компонент NestedMenu
+import CharFieldWithError from "../../components/Fields/CharFieldWithError";
+import EmbryoFilterForm from "./FilterComponents/EmbryoFilter";
+
+function FilterBlock() {
+  const [isOpenEmbryo, setIsOpenEmbryo] = useState(false);
+  const [isOpenFather, setIsOpenFather] = useState(false);
+  const [embryoData, setEmbryoData] = useState({});
+  const [fatherData, setFatherData] = useState({});    
+  const [motherData, setMotherData] = useState({});  
+  const [errors, setError] = useState({});
+  let formData = {}
+
+  const toggleEmbryo = () => {
+    setIsOpenEmbryo(!isOpenEmbryo);
+  };
+
+  const toggleFather = () => {
+    setIsOpenFather(!isOpenFather);
+  };
+
+  const handleChangeEmbryo = (event) => {
+    const { name, value } = event.target;
+    const updatedEmbryoData = { ...embryoData, [name]: value };
+    if (value.trim() === '') {
+      delete updatedEmbryoData[name];
+    }
+      setEmbryoData(updatedEmbryoData);
+  };
+
+  const handleChangeEmbryoCheckMark = (event) => {
+    const { name, checked } = event.target;
+    const value = checked ? 'on' : ''; // Если чекбокс отмечен, установить значение 'on', иначе пустую строку
+    setEmbryoData({ ...embryoData, [name]: value });
+  };
+
+  const handleChangeDateOfReceipt = (date) => {
+    const formattedDate = date.toISOString().split('T')[0];
+    setEmbryoData({ ...embryoData, ["date_of_receipt"]: formattedDate });   
+  };
+
+  const handleChangeDateLastMenstruation = (date) => {
+      const formattedDate = date.toISOString().split('T')[0];
+      setEmbryoData({ ...embryoData, ["last_menstruation"]: formattedDate });
+  }   
+
+  const handleChangeFather = (event) => {
+    const { name, value } = event.target;
+    setFatherData({ ...fatherData, [name]: value });
+  };
+
+  const handleChangeMother = (event) => {
+    const { name, value } = event.target;
+    setMotherData({ ...motherData, [name]: value });
+  };
+
+  const uniteAllFormData = () => {
+    formData["embryo"] = embryoData
+    formData["father"] = fatherData
+    formData["mother"] = motherData
+    return formData
+  };
+  
+
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+      
+    formData = uniteAllFormData();
+    try {
+      uniteAllFormData();
+      axios.get(`/api/individ/search/`, { params: formData });
+
+    } 
+    catch (error) {
+        console.error('Ошибка с отправкой индивида:', error);
+        setError(error.response.data);
+      }
+    };
+
+  return (
+  <div className="filter" style={{ maxHeight: '800px', overflowY: 'auto' }}>
+    <form onSubmit={handleSearch}>
+      <EmbryoFilterForm
+                embryoData={embryoData}
+                handleChangeEmbryo={handleChangeEmbryo}
+                handleChangeDateOfReceipt={handleChangeDateOfReceipt}
+                handleChangeDateLastMenstruation={handleChangeDateLastMenstruation}
+                errors={errors}
+                toggleEmbryo = {toggleEmbryo}
+                handleChangeEmbryoCheckMark = {handleChangeEmbryoCheckMark}
+                isOpenEmbryo = {isOpenEmbryo}
+
+        />
+      <div className="collapsible" onClick={toggleFather}>
+        {"Отец"}
+        <br />
+        {isOpenFather && (          
+          <div onClick={(event) => event.stopPropagation()}>
+            <CharFieldWithError
+              label="Название"
+              name="name"
+              value={fatherData.name}
+              onChange={handleChangeFather}
+              errors={errors}
+            />
+          </div>
+        )}
+      </div>
+      <button type="submit">Применить</button>
+    </form>
+  </div>
+
+
+  );
+}
 
 export default function IndividList() {
     const [IndividList, seIndividList] = useState([]);
@@ -10,7 +125,8 @@ export default function IndividList() {
     useEffect(() => {
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
         axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshList()
+        refreshList() 
+
         document.title = 'Индивиды';
       }, []);
     
@@ -24,8 +140,6 @@ export default function IndividList() {
           .delete(`/api/individ/${item.individ.id}/delete`)
           .then((res) => refreshList());
       };
-
-
     const refreshList = () => {
         axios
           .get("/api/individ/")
@@ -34,10 +148,14 @@ export default function IndividList() {
         })
           .catch((err) => console.log(err));
       };    
+
     return (
         <main className="container">
+        <div>
              <NestedMenu />
             <div className="features">
+            <FilterBlock/>
+
                 <table className="table">
                     <thead>
                         <tr>
@@ -67,6 +185,7 @@ export default function IndividList() {
                         ))}
                     </tbody>
                 </table>
+            </div>
             </div>
         </main>
     )

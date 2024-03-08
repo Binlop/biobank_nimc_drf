@@ -9,7 +9,17 @@ from .selectors import FamilyMemberListSelector, FamilyMemberDetailSelector
 class FamilyMemberListView(APIView):
 
     def get(self, request, format=None):
-        members = FamilyMemberListSelector.get_individ_list(user=request.user)      
+        selector = FamilyMemberListSelector()
+        members = selector.get_individ_list(user=request.user)      
+        serializer = base_serializer.IndividSerializerOutput(members, many=True)
+        return Response(serializer.data)
+
+class FamilyMemberListSearchView(APIView):
+
+    def get(self, request, format=None):
+        selector = FamilyMemberListSelector()
+        selector.get_filtered_individ_list(user=request.user, filters=request.query_params)
+        members = selector.get_individ_list(user=request.user)      
         serializer = base_serializer.IndividSerializerOutput(members, many=True)
         return Response(serializer.data)
 
@@ -64,7 +74,7 @@ class FamilyMemberUpdateView(APIView):
 
 class EmbryoCreateView(FamilyMemberCreateView):
     def get_serializer_class(self, requested_data):
-        return base_serializer.EmbryoSerializerInput(requested_data)
+        return base_serializer.EmbryoSerializerInput(data=requested_data)
 
 class EmbryoUpdateView(FamilyMemberUpdateView):
     def get_serializer_class(self, instance, requested_data):

@@ -6,13 +6,15 @@ from .models import Embryo, Father, Mother
 from django.db.models import Q
 from typing import Union
 from itertools import chain
+import json
+from .filters import EmbryoFilter
 
 class FamilyMemberListSelector:
     """
     Класс отвечает за получение списка индивидов из бд
     """
 
-    def get_individ_list(user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
+    def get_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
         user_laboratories = user.profile.get_user_laboratories()
         user_laboratory_ids = user_laboratories.values_list('id', flat=True)
         
@@ -25,6 +27,21 @@ class FamilyMemberListSelector:
         individ_list = list(chain(embryo_qs, father_qs, mother_qs))
         
         return individ_list
+
+    def get_filtered_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
+        filters = dict(filters)
+        embryo_data = json.loads(filters['embryo'][0])
+        father_data = json.loads(filters['father'][0])
+        mother_data = json.loads(filters['mother'][0])
+        print(embryo_data)
+
+        # Создание вложенного словаря
+        filters_result = {'embryo': embryo_data, 'father': father_data, 'mother': mother_data}
+        # print(filters_result)
+
+        embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all())
+        filtered_queryset = embryo_filter.qs
+        print(filtered_queryset)
 
 class FamilyMemberDetailSelector:
     """

@@ -126,3 +126,34 @@ table td {
     position: relative;
     margin-left: 23%;
 }
+
+.filter{
+    position: absolute;
+    margin-left:1000px;
+    margin-top: 50px;
+    width: 300px;
+
+}
+
+.filter label{
+    color:white;
+}
+
+.collapsible {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    width: 300px;
+    color: white;
+    transition: max-height 0.3s ease-out;
+
+
+  }
+
+.content {
+  display: none;
+  padding: 10px;
+  width: 300px;
+  transition: max-height 0.3s ease-out;
+}

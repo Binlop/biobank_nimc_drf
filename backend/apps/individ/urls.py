@@ -3,6 +3,7 @@ from individ import views
 
 urlpatterns = [
     path('', views.FamilyMemberListView.as_view()),
+    path('search/', views.FamilyMemberListSearchView.as_view()),
     path('<int:pk>/', views.FamilyMemberDetail.as_view()),
     path('<int:pk>/delete/', views.FamilyMemberDeleteView.as_view()),
 
