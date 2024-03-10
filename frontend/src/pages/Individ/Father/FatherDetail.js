@@ -85,7 +85,9 @@ export default function FatherDetail() {
                             </tr>
                             <tr>
                                 <td className="table_detail_property">Семья</td>
-                                <td className="table_detail_value">{individDetail.family ? individDetail.family.name : 'Нет данных'}</td>
+                                <td className="table_detail_value">{individDetail.family ? 
+                                <Link to={`/families/${individDetail.family.id}`} className="link-style">{individDetail.family.name}</Link> 
+                                : 'Нет данных'}</td>
                             </tr>
                             <tr>
                                 <td className="table_detail_property">Кол-во крови</td>

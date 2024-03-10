@@ -22,6 +22,13 @@ class FamilyMemberListSearchView(APIView):
         members = selector.get_individ_list(user=request.user)      
         serializer = base_serializer.IndividSerializerOutput(members, many=True)
         return Response(serializer.data)
+    
+class FamilyMembersToFamilyListView(APIView):
+    def get(self, request, pk):
+        selector = FamilyMemberListSelector()
+        members = selector.filter_individs_by_family(user=request.user, family_id=pk)
+        serializer = base_serializer.IndividSerializerOutput(members, many=True)
+        return Response(serializer.data)
 
 class FamilyMemberDeleteView(APIView):
     

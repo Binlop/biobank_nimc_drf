@@ -14,12 +14,10 @@ class FamilyMemberListSelector:
     Класс отвечает за получение списка индивидов из бд
     """
 
-    def get_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
+    def filter_individs_by_q(self, user: User, individ_q: Q) -> QuerySet[Embryo, Father, Mother]:
         user_laboratories = user.profile.get_user_laboratories()
         user_laboratory_ids = user_laboratories.values_list('id', flat=True)
-        
-        individ_q = Q(laboratory__in=user_laboratory_ids)
-        
+        individ_q = Q(laboratory__in=user_laboratory_ids) & individ_q 
         embryo_qs = Embryo.objects.filter(individ_q).distinct()
         father_qs = Father.objects.filter(individ_q).distinct()
         mother_qs = Mother.objects.filter(individ_q).distinct()
@@ -27,6 +25,10 @@ class FamilyMemberListSelector:
         individ_list = list(chain(embryo_qs, father_qs, mother_qs))
         
         return individ_list
+    
+    def get_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
+        individ_q = Q()
+        return self.filter_individs_by_q(user=user, individ_q=individ_q)
 
     def get_filtered_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
         filters = dict(filters)
@@ -42,6 +44,11 @@ class FamilyMemberListSelector:
         embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all())
         filtered_queryset = embryo_filter.qs
         print(filtered_queryset)
+
+    def filter_individs_by_family(self, user: User, family_id: int) -> QuerySet[Embryo, Father, Mother]:
+        individ_q = Q(family__id=family_id)
+        return self.filter_individs_by_q(user=user, individ_q=individ_q)
+
 
 class FamilyMemberDetailSelector:
     """
