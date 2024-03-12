@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
+from sample.models import Sample
 from laboratory.serializers import LaboratorySerializer
 from .services.storage import FreezerService, DrawerService, ShelfService, BoxService, SampleMapService
 from .models import Freezer, Drawer, Shelf, Box, SamplesMap
@@ -153,7 +155,20 @@ class SamplesSerializerInput(StorageSerializerOutput):
         service = SampleMapService()
         return service.update_storage_object(instance, validated_data)
 
+class SampleSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
 class SamplesSerializerOutut(StorageSerializerOutput):
+    sample = serializers.SerializerMethodField()
+
     class Meta:
         model = SamplesMap
-        fields = ['id', 'name', 'state_location', 'sample_type', 'sample_id', 'box']
+        fields = ['id', 'name', 'state_location', 'sample_type', 'sample', 'box']
+
+    def get_sample(self, obj: SamplesMap):
+        if obj.sample_id:
+            sample = get_object_or_404(Sample, id=obj.sample_id)
+            print(sample)
+            serializer = SampleSerializer(sample)
+            return serializer.data

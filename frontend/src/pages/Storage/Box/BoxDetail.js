@@ -34,9 +34,11 @@ export default function BoxDetail() {
               <div class="red-circle">
                 {sample_place.name}
               </div>
-            ) : sample_place.sample_type === "sample" ? (
+            ) : sample_place.sample_type === "dna" || sample_place.sample_type === "blood" || sample_place.sample_type === "chorion" ? (
               <div class="red-circle">
-                {sample_place.name}
+                    <Link to={`/samples/${sample_place.sample_type}/${sample_place.sample.id}`} className="link-style">
+                    {sample_place.sample.name}
+                  </Link>
               </div>
             ) : (
               <div class="green-circle"></div>

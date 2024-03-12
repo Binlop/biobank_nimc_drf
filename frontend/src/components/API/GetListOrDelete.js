@@ -1,15 +1,15 @@
 import axios from 'axios';
 
-export const handleDelete = (apiPath, refreshList) => {
+export const handleDelete = (apiPathDelete, setIndividList, apiPathList) => {
     axios
-        .delete(`${apiPath}`)
-        .then((res) => refreshList())
+        .delete(`${apiPathDelete}`)
+        .then((res) => refreshList(setIndividList, apiPathList))
         .catch((err) => console.log(err));
 };
 
-export const refreshList = (setIndividList, apiPath) => {
+export const refreshList = (setIndividList, apiPathList) => {
     axios
-        .get(`${apiPath}`)
+        .get(`${apiPathList}`)
         .then((res) => {
             setIndividList(res.data);
         })

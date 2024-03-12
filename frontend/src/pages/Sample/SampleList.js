@@ -3,7 +3,6 @@ import "./sample.css"
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { handleDelete, refreshList } from "../../components/API/GetListOrDelete";
-import NestedMenu from "./NestedMenu";
 
 export default function SampleList() {
     const [IndividList, seIndividList] = useState([]);
@@ -19,14 +18,18 @@ export default function SampleList() {
         const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
         return cookieValue ? cookieValue.pop() : '';
       }
-    
+
     const handleDeleteClick = (sample_id) => {
-        handleDelete(sample_id, () => refreshList(`api/sample/${sample_id}/`, seIndividList));
+        console.log(sample_id)
+        handleDelete(`/api/sample/${sample_id}/delete/`, seIndividList, `/api/sample/`);
     };
 
     return (
         <main className="container">
-             <NestedMenu />
+               <div className="title_object">
+                <p>
+                <span className="larger-text">Образцы</span></p>
+                </div>
             <div className="features">
                 <table className="table">
                     <thead>
@@ -44,7 +47,7 @@ export default function SampleList() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDeleteClick(item)}
+                                        onClick={() => handleDeleteClick(item.sample.id)}
                                     >
                                         Удалить
                                     </button>
