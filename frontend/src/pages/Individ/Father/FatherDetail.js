@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "../individ.css"
-import NestedMenu from "../../Sample/NestedMenu";
+import AddSampleToAdult from "../AddSample";
+
 
 export default function FatherDetail() {
     const { id } = useParams();
@@ -57,11 +58,10 @@ export default function FatherDetail() {
                     )}
                 </p>
                 <div className="add_sample">
-                <NestedMenu
+                <AddSampleToAdult
                 individ_id={id}/>
 
                 </div>
-
             </div>
             <div className="features">
                 {individDetail && (

@@ -56,12 +56,12 @@ class StorageUpdateView(StorageViewBase):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SampleDeleteView(StorageViewBase):
+class StorageDeleteView(StorageViewBase):
     
     def delete(self, request, pk):
-        selector = SampleDetailSelector()
-        member = selector.get_sample_detail(user=request.user, pk=pk, delete=True)
-        member.delete()
+        selector = self.get_selector_class()
+        obj = selector.get_storage_detail(user=request.user, pk=pk)
+        obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class FreezerListView(StorageListView):
@@ -79,6 +79,10 @@ class FreezerUpdateView(StorageUpdateView):
     serializer_class = serializers.FreezerInputSerializer
     selector_class = selectors.FreezerDetailSelector
 
+class FreezerDeleteView(StorageDeleteView):
+    selector_class = selectors.FreezerDetailSelector
+
+
 class DrawerDetailView(StorageDetailView):
     serializer_class = serializers.DrawerSerializerOutput
     selector_class = selectors.DrawerDetailSelector
@@ -89,6 +93,7 @@ class DrawerCreateView(StorageCreateView):
 class DrawerUpdateView(StorageUpdateView):
     serializer_class = serializers.DrawerSrializerInput
     selector_class = selectors.DrawerDetailSelector
+
 
 class ShelfrDetailView(StorageDetailView):
     serializer_class = serializers.ShelfSerializerOutput
@@ -101,6 +106,7 @@ class ShelfUpdateView(StorageUpdateView):
     serializer_class = serializers.ShelfSerializerInput
     selector_class = selectors.ShelfDetailSelector
 
+
 class BoxDetailView(StorageDetailView):
     serializer_class = serializers.BoxSerializerOutput
     selector_class = selectors.BoxDetailSelector
@@ -111,6 +117,7 @@ class BoxCreateView(StorageCreateView):
 class BoxUpdateView(StorageUpdateView):
     serializer_class = serializers.BoxSerializerInput
     selector_class = selectors.BoxDetailSelector
+
 
 class SampleMapCreateView(StorageCreateView):
     serializer_class = serializers.SamplesSerializerInput

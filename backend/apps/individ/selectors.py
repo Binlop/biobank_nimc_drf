@@ -2,12 +2,12 @@ from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
 from .models import Individ
 from django.shortcuts import get_object_or_404
-from .models import Embryo, Father, Mother
+from .models import Embryo, Father, Mother, AnotherFamilyMember
 from django.db.models import Q
 from typing import Union
 from itertools import chain
 import json
-from .filters import EmbryoFilter
+from .filters import EmbryoFilter, FatherFilter, MotherFilter
 
 class FamilyMemberListSelector:
     """
@@ -21,8 +21,9 @@ class FamilyMemberListSelector:
         embryo_qs = Embryo.objects.filter(individ_q).distinct()
         father_qs = Father.objects.filter(individ_q).distinct()
         mother_qs = Mother.objects.filter(individ_q).distinct()
+        another_member_qs = AnotherFamilyMember.objects.filter(individ_q).distinct()
         
-        individ_list = list(chain(embryo_qs, father_qs, mother_qs))
+        individ_list = list(chain(embryo_qs, father_qs, mother_qs, another_member_qs))
         
         return individ_list
     
@@ -35,14 +36,16 @@ class FamilyMemberListSelector:
         embryo_data = json.loads(filters['embryo'][0])
         father_data = json.loads(filters['father'][0])
         mother_data = json.loads(filters['mother'][0])
-        print(embryo_data)
+        print(mother_data)
 
         # Создание вложенного словаря
         filters_result = {'embryo': embryo_data, 'father': father_data, 'mother': mother_data}
         # print(filters_result)
 
         embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all())
-        filtered_queryset = embryo_filter.qs
+        father_filter = FatherFilter(father_data, queryset=Father.objects.all())
+        mother_filter = MotherFilter(mother_data, queryset=Mother.objects.all())
+        filtered_queryset = mother_filter.qs
         print(filtered_queryset)
 
     def filter_individs_by_family(self, user: User, family_id: int) -> QuerySet[Embryo, Father, Mother]:

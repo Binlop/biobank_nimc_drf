@@ -1,0 +1,8 @@
+.main_block{
+    background-color: blue;
+}
+
+.sub_block{
+    background-color: red;
+    position: relative;
+}

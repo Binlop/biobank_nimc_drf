@@ -90,8 +90,7 @@ table td {
     text-align: left;
     margin-left: 10px;
     margin-top: 10px;
-    margin-bottom: 30px;
-    gap: 15px;
+    margin-bottom: 50px;
     position: absolute;
     font-family:'Times New Roman', Times, serif
 }
@@ -100,9 +99,13 @@ table td {
 .larger-text {
     /* position:absolute; */
     font-size: 24px;
-    margin-left: 0px;
+    margin-left: 40px;
 }
 
+.add_sample{
+    color: red;
+    background-color: #eb5959;
+}
 .user_form{
     width: 400px;
     text-align: center;
@@ -157,3 +160,27 @@ table td {
   width: 300px;
   transition: max-height 0.3s ease-out;
 }
+
+.individ_samples_list{
+    display: flex;
+    margin-top: 10px;
+    flex-direction: row;
+    gap: 50px;
+    position: relative;
+    margin-left: 760px;
+}
+
+.container_pregnancy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .input_container {
+    display: flex;
+    margin-top: 10px;
+    flex-direction: row;
+    gap: 10px;
+  }
+  .body {
+    margin-top: 20px;
+  }

@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from individ.serializer import IndividSerializerInput
 from individ.serializer import EmbryoSerializerOutput, FatherSerializerOutput, MotherSerializerOutput, AdultSerializerOutput
 from individ.models import Individ, Embryo, Father, Mother, AnotherFamilyMember
 from storage.serializer import SamplesSerializerOutut
@@ -26,6 +25,18 @@ class SampleSerializerOutput(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
 
 
+class IndividSamplesListSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=150)
+    sample = SampleSerializerOutput()
+    sampletype = serializers.CharField(max_length=10) #e.g Кровь, ДНК, хорион
+    location = serializers.SerializerMethodField()
+
+    def get_location(self, obj):
+        location = obj.sample.location
+        serializer = SamplesSerializerOutut(location, fields=('name', 'box'))
+        return serializer.data
+
 class CustomSampleSerializerOutput(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=150)
@@ -33,28 +44,31 @@ class CustomSampleSerializerOutput(serializers.Serializer):
     barcode = serializers.CharField(max_length=150, required=True)
     sampletype = serializers.CharField(max_length=10) #e.g Кровь, ДНК, хорион
     volume = serializers.IntegerField(required=False)
-    sample = SampleSerializerOutput()
     location = serializers.SerializerMethodField()
 
     def get_individ(self, obj):
         individ = obj.individ.content_object
         if isinstance(individ, Embryo):
-            serializer = EmbryoSerializerOutput(individ)
+            serializer = EmbryoSerializerOutput(individ, fields=('name', 'individ_type', 'individ'))
         elif isinstance(individ, Father):
-            serializer = FatherSerializerOutput(individ)
+            serializer = FatherSerializerOutput(individ, fields=('name', 'individ_type', 'individ'))
         elif isinstance(individ, Mother):
-            serializer = MotherSerializerOutput(individ)
+            serializer = MotherSerializerOutput(individ, fields=('name','individ_type', 'individ'))
         elif isinstance(individ, AnotherFamilyMember):
-            serializer = AdultSerializerOutput(individ)
+            serializer = AdultSerializerOutput(individ, fields=('name', 'individ_type', 'individ'))
         else:
             raise Exception('Unexpected type of individ object')
 
         return serializer.data
 
     def get_location(self, obj):
-        location = obj.sample.location
+        location = obj.content_object.location
         serializer = SamplesSerializerOutut(location, fields=('id', 'name', 'box'))
         return serializer.data
+    
+    def get_sample(self, obj):
+        location = obj.content_object
+
 
 class CustomSampleSerializerInput(serializers.Serializer):
     name = serializers.CharField(max_length=150)

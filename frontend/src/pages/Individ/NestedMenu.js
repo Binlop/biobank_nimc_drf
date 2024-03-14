@@ -23,7 +23,7 @@ const NestedMenu = () => {
     <div className="title_object">
       <p>
         <span className="larger-text">Индивиды </span>
-        <button onClick={handleMenuClick}>Добавить</button>
+        <button onClick={handleMenuClick} className='btn btn-primary'>Добавить</button>
         {showMenu && (
         <div className='main_block'>
           <ul>

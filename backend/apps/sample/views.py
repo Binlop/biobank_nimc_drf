@@ -23,7 +23,7 @@ class IndividSampleList(SampleViewBase):
     def get(self, request, pk):
         selector = SampleListSelector()
         samples = selector.get_individ_samples(user=request.user, individ_id=pk)      
-        serializer = serializers.CustomSampleSerializerOutput(samples, many=True)
+        serializer = serializers.IndividSamplesListSerializer(samples, many=True)
         return Response(serializer.data)
 
 class SampleDetailView(SampleViewBase):
@@ -47,9 +47,9 @@ class SampleCreateView(SampleViewBase):
 class SampleUpdateView(SampleViewBase):
 
     def put(self, request, pk):
+        print(request.data)
         selector = SampleDetailSelector()
         sample = selector.get_sample_detail(user=request.user, pk=pk)
-        serializer = serializers.DNAInputSerializer(sample, data=request.data)
         serializer = self.get_serializer_class()(sample, data=request.data)
         if serializer.is_valid():
             serializer.save()

@@ -1,9 +1,9 @@
 // NestedMenu.js
 import React, { useState } from 'react';
-import "./nested_menu.css"
+import "./add_sample.css"
 import { Link } from 'react-router-dom';
 
-const NestedMenu = ({individ_id}) => {
+const AddSampleToAdult = ({individ_id}) => {
   const [showMenu, setShowMenu] = useState(false);
   const [activeMenuItem, setActiveMenuItem] = useState(null);
 
@@ -41,4 +41,4 @@ const NestedMenu = ({individ_id}) => {
   );
 };
 
-export default NestedMenu;
+export default AddSampleToAdult;

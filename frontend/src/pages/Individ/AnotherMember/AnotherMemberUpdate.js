@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import "../individ.css"
 import DatePicker from "react-datepicker";
@@ -7,10 +8,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
 
-export default function FatherCreate() {
+export default function AnotherMemberUpdate() {
+    const { id } = useParams();
+
   const [formData, setFormData] = useState({
     laboratory: [],
-    pregnancy: [],
     });
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
@@ -19,7 +21,8 @@ export default function FatherCreate() {
 
 
   useEffect(() => {
-    document.title = 'Добавить мать';
+    refreshIndividData();
+    document.title = 'Изменить иного члена семьи';
     const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
     fetchLaboratories();
@@ -29,6 +32,22 @@ export default function FatherCreate() {
   const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
   return cookieValue ? cookieValue.pop() : '';
   }
+
+  const refreshIndividData = () => {
+    axios
+        .get(`/api/individ/${id}`)
+        .then((res) => {
+          setFormData(res.data);
+          console.log(res.data)
+          const laboratoryIds = res.data.laboratory.map(lab => lab.id);
+          console.log(laboratoryIds)
+          setFormData(prevState => ({
+            ...prevState,
+            laboratory: laboratoryIds
+          }));            
+        })
+        .catch((err) => console.log(err));
+  };
 
   const fetchLaboratories = () => {
     axios
@@ -59,9 +78,9 @@ export default function FatherCreate() {
       const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
       const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
 
-      const formEmbryo = makeEmbryoForm();
+      const formFather = makeFatherForm();
 
-      await axios.post(`/api/individ/father/create/`, formEmbryo, {
+      await axios.put(`/api/individ/${formData.individ_type}/${id}/update/`, formFather, {
       headers: {
       "Content-Type": contentTypeHeader,
       },
@@ -73,17 +92,17 @@ export default function FatherCreate() {
         setError(error.response.data);
       }
   };
-  const makeEmbryoForm = () => {
-    const formEmbryo = new FormData();
+  const makeFatherForm = () => {
+    const formFather = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
         const value = formData[key];
         if (value) {
-          formEmbryo.append(key, value);
+          formFather.append(key, value);
         }
       }
     }
-    return formEmbryo;
+    return formFather;
   };
 
   const handleChangeLaboratory = (e) => {
@@ -107,7 +126,7 @@ export default function FatherCreate() {
   return (
     <div className="features">
       <div className="user_form">
-      <h2>Добавить отца</h2>
+      <h2>Изменить иного члена семьи</h2>
         <form onSubmit={handleSubmit}>
           <CharFieldWithError
             label="Название:"
@@ -134,6 +153,7 @@ export default function FatherCreate() {
           value={lab.id}
           onChange={handleChangeLaboratory}
           className="form-check-input"
+          checked={formData.laboratory.includes(lab.id)}
           />
           <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
           </div>
@@ -238,14 +258,14 @@ export default function FatherCreate() {
             errors={errors}
           />
           <CharFieldWithError
-            label="ID отца"
-            name="father_id"
-            value={formData.father_id}
+            label="ID иного члена семьи"
+            name="another_member_user_id"
+            value={formData.another_member_user_id}
             onChange={handleChange}
             errors={errors}
           />
           <button type="submit" className="btn btn-primary">
-          Добавить
+          Изменить
           </button>
         </form>
       </div>

@@ -20,8 +20,8 @@ export default function FreezerList() {
         return cookieValue ? cookieValue.pop() : '';
       }
     
-    const handleDeleteClick = (freezer_id) => {
-        handleDelete(freezer_id, () => refreshList(`api/storage/freezer/${freezer_id}/`, seFreezerList));
+    const handleDeleteClick = (obj_id) => {
+        handleDelete(`/api/storage/freezer/${obj_id}/delete/`, seFreezerList, `/api/storage/`);
     };
 
     return (
@@ -46,7 +46,7 @@ export default function FreezerList() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDeleteClick(item)}
+                                        onClick={() => handleDeleteClick(item.id)}
                                     >
                                         Удалить
                                     </button>

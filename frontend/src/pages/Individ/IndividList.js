@@ -5,10 +5,14 @@ import { Link } from 'react-router-dom';
 import NestedMenu from './NestedMenu'; // Импортируем компонент NestedMenu
 import CharFieldWithError from "../../components/Fields/CharFieldWithError";
 import EmbryoFilterForm from "./FilterComponents/EmbryoFilter";
+import FatherFilterForm from "./FilterComponents/FatherFilter";
+import MotherFilterForm from "./FilterComponents/MotherFilter";
+
 
 function FilterBlock() {
   const [isOpenEmbryo, setIsOpenEmbryo] = useState(false);
   const [isOpenFather, setIsOpenFather] = useState(false);
+  const [isOpenMother, setisOpenMother] = useState(false);
   const [embryoData, setEmbryoData] = useState({});
   const [fatherData, setFatherData] = useState({});    
   const [motherData, setMotherData] = useState({});  
@@ -21,6 +25,10 @@ function FilterBlock() {
 
   const toggleFather = () => {
     setIsOpenFather(!isOpenFather);
+  };
+
+  const toggleMother = () => {
+    setisOpenMother(!isOpenMother);
   };
 
   const handleChangeEmbryo = (event) => {
@@ -38,6 +46,7 @@ function FilterBlock() {
     setEmbryoData({ ...embryoData, [name]: value });
   };
 
+
   const handleChangeDateOfReceipt = (date) => {
     const formattedDate = date.toISOString().split('T')[0];
     setEmbryoData({ ...embryoData, ["date_of_receipt"]: formattedDate });   
@@ -46,11 +55,39 @@ function FilterBlock() {
   const handleChangeDateLastMenstruation = (date) => {
       const formattedDate = date.toISOString().split('T')[0];
       setEmbryoData({ ...embryoData, ["last_menstruation"]: formattedDate });
-  }   
+  }
+
+  const handleChangeDateOfBirth = (date) => {
+    const formattedDate = date.toISOString().split('T')[0];
+    setFatherData({ ...fatherData, ["date_of_birth"]: formattedDate });   
+  };
+
+  const handleChangeDateOfBirthMother = (date) => {
+    const formattedDate = date.toISOString().split('T')[0];
+    setMotherData({ ...motherData, ["date_of_birth"]: formattedDate });   
+  };
+
 
   const handleChangeFather = (event) => {
     const { name, value } = event.target;
+    const updatedParentData = { ...fatherData, [name]: value };
+    if (value.trim() === '') {
+      delete updatedParentData[name];
+    }
+    console.log(updatedParentData)
+    setFatherData(updatedParentData);
+  };
+
+  const handleChangeFatherCheckMark = (event) => {
+    const { name, checked } = event.target;
+    const value = checked ? 'on' : ''; // Если чекбокс отмечен, установить значение 'on', иначе пустую строку
     setFatherData({ ...fatherData, [name]: value });
+  };
+
+  const handleChangeMotherCheckMark = (event) => {
+    const { name, checked } = event.target;
+    const value = checked ? 'on' : ''; // Если чекбокс отмечен, установить значение 'on', иначе пустую строку
+    setMotherData({ ...motherData, [name]: value });
   };
 
   const handleChangeMother = (event) => {
@@ -59,6 +96,7 @@ function FilterBlock() {
   };
 
   const uniteAllFormData = () => {
+    console.log(fatherData)
     formData["embryo"] = embryoData
     formData["father"] = fatherData
     formData["mother"] = motherData
@@ -96,21 +134,26 @@ function FilterBlock() {
                 isOpenEmbryo = {isOpenEmbryo}
 
         />
-      <div className="collapsible" onClick={toggleFather}>
-        {"Отец"}
-        <br />
-        {isOpenFather && (          
-          <div onClick={(event) => event.stopPropagation()}>
-            <CharFieldWithError
-              label="Название"
-              name="name"
-              value={fatherData.name}
-              onChange={handleChangeFather}
-              errors={errors}
-            />
-          </div>
-        )}
-      </div>
+      <FatherFilterForm
+                fatherData={fatherData}
+                handleChangeFather={handleChangeFather}
+                handleChangeDateOfBirth={handleChangeDateOfBirth}
+                errors={errors}
+                toggleFather = {toggleFather}
+                handleChangeFatherCheckMark = {handleChangeFatherCheckMark}
+                isOpenFather = {isOpenFather}
+
+        />
+      <MotherFilterForm
+                motherData={motherData}
+                handleChangeMother={handleChangeMother}
+                handleChangeDateOfBirth={handleChangeDateOfBirthMother}
+                errors={errors}
+                toggleMother = {toggleMother}
+                handleChangeMotherCheckMark = {handleChangeMotherCheckMark}
+                isOpenMother = {isOpenMother}
+
+        />
       <button type="submit">Применить</button>
     </form>
   </div>
@@ -160,9 +203,8 @@ export default function IndividList() {
                     <thead>
                         <tr>
                             <th className="table_list_property">Название</th>
-                            <th className="table_list_property">Кол-во ДНК</th>
-                            <th className="table_list_property">Кол-во хориона</th>
-                            <th className="table_list_property">Кол-во крови</th>
+                            <th className="table_list_property">Направление</th>
+                            <th className="table_list_property">Семья</th>
                             <th className="table_list_property">Действия</th>
                         </tr>
                     </thead>
@@ -170,9 +212,14 @@ export default function IndividList() {
                         {IndividList && IndividList.map(item => (
                             <tr key={item.id}>
                                 <td className="table_list_value"><Link to={`/individs/${item.individ_type}/${item.individ.id}/`} className="link-style">{item.name}</Link></td>
-                                <td className="table_list_value">{item.count_dna}</td>
-                                <td className="table_list_value">{item.count_chorion}</td>
-                                <td className="table_list_value">{item.count_blood}</td>
+                                <td className="table_detail_value">
+                                    {item.laboratory && item.laboratory.map(item => (
+                                        <Link to={`/laboratories/${item.id}`} className="link-style">{item.name}<br></br></Link>
+                                    ))}
+                                </td>                               
+                                <td className="table_detail_value">{item.family ? 
+                                <Link to={`/families/${item.family.id}`} className="link-style">{item.family.name}</Link> 
+                                : 'Нет данных'}</td>                                
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"

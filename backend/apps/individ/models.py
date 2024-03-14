@@ -188,17 +188,17 @@ class MotherPregnancy(models.Model):
     mother = models.ForeignKey(Mother, related_name='pregnancy', on_delete=models.CASCADE)
     pregnancy_year = models.IntegerField('Год беременности')
     diagnosis = models.CharField(choices=DIAGNOSIS_CHOICES, default='none', max_length=100)
+    
 
     class Meta:
         verbose_name = 'Беременность матери'
         verbose_name_plural = 'Беременности матерей'
 
-    def __str__(self):
-        return self.mother.name
 
 
 class AnotherFamilyMember(Adult):
     """Класс характеризует иного возможного члена семьи"""
+    another_member_user_id = models.IntegerField('ID члена семьи')
     test_field = models.CharField('Тестовое поле иной член семьи', max_length=250, null=True)
 
     class Meta: 

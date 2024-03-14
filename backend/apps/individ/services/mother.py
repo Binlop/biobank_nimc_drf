@@ -1,6 +1,7 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from family.services import FamilyCreateService
-from ..models import Individ, Mother
+from ..models import Individ, Mother, MotherPregnancy
 
 class MotherService():
     
@@ -30,3 +31,14 @@ class MotherService():
         instance.laboratory.set(laboratory_data)
         instance.save()
         return instance
+    
+    @transaction.atomic
+    def create_mother_pregnancy(self, validated_data: dict):
+        mother_id = validated_data.pop('mother_preg_id', None)
+        if mother_id:
+            mother = get_object_or_404(Mother, id=mother_id)
+            validated_data['mother'] = mother
+            pregnancy = MotherPregnancy.objects.create(**validated_data)
+            pregnancy.save()
+            return pregnancy
+    

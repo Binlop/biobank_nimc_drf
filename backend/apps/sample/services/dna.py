@@ -15,13 +15,13 @@ class SampleService():
         if location_id:
             location = get_object_or_404(SamplesMap, id=location_id)
             sample.location = location
-        print(location_id)
         sample.save()
         self.set_new_location_to_occupied(location_id=location_id, sample=sample)
         return sample
 
     @transaction.atomic
     def update_sample(self, sample: Sample, location_id: int) -> Sample:
+        print(location_id)
         if location_id:
             if sample.location:
                 self.set_previous_location_to_free(previous_location=sample.location)
@@ -54,13 +54,13 @@ class SampleService():
 
         individ = get_object_or_404(Individ, id=validated_data['individ_id'])
         custom_sample.individ = individ
-        print(custom_sample)
         return custom_sample
     
     def update_custom_sample(self, instance: A, validated_data: dict) -> A:
         location = validated_data.pop('sample_place', None)
         for field, value in validated_data.items():
             setattr(instance, field, value)
+        instance.sample.name = instance.name
         self.update_sample(instance.sample, location_id=location)
         return instance
 
@@ -69,7 +69,6 @@ class DNAService(SampleService):
 
     @transaction.atomic
     def create_dna(self, validated_data: dict) -> DNA:
-        print(validated_data)
         location = validated_data.pop('sample_place', None)
         dna = self.create_custom_sample(validated_data=validated_data)
         dna.sampletype = 'dna'

@@ -11,6 +11,10 @@ import FatherDetail from './Father/FatherDetail';
 import FatherCreate from './Father/FatherCreate';
 import FatherUpdate from './Father/FatherUpdate';
 
+import AnotherMemberDetail from './AnotherMember/AnotherMemberDetail';
+import AnotherMemberCreate from './AnotherMember/AnotherMemberCreate';
+import AnotherMemberUpdate from './AnotherMember/AnotherMemberUpdate';
+
 function Individ() {
   return (
       <main className="container">
@@ -28,6 +32,10 @@ function Individ() {
           <Route path="/father/:id/" element={<FatherDetail />} />
           <Route path="/father/create/" element={<FatherCreate />} />
           <Route path="/father/:id/update/" element={<FatherUpdate />} />
+
+          <Route path="/another_member/:id/" element={<AnotherMemberDetail />} />
+          <Route path="/another_member/create/" element={<AnotherMemberCreate />} />
+          <Route path="/another_member/:id/update/" element={<AnotherMemberUpdate />} />
 
         </Routes>
       </main>

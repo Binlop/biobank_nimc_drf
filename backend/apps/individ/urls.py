@@ -4,7 +4,7 @@ from individ import views
 urlpatterns = [
     path('', views.FamilyMemberListView.as_view()),
     path('search/', views.FamilyMemberListSearchView.as_view()),
-    path('family_<int:pk>_individs/', views.FamilyMembersToFamilyListView.as_view()),
+    path('family_<int:pk>_individs/', views.FamilyMembersToFamilyView.as_view()),
 
 
     path('<int:pk>/', views.FamilyMemberDetail.as_view()),
@@ -19,7 +19,7 @@ urlpatterns = [
     path('mother/create/', views.MotherCreateView.as_view()),
     path('mother/<int:pk>/update/', views.MotherUpdateView.as_view()),
 
-    path('another_member/create/', views.AnotherFamilyCreateView.as_view()),
-    path('another_member/<int:pk>/update/', views.AnotherFamilyUpdateView.as_view()),
+    path('another_member/create/', views.AnotherMemberCreateView.as_view()),
+    path('another_member/<int:pk>/update/', views.AnotherMemberUpdateView.as_view()),
 
 ]

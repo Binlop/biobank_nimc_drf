@@ -261,7 +261,7 @@ export default function FatherUpdate() {
           <CharFieldWithError
             label="ID отца"
             name="father_id"
-            value={formData.mother_id}
+            value={formData.father_id}
             onChange={handleChange}
             errors={errors}
           />

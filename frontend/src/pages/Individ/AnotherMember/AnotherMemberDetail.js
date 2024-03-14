@@ -4,7 +4,8 @@ import axios from "axios";
 import "../individ.css"
 import AddSampleToAdult from "../AddSample";
 
-export default function MotherDetail() {
+
+export default function AnotherMemberDetail() {
     const { id } = useParams();
     const [individDetail, setIndividDetail] = useState(null);
     const [samplesList, seSampleList] = useState([]);
@@ -26,7 +27,7 @@ export default function MotherDetail() {
             .catch((err) => {
                 console.log(err)});
     };   
-    
+
     const getIndividSamples = () => {
         axios
         .get(`/api/sample/individ_${id}_samples/`)
@@ -50,8 +51,8 @@ export default function MotherDetail() {
                     {individDetail && (
                         <>
                         <span className="larger-text">{individDetail.name}</span>
-                        <Link to={`/individs/mother/${id}/update/`} className="btn btn-primary">
-                            Изменить индивида
+                        <Link to={`/individs/another_member/${id}/update/`} className="btn btn-primary">
+                            Изменить
                         </Link>
                         </>
                     )}
@@ -59,7 +60,6 @@ export default function MotherDetail() {
                 <div className="add_sample">
                 <AddSampleToAdult
                 individ_id={id}/>
-
                 </div>
             </div>
             <div className="features">
@@ -75,7 +75,7 @@ export default function MotherDetail() {
                                 <td className="table_detail_value">{individDetail.description}</td>
                             </tr>
                             <tr>
-                                <td className="table_detail_property">Направления</td>
+                                <td className="table_detail_property">Лаборатории</td>
                                 <td className="table_detail_value">
                                     {individDetail.laboratory && individDetail.laboratory.map(item => (
                                         <Link to={`/laboratories/${item.id}`} className="link-style">{item.name}<br></br></Link>
@@ -109,8 +109,8 @@ export default function MotherDetail() {
                                 <td className="table_detail_value">{individDetail.family_number}</td>
                             </tr>
                             <tr>
-                                <td className="table_detail_property">ID матери</td>
-                                <td className="table_detail_value">{individDetail.mother_id}</td>
+                                <td className="table_detail_property">ID иного члена семьи</td>
+                                <td className="table_detail_value">{individDetail.another_member_user_id}</td>
                             </tr>
                             <tr>
                                 <td className="table_detail_property">Фамилия</td>
@@ -152,81 +152,10 @@ export default function MotherDetail() {
                                 <td className="table_detail_property">Наследственная отягощенность в семье</td>
                                 <td className="table_detail_value">{individDetail.hereditary_burden_in_the_family}</td>
                             </tr>
-                            <tr>
-                                <td className="table_detail_property">Число беременностей</td>
-                                <td className="table_detail_value">{individDetail.number_of_pregnancies}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Привычное невынашивание</td>
-                                <td className="table_detail_value">{individDetail.habitual_miscarriage}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Привычное невынашивание</td>
-                                <td className="table_detail_value">{individDetail.habitual_miscarriage}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Настоящая беременность - диагноз</td>
-                                <td className="table_detail_value">{individDetail.diagnosis_of_current_pregnancy}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Примечание</td>
-                                <td className="table_detail_value">{individDetail.note}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Гинекологические заболевания матери</td>
-                                <td className="table_detail_value">{individDetail.mother_gynecological_diseases}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Экстрагенитальные заболевания матери</td>
-                                <td className="table_detail_value">{individDetail.mother_extragenital_diseases}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Возраст начала менструации, лет</td>
-                                <td className="table_detail_value">{individDetail.age_at_menarche}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Продолжительность цикла, дней</td>
-                                <td className="table_detail_value">{individDetail.cycle_duration_days}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Примечание</td>
-                                <td className="table_detail_value">{individDetail.menstrual_note}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Беременности</td>
-                                <td className="table_detail_value">
-                                    {individDetail.pregnancy && individDetail.pregnancy.map(item => (
-                                        item.pregnancy_year, item.diagnosis
-                                    ))}
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 )}
             </div>
-            <div className="features">
-            {individDetail && individDetail.pregnancy && (
-                <div>
-                    <h5>Беременности</h5>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th className="table_list_property">Год</th>
-                                <th className="table_list_property">Диагноз</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {individDetail.pregnancy.map(item => (
-                                <tr key={item.id}>
-                                    <td className="table_list_value">{item.pregnancy_year}</td>
-                                    <td className="table_list_value">{item.diagnosis}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
             <div className="features">
             {samplesList && (
                 <div>
@@ -242,7 +171,7 @@ export default function MotherDetail() {
                     {samplesList.map(item => (
                             <tr key={item.id}>
                                 <td className="table_list_value"><Link to={`/samples/${item.sampletype}/${item.sample.id}/`} className="link-style">{item.name}</Link></td>
-                                <td className="table_list_value"><Link to={`/storage/box/${item.location.box}/`} className="link-style">{item.location.name}</Link></td>
+                                <td className="table_list_value"></td>
                                 <td className="table_list_value">{item.volume}</td>
                                 <td className="table_list_value">
                                     <button

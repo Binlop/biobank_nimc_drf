@@ -35,6 +35,9 @@ export default function DrawerDetail() {
                   <Link to={`/storage/drawer/${id}/update`} className="btn btn-primary mr-2">
                     Изменить ящик
                   </Link>
+                  <Link to={`/storage/drawer/${id}/update`} className="btn btn-primary mr-2">
+                    Изменить ящик
+                  </Link>
                   <Link to={`/storage/shelf/create/?drawer_id=${id}`} className="btn btn-primary">
                     Добавить полку
                   </Link>

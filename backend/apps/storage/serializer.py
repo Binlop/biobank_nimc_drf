@@ -169,6 +169,5 @@ class SamplesSerializerOutut(StorageSerializerOutput):
     def get_sample(self, obj: SamplesMap):
         if obj.sample_id:
             sample = get_object_or_404(Sample, id=obj.sample_id)
-            print(sample)
             serializer = SampleSerializer(sample)
             return serializer.data

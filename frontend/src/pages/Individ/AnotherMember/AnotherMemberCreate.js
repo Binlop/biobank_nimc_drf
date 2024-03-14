@@ -7,10 +7,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
 
-export default function FatherCreate() {
+export default function AnotherMemberCreate() {
   const [formData, setFormData] = useState({
     laboratory: [],
-    pregnancy: [],
     });
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
@@ -19,7 +18,7 @@ export default function FatherCreate() {
 
 
   useEffect(() => {
-    document.title = 'Добавить мать';
+    document.title = 'Добавить иного члена семьи';
     const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
     fetchLaboratories();
@@ -61,7 +60,7 @@ export default function FatherCreate() {
 
       const formEmbryo = makeEmbryoForm();
 
-      await axios.post(`/api/individ/father/create/`, formEmbryo, {
+      await axios.post(`/api/individ/another_member/create/`, formEmbryo, {
       headers: {
       "Content-Type": contentTypeHeader,
       },
@@ -107,7 +106,7 @@ export default function FatherCreate() {
   return (
     <div className="features">
       <div className="user_form">
-      <h2>Добавить отца</h2>
+      <h2>Добавить иного члена семьи</h2>
         <form onSubmit={handleSubmit}>
           <CharFieldWithError
             label="Название:"
@@ -115,14 +114,7 @@ export default function FatherCreate() {
             value={formData.name}
             onChange={handleChange}
             errors={errors}
-          />
-          <CharFieldWithError
-            label="Тестовое поле:"
-            name="test_field"
-            value={formData.test_field}
-            onChange={handleChange}
-            errors={errors}
-          />                              
+          />                            
           <div className="form-group">
           <label>Лаборатории:</label>
           {allLaboratories.map(lab => (
@@ -238,9 +230,9 @@ export default function FatherCreate() {
             errors={errors}
           />
           <CharFieldWithError
-            label="ID отца"
-            name="father_id"
-            value={formData.father_id}
+            label="ID иного члена семьи"
+            name="another_member_user_id"
+            value={formData.another_member_user_id}
             onChange={handleChange}
             errors={errors}
           />

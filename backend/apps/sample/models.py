@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from individ.models import Individ
 from storage.models import SamplesMap
 
@@ -17,13 +16,13 @@ class CustomSampleType(models.Model):
     """
     Абстрактный класс для описания общих свойств образца
     """
-    # sample = GenericRelation(Sample, on_delete=models.CASCADE)
-    sample = models.OneToOneField(Sample, on_delete=models.CASCADE, null=True)
-    name = models.CharField('Название образца', max_length=150) # e.g кровь Василия Пупкина
-    sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
+    individ = GenericRelation(Sample, on_delete=models.CASCADE)
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
+    sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
+    name = models.CharField('Название образца', max_length=150) # e.g кровь Василия Пупкина
     barcode = models.CharField('Баркод', max_length=150, null=True)
-    
+    volume = models.IntegerField('Кол-во данного типа образца днк', default=0)
+
     class Meta:
         abstract = True
         verbose_name = 'образец'
@@ -36,37 +35,41 @@ class CustomSampleType(models.Model):
         return str(self.name)
 
 
-# class Blood(CustomSampleType):
-#     """
-#     Класс описывает характеристики типа образца кровь
-#     """
-#     volume = models.IntegerField('Кол-во данного типа образца кровь', default=0)
-
-#     class Meta:
-#         verbose_name = 'кровь индивида'
-#         verbose_name_plural = 'кровь индивидов'
-
-
 class DNA(CustomSampleType):
-    """
-    Класс описывает характеристики типа образца ДНК
-    """
-    volume = models.IntegerField('Кол-во данного типа образца днк', default=0)
-
+    concentration = models.IntegerField('Концентрация ДНК, нг/нкл')
+    
     class Meta:
         verbose_name = 'ДНК индивида'
         verbose_name_plural = 'ДНК индивидов'
 
 
-class Chorion(CustomSampleType):
-    """
-    Класс описывает характеристики типа образца хориона
-    """
-    volume = models.IntegerField('Кол-во данного типа образца хорион', default=0)
+class Blood(CustomSampleType):
+    class Meta:
+        verbose_name = 'Кровь индивида'
+        verbose_name_plural = 'Кровь индивидов'
 
+
+class Chorion(CustomSampleType):
     class Meta:
         verbose_name = 'хорион индивида'
         verbose_name_plural = 'хорионы индивидов'
+    
+
+class Endometrium(CustomSampleType):
+    class Meta:
+        verbose_name = 'хорион индивида'
+        verbose_name_plural = 'хорионы индивидов'
+
+class FetalSacNitrogen(CustomSampleType):
+    class Meta:
+        verbose_name = 'плодный мешок в азоте'
+        verbose_name_plural = 'плодные мешки в азоте'
+
+class FetalSacFreezer(CustomSampleType):
+    class Meta:
+        verbose_name = 'плодный мешок в -80'
+        verbose_name_plural = 'плодные мешки в -80'
+
 
 
 class Aliquot(models.Model):
@@ -74,18 +77,19 @@ class Aliquot(models.Model):
     Модель аликвоты(часть родительского образца). Связана с индивидом, к которому принадлежит
     данная аликвота и с родительским образцом, от которого была отлита аликвота
     """
+
+    individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
+    location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_aliquot') # Место хранения аликвоты
     name = models.CharField('Название аликвоты', max_length=150)
     volume = models.IntegerField('Кол-во аликвоты', default=0)
-    individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
-    # location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_aliquot') # Место хранения аликвоты
     barcode = models.CharField('Баркод', max_length=150, null=True)
 
     class Meta:
         verbose_name = 'алкивота индивида'
         verbose_name_plural = 'аликвоты индивидов'
     
+    def get_sample_laboratories(self):
+        return self.individ.content_object.get_individ_laboratories()
+
     def __str__(self):
         return str(self.name)
-    
-    # def get_laboratory_id(self):
-    #     return self.family_member.laboratory.id

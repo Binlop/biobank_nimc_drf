@@ -1,5 +1,5 @@
 import django_filters
-from .models import Embryo
+from .models import Embryo, Mother
 
 class EmbryoFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')    
@@ -60,4 +60,49 @@ class EmbryoFilter(django_filters.FilterSet):
         lookup_iexact = f'{name}__iexact'
         lookup_icontains = f'{name}__icontains'
         return queryset.filter(**{lookup_iexact: value}) | queryset.filter(**{lookup_icontains: value})
+    
+class AdultFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')    
+    count_blood = django_filters.CharFilter(method='filter_count_sample_gt_zero')
+    count_dna = django_filters.CharFilter(method='filter_count_sample_gt_zero')
+    count_chorion = django_filters.CharFilter(method='filter_count_sample_gt_zero')
+    family_number = django_filters.NumberFilter()
+    abortion_id = django_filters.NumberFilter()
+    last_name = django_filters.CharFilter(lookup_expr='icontains')    
+    first_name = django_filters.CharFilter(lookup_expr='icontains')    
+    patronymic = django_filters.CharFilter(lookup_expr='icontains')    
+    date_of_birth = django_filters.DateFilter()
+    age_at_sampling = django_filters.NumberFilter()
+    phone = django_filters.NumberFilter()
+    home_address = django_filters.CharFilter(lookup_expr='icontains')    
+    nationality = django_filters.CharFilter(lookup_expr='icontains')    
+    place_of_birth = django_filters.CharFilter(lookup_expr='icontains')    
+    hereditary_burden_in_the_family = django_filters.CharFilter(lookup_expr='icontains')    
+
+
+    def filter_count_sample_gt_zero(self, queryset, name, value):
+        if name=="count_blood" and value == "on":
+            return queryset.filter(count_blood__gt=0)            
+        elif name=="count_dna" and value == "on":
+            return queryset.filter(count_dna__gt=0)            
+        elif name=="count_chorion" and value == "on":
+            return queryset.filter(count_chorion__gt=0)            
+        return queryset
+    
+
+class FatherFilter(AdultFilter):
+    father_id = django_filters.NumberFilter()
+
+
+class MotherFilter(AdultFilter):
+    mother_id = django_filters.NumberFilter()
+    number_of_pregnancies = django_filters.NumberFilter()
+    habitual_miscarriage = django_filters.ChoiceFilter(choices=Mother.MISCARRIAGE_CHOICES)
+    diagnosis_of_current_pregnancy = django_filters.ChoiceFilter(choices=Embryo.DIAGNOSIS_CHOICES)
+    note = django_filters.CharFilter(lookup_expr='icontains')   
+    mother_gynecological_diseases = django_filters.CharFilter(lookup_expr='icontains')   
+    mother_extragenital_diseases = django_filters.CharFilter(lookup_expr='icontains')   
+    age_at_menarche = django_filters.NumberFilter()
+    cycle_duration_days = django_filters.NumberFilter()
+    menstrual_note = django_filters.CharFilter(lookup_expr='icontains')   
 
