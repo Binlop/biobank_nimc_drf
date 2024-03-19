@@ -1,0 +1,6 @@
+--2024-03-16 13:01:45--  https://l1base.charite.de/show.php?DBN=hsflnil1_8438_rm
+Распознаётся l1base.charite.de (l1base.charite.de)… 141.42.206.79
+Подключение к l1base.charite.de (l1base.charite.de)|141.42.206.79|:443... соединение установлено.
+ОШИБКА: невозможно проверить сертификат l1base.charite.de, выпущенный ‘CN=GEANT OV RSA CA 4,O=GEANT Vereniging,C=NL’:
+  Невозможно локально проверить подлинность запрашивающего.
+Для небезопасного подключения к l1base.charite.de используйте параметр «--no-check-certificate».

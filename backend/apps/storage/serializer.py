@@ -156,10 +156,12 @@ class SamplesSerializerInput(StorageSerializerOutput):
         return service.update_storage_object(instance, validated_data)
 
 class SampleSerializer(serializers.Serializer):
+    """Получение объектов образцов в хранилище"""
     id = serializers.IntegerField()
     name = serializers.CharField()
 
 class SamplesSerializerOutut(StorageSerializerOutput):
+    """Получение списка объектов SamplesMap - места хранения образцов"""
     sample = serializers.SerializerMethodField()
 
     class Meta:
@@ -170,4 +172,6 @@ class SamplesSerializerOutut(StorageSerializerOutput):
         if obj.sample_id:
             sample = get_object_or_404(Sample, id=obj.sample_id)
             serializer = SampleSerializer(sample)
+            print(sample)
             return serializer.data
+        return None

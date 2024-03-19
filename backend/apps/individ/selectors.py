@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
 from .models import Individ
 from django.shortcuts import get_object_or_404
-from .models import Embryo, Father, Mother, AnotherFamilyMember
+from .models import Embryo, Father, Mother, AnotherFamilyMember, MotherPregnancy
 from django.db.models import Q
 from typing import Union
 from itertools import chain
@@ -31,23 +31,22 @@ class FamilyMemberListSelector:
         individ_q = Q()
         return self.filter_individs_by_q(user=user, individ_q=individ_q)
 
-    def get_filtered_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
+    def get_filtered_individ_list(self, user: User, filters: dict = {}) -> QuerySet[Embryo, Father, Mother]:
         filters = dict(filters)
-        embryo_data = json.loads(filters['embryo'][0])
-        father_data = json.loads(filters['father'][0])
-        mother_data = json.loads(filters['mother'][0])
-        print(mother_data)
+        embryo_data = json.loads(filters.get('embryo', None)[0])
+        father_data = json.loads(filters.get('father', None)[0])
+        mother_data = json.loads(filters.get('mother', None)[0])
 
-        # Создание вложенного словаря
-        filters_result = {'embryo': embryo_data, 'father': father_data, 'mother': mother_data}
-        # print(filters_result)
+        embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all() if embryo_data else Embryo.objects.none())
+        father_filter = FatherFilter(father_data, queryset=Father.objects.all() if father_data else Father.objects.none())
+        mother_filter = MotherFilter(mother_data, queryset=Mother.objects.all() if mother_data else Mother.objects.none())
+        embryo_qs = embryo_filter.qs 
+        father_qs = father_filter.qs 
+        mother_qs = mother_filter.qs
 
-        embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all())
-        father_filter = FatherFilter(father_data, queryset=Father.objects.all())
-        mother_filter = MotherFilter(mother_data, queryset=Mother.objects.all())
-        filtered_queryset = mother_filter.qs
-        print(filtered_queryset)
-
+        individ_list = list(chain(embryo_qs, father_qs, mother_qs))
+        return individ_list
+    
     def filter_individs_by_family(self, user: User, family_id: int) -> QuerySet[Embryo, Father, Mother]:
         individ_q = Q(family__id=family_id)
         return self.filter_individs_by_q(user=user, individ_q=individ_q)
@@ -68,11 +67,6 @@ class FamilyMemberDetailSelector:
         member = get_object_or_404(Individ, pk=pk)
         return self.check_user_acces_to_family_member(member=member, user=user, delete=delete)
 
-
-class FamilyMemberCheckingPermission:
-
-    def check_user_acces_to_family_member(self, member: Union[Embryo, Father, Mother], user: User) -> Union[Embryo, Father, Mother]:
-        if member.get_individ_laboratories() & user.profile.get_user_laboratories():
-            return member
-        else: return None
-
+    def get_mother_pregnancy(self, mother_id):
+        pregnancy = MotherPregnancy.objects.filter(mother_id=mother_id)
+        return pregnancy

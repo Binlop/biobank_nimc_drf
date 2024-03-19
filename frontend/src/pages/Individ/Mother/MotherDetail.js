@@ -42,6 +42,11 @@ export default function MotherDetail() {
               .delete(`/api/sample/${item.sample.id}/delete`)
               .then((res) => refreshList());
         };
+    const editItem = (item) => {
+            axios
+              .delete(`/api/sample/${item.sample.id}/delete`)
+              .then((res) => refreshList());
+        };
 
     return (
         <main className="container">
@@ -220,10 +225,25 @@ export default function MotherDetail() {
                                 <tr key={item.id}>
                                     <td className="table_list_value">{item.pregnancy_year}</td>
                                     <td className="table_list_value">{item.diagnosis}</td>
+                                    <td className="table_list_value">
+                                    <button
+                                        className="btn btn-primary mr-2"
+                                        onClick={() => editItem(item)}
+                                    >
+                                        Изменить
+                                    </button>
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleDelete(item)}
+                                    >
+                                        Удалить
+                                    </button>
+                                </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+    
                 </div>
             )}
         </div>

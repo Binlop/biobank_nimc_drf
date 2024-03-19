@@ -51,7 +51,7 @@ export default function FatherDetail() {
                     {individDetail && (
                         <>
                         <span className="larger-text">{individDetail.name}</span>
-                        <Link to={`/individs/mother/${id}/update/`} className="btn btn-primary">
+                        <Link to={`/individs/father/${id}/update/`} className="btn btn-primary">
                             Изменить индивида
                         </Link>
                         </>
@@ -96,10 +96,6 @@ export default function FatherDetail() {
                             <tr>
                                 <td className="table_detail_property">Кол-во ДНК</td>
                                 <td className="table_detail_value">{individDetail.count_dna}</td>
-                            </tr>
-                            <tr>
-                                <td className="table_detail_property">Кол-во хориона</td>
-                                <td className="table_detail_value">{individDetail.count_chorion}</td>
                             </tr>
                             <tr>
                                 <td className="table_detail_property">Кол-во хориона</td>
@@ -172,7 +168,9 @@ export default function FatherDetail() {
                     {samplesList.map(item => (
                             <tr key={item.id}>
                                 <td className="table_list_value"><Link to={`/samples/${item.sampletype}/${item.sample.id}/`} className="link-style">{item.name}</Link></td>
-                                <td className="table_list_value"></td>
+                                <td className="table_list_value">
+                                <Link to={`/storage/box/${item.location.box}/`} className="link-style">{item.location.name}</Link>
+                                </td>                                
                                 <td className="table_list_value">{item.volume}</td>
                                 <td className="table_list_value">
                                     <button

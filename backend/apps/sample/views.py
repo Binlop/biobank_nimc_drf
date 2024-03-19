@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from . import serializer as serializers
 from .selectors import SampleListSelector, SampleDetailSelector
+from .services.sample import BaseSampleService
 from rest_framework import status
 
 class SampleViewBase(APIView):
@@ -47,7 +48,6 @@ class SampleCreateView(SampleViewBase):
 class SampleUpdateView(SampleViewBase):
 
     def put(self, request, pk):
-        print(request.data)
         selector = SampleDetailSelector()
         sample = selector.get_sample_detail(user=request.user, pk=pk)
         serializer = self.get_serializer_class()(sample, data=request.data)
@@ -61,15 +61,48 @@ class SampleDeleteView(SampleViewBase):
     
     def delete(self, request, pk):
         selector = SampleDetailSelector()
+        service = BaseSampleService()
         member = selector.get_sample_detail(user=request.user, pk=pk, delete=True)
-        member.delete()
+        service.delete_sample(instance=member)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class DNADetailView(SampleDetailView):
-    serializer = serializers.DNAOutputSerializer
     
 class DNACreateView(SampleCreateView):
     serializer = serializers.DNAInputSerializer
     
 class DNAUpdateView(SampleUpdateView):
     serializer = serializers.DNAInputSerializer
+    
+
+class BloodCreateView(SampleCreateView):
+    serializer = serializers.BloodInputSerializer
+    
+class BloodUpdateView(SampleUpdateView):
+    serializer = serializers.BloodInputSerializer
+
+    
+class ChorionCreateView(SampleCreateView):
+    serializer = serializers.ChorionInputSerializer
+    
+class ChorionUpdateView(SampleUpdateView):
+    serializer = serializers.ChorionInputSerializer
+
+
+class EndometriumCreateView(SampleCreateView):
+    serializer = serializers.EndometriumInputSerializer
+    
+class EndometriumUpdateView(SampleUpdateView):
+    serializer = serializers.EndometriumInputSerializer
+
+
+class FetalSacNitrogenCreateView(SampleCreateView):
+    serializer = serializers.FetalSacNitrogenInputSerializer
+    
+class FetalSacNitrogenUpdateView(SampleUpdateView):
+    serializer = serializers.FetalSacNitrogenInputSerializer
+
+
+class FetalSacFreezerCreateView(SampleCreateView):
+    serializer = serializers.FetalSacFreezerInputSerializer
+    
+class FetalSacFreezerUpdateView(SampleUpdateView):
+    serializer = serializers.FetalSacFreezerInputSerializer

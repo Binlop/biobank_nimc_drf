@@ -108,7 +108,7 @@ class Embryo(FamilyMember):
     methylation = models.CharField('Метилирование', max_length=256, null=True)
     LINE =  models.CharField('LINE', max_length=256, null=True)
     сonflict_between_different_methods = models.BooleanField('Конфликт между различными методами ', default=False)
-    essence_conflict = models.CharField('LINE', max_length=256, null=True)
+    essence_conflict = models.CharField('essence_conflict', max_length=256, null=True)
 
 
     class Meta:

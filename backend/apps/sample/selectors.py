@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
-from .models import Sample, DNA, Chorion
+from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer
 
 class SampleListSelector:
     """
@@ -17,20 +17,29 @@ class SampleListSelector:
 
         dna_qs = DNA.objects.all()
         chorion_qs = Chorion.objects.all()
+        blood_qs = Blood.objects.all()
+        endometrium_qs = Endometrium.objects.all()
+        fetal_sac_freezer_qs = FetalSacFreezer.objects.all()
+        fetal_sac_nitrogen_qs = FetalSacNitrogen.objects.all()
 
-        samples_list = list(chain(dna_qs, chorion_qs))
+        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs))
+        
         for sample in samples_list:
             if sample.get_sample_laboratories() & user_laboratory_ids:
                 continue
             else:
                 samples_list.remove(sample)
-
         return samples_list
     
     def get_individ_samples(self, user: User, individ_id: int):
         dna_qs = DNA.objects.filter(individ_id=individ_id)
         chorion_qs = Chorion.objects.filter(individ_id=individ_id)
-        samples_list = list(chain(dna_qs, chorion_qs))
+        blood_qs = Blood.objects.filter(individ_id=individ_id)
+        endometrium_qs = Endometrium.objects.filter(individ_id=individ_id)
+        fetal_sac_freezer_qs = FetalSacFreezer.objects.filter(individ_id=individ_id)
+        fetal_sac_nitrogen_qs = FetalSacNitrogen.objects.filter(individ_id=individ_id)
+
+        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs))
 
         return samples_list
 

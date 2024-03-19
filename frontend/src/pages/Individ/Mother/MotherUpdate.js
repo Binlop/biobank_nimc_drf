@@ -19,7 +19,7 @@ export default function MotherUpdate() {
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [date_of_birth, setDatebirth] = useState(new Date());
   const [errors, setError] = useState(null); 
-
+  const currentPregnancies = []
 
   useEffect(() => {
     refreshIndividData();
@@ -40,6 +40,10 @@ export default function MotherUpdate() {
         .then((res) => {
           setFormData(res.data);
           console.log(res.data)
+          currentPregnancies = JSON.stringify(res.data.pregnancy)
+          const newInputs = [...inputs, ...currentPregnancies]; // Добавляем текущие беременности к новым входным данным
+          setInputs(newInputs);
+          console.log(inputs)
           const laboratoryIds = res.data.laboratory.map(lab => lab.id);
           console.log(laboratoryIds)
           setFormData(prevState => ({
@@ -125,21 +129,6 @@ export default function MotherUpdate() {
     }));
   };
 
-  const handleChangePregnancy = (index, event) => {
-    const { name, value } = event.target;
-    const newPregnancy = formData.pregnancy.map((item, i) => {
-      if (i === index) {
-        const newValue = value.split(','); // Разделяем строку на пары значений (год и диагноз)
-        return [parseInt(newValue[0]), newValue[1]]; // Преобразуем год в целое число
-      } else {
-        return item;
-      }
-    });
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      pregnancy: newPregnancy
-    }));
-  };
 
   const handleChangeDate = (date) => {
     const formattedDate = date.toISOString().split('T')[0];
@@ -147,31 +136,65 @@ export default function MotherUpdate() {
     setDatebirth(date)
   };
 
-  const handleChangeСheckmark = (e) => {
-    const { name, checked } = e.target;
-    setFormData({ ...formData, [name]: checked });
-  }
+  const [inputs, setInputs] = useState([{ pregnancy_year: "", diagnosis: "" }]);
 
+  const handleAddInput = () => {
+    setInputs([...inputs, { pregnancy_year: "", diagnosis: "" }]);
+  };
+
+  const handleChangePreg = (event, index) => {
+    let { name, value } = event.target;
+    let onChangeValue = [...inputs];
+    onChangeValue[index][name] = value;
+    setInputs(onChangeValue);
+  };
+
+  const handleDeleteInput = (index) => {
+    const newArray = [...inputs];
+    newArray.splice(index, 1);
+    setInputs(newArray);
+  };
   return (
     <div className="features">
       <div className="user_form">
       <h2>Добавить мать</h2>
         <form onSubmit={handleSubmit}>
-        {/* <div className="form-group">
-        <label>Беременности</label>
-        {formData.pregnancy.map((item, index) => (
-      <div key={index}>
-        <input
-          type="text"
-          name="pregnancy"
-          placeholder="Год, Диагноз"
-          value={`${item[0]},${item[1]}`} // Объединяем год и диагноз в строку с разделителем
-          onChange={(event) => handleChangePregnancy(index, event)}
-        />
-      </div>
-    ))}
-    <button onClick={(e) => { e.preventDefault(); handleAddFieldPregnancy(); }}>Добавить поле для беременности</button>      
-    </div> */}
+        <div className="container_pregnancy">
+          {inputs.map((item, index) => (
+            <div className="input_container" key={index}>
+              <input
+                name="pregnancy_year"
+                placeholder="Год беременности"
+                type="text"
+                value={item.pregnancy_year}
+                onChange={(event) => handleChangePreg(event, index)}
+              />
+              <label>Диагноз</label>
+              <select type="text" name="diagnosis" value={item.diagnosis} onChange={(event) => handleChangePreg(event, index)} className="form-control">
+              <option value="noth">---------------------</option>
+              <option value="none">Нет данных</option>
+              <option value="spontaneous_abortion">Спонтанный аборт</option>
+              <option value="blighted_ovum">Неразвивающаяся беременность</option>
+              <option value="anembryonia">Анэмбриония</option>
+              <option value="fetal_development_abnormalities">Пороки развития плода</option>
+              <option value="medical_abortion">Медицинский аборт</option>
+              <option value="ectopic_pregnancy">Внематочная беременность</option>
+              <option value="stillbirth">Мертворожденный ребенок</option>
+              <option value="live_birth">Живорожденный ребенок</option>
+              <option value="child_with_developmental_defects">Ребенок с пороками развития</option>
+              <option value="child_with_delayed_development">Ребенок с задержкой психо-речевого развития</option>
+              </select>
+              {inputs.length > 1 && (
+                <button onClick={() => handleDeleteInput(index)}>Удалить</button>
+              )}
+              {index === inputs.length - 1 && (
+                <button onClick={() => handleAddInput()}>Добавить</button>
+              )}
+            </div>
+          ))}
+
+          <div className="body"> {JSON.stringify(inputs)} </div>
+        </div>
           <CharFieldWithError
             label="Название:"
             name="name"

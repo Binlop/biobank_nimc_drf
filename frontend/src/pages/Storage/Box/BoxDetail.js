@@ -34,7 +34,8 @@ export default function BoxDetail() {
               <div class="red-circle">
                 {sample_place.name}
               </div>
-            ) : sample_place.sample_type === "dna" || sample_place.sample_type === "blood" || sample_place.sample_type === "chorion" ? (
+            ) : sample_place.sample_type === "dna" || sample_place.sample_type === "blood" || sample_place.sample_type === "chorion" || sample_place.sample_type === "endometrium"
+            || sample_place.sample_type === "fetal_sac_nitrogen" || sample_place.sample_type === "fetal_sac_freezer"? (
               <div class="red-circle">
                     <Link to={`/samples/${sample_place.sample_type}/${sample_place.sample.id}`} className="link-style">
                     {sample_place.sample.name}

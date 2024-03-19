@@ -87,7 +87,7 @@ table td {
 /* Стиль названия раздела биобанка*/
 .title_object p {
     color: #fff;
-    text-align: left;
+    /* text-align: left; */
     margin-left: 10px;
     margin-top: 10px;
     margin-bottom: 50px;
@@ -103,8 +103,10 @@ table td {
 }
 
 .add_sample{
+    position: absolute;
     color: red;
     background-color: #eb5959;
+    margin-left: 300px;
 }
 .user_form{
     width: 400px;
@@ -123,11 +125,6 @@ table td {
 .pregnancy{
     margin-top: 5px;
     margin-bottom: 5px;
-}
-
-.add_sample{
-    position: relative;
-    margin-left: 23%;
 }
 
 .filter{

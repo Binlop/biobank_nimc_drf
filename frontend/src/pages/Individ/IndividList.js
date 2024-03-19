@@ -3,13 +3,12 @@ import "./individ.css"
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import NestedMenu from './NestedMenu'; // Импортируем компонент NestedMenu
-import CharFieldWithError from "../../components/Fields/CharFieldWithError";
 import EmbryoFilterForm from "./FilterComponents/EmbryoFilter";
 import FatherFilterForm from "./FilterComponents/FatherFilter";
 import MotherFilterForm from "./FilterComponents/MotherFilter";
 
 
-function FilterBlock() {
+function FilterBlock({ setIndividList }) {  
   const [isOpenEmbryo, setIsOpenEmbryo] = useState(false);
   const [isOpenFather, setIsOpenFather] = useState(false);
   const [isOpenMother, setisOpenMother] = useState(false);
@@ -92,11 +91,14 @@ function FilterBlock() {
 
   const handleChangeMother = (event) => {
     const { name, value } = event.target;
-    setMotherData({ ...motherData, [name]: value });
+    const updatedParentData = { ...motherData, [name]: value };
+    if (value.trim() === '') {
+      delete updatedParentData[name];
+    }
+    setMotherData(updatedParentData);
   };
-
   const uniteAllFormData = () => {
-    console.log(fatherData)
+    console.log(motherData)
     formData["embryo"] = embryoData
     formData["father"] = fatherData
     formData["mother"] = motherData
@@ -107,18 +109,22 @@ function FilterBlock() {
 
   const handleSearch = (event) => {
     event.preventDefault();
-      
-    formData = uniteAllFormData();
+    
+    const formData = uniteAllFormData();
     try {
-      uniteAllFormData();
-      axios.get(`/api/individ/search/`, { params: formData });
-
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой индивида:', error);
-        setError(error.response.data);
-      }
-    };
+      axios
+        .get(`/api/individ/search/`, { params: formData })
+        .then((res) => {
+          setIndividList(res.data);
+        }) 
+        .catch(error => {
+          console.error('Ошибка с отправкой индивида:', error);
+          setError(error.response.data);
+        });
+    } catch (error) {
+      console.error('Ошибка:', error);
+    }
+  }
 
   return (
   <div className="filter" style={{ maxHeight: '800px', overflowY: 'auto' }}>
@@ -163,7 +169,7 @@ function FilterBlock() {
 }
 
 export default function IndividList() {
-    const [IndividList, seIndividList] = useState([]);
+    const [IndividList, setIndividList] = useState([]);
 
     useEffect(() => {
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
@@ -187,18 +193,21 @@ export default function IndividList() {
         axios
           .get("/api/individ/")
           .then((res) => {
-            seIndividList(res.data)
+            setIndividList(res.data)
         })
           .catch((err) => console.log(err));
-      };    
+      };   
+    
+    const handleSetIndividList = (list) => {
+        setIndividList(list);
+    };
 
     return (
         <main className="container">
         <div>
              <NestedMenu />
             <div className="features">
-            <FilterBlock/>
-
+            <FilterBlock setIndividList={handleSetIndividList} />
                 <table className="table">
                     <thead>
                         <tr>

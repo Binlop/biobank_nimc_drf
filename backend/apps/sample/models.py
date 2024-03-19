@@ -16,7 +16,7 @@ class CustomSampleType(models.Model):
     """
     Абстрактный класс для описания общих свойств образца
     """
-    individ = GenericRelation(Sample, on_delete=models.CASCADE)
+    sample = GenericRelation(Sample)
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
     sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
     name = models.CharField('Название образца', max_length=150) # e.g кровь Василия Пупкина
@@ -36,7 +36,7 @@ class CustomSampleType(models.Model):
 
 
 class DNA(CustomSampleType):
-    concentration = models.IntegerField('Концентрация ДНК, нг/нкл')
+    concentration = models.IntegerField('Концентрация ДНК, нг/нкл', default=0)
     
     class Meta:
         verbose_name = 'ДНК индивида'
@@ -57,8 +57,8 @@ class Chorion(CustomSampleType):
 
 class Endometrium(CustomSampleType):
     class Meta:
-        verbose_name = 'хорион индивида'
-        verbose_name_plural = 'хорионы индивидов'
+        verbose_name = 'эндометриум индивида'
+        verbose_name_plural = 'эндометриум индивидов'
 
 class FetalSacNitrogen(CustomSampleType):
     class Meta:

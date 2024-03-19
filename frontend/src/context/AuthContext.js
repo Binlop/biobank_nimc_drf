@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom'
+import "core-js/stable/atob";
 
 const AuthContext = createContext()
 
@@ -31,6 +32,7 @@ export const AuthProvider = ({children}) => {
             setAuthTokens(data)
             setUser(jwtDecode(data.access))
             navigate('/')
+            console.log(user);
         } else {
             alert('Something went wrong while logging in the user!')
         }

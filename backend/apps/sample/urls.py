@@ -11,7 +11,21 @@ urlpatterns = [
 
     path('dna/create/', views.DNACreateView.as_view()),
     path('dna/<int:pk>/update/', views.DNAUpdateView.as_view()),
+    
+    path('blood/create/', views.BloodCreateView.as_view()),
+    path('blood/<int:pk>/update/', views.BloodUpdateView.as_view()),
 
+    path('chorion/create/', views.ChorionCreateView.as_view()),
+    path('chorion/<int:pk>/update/', views.ChorionUpdateView.as_view()),
+
+    path('endometrium/create/', views.EndometriumCreateView.as_view()),
+    path('endometrium/<int:pk>/update/', views.EndometriumUpdateView.as_view()),
+
+    path('fetal_sac_nitrogen/create/', views.FetalSacNitrogenCreateView.as_view()),
+    path('fetal_sac_nitrogen/<int:pk>/update/', views.FetalSacNitrogenUpdateView.as_view()),
+
+    path('fetal_sac_freezer/create/', views.FetalSacFreezerCreateView.as_view()),
+    path('fetal_sac_freezer/<int:pk>/update/', views.FetalSacFreezerUpdateView.as_view()),
 ]
 
 

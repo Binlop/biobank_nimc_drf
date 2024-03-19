@@ -2,8 +2,9 @@ from rest_framework import serializers
 from individ.serializer import EmbryoSerializerOutput, FatherSerializerOutput, MotherSerializerOutput, AdultSerializerOutput
 from individ.models import Individ, Embryo, Father, Mother, AnotherFamilyMember
 from storage.serializer import SamplesSerializerOutut
-from .services import dna, chorion
-from .models import Sample, DNA, Chorion
+from .services import sample
+from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer
+
 
 class SampleSerializerBase(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -17,6 +18,14 @@ class SampleSerializerBase(serializers.Serializer):
             serializer = DNAOutputSerializer(value)
         elif isinstance(value, Chorion):
             serializer = ChorionOutputSerializer(value)
+        elif isinstance(value, Blood):
+            serializer = BloodOutputSerializer(value)
+        elif isinstance(value, Endometrium):
+            serializer = EndometriumOutputSerializer(value)
+        elif isinstance(value, FetalSacNitrogen):
+            serializer = FetalSacNitrogenOutputSerializer(value)
+        elif isinstance(value, FetalSacFreezer):
+            serializer = FetalSacFreezerOutputSerializer(value)
         else:
             raise Exception('Unexpected type of sample object')
         return serializer.data
@@ -28,13 +37,20 @@ class SampleSerializerOutput(serializers.Serializer):
 class IndividSamplesListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=150)
-    sample = SampleSerializerOutput()
+    sample = serializers.SerializerMethodField()
     sampletype = serializers.CharField(max_length=10) #e.g Кровь, ДНК, хорион
     location = serializers.SerializerMethodField()
+    volume = serializers.IntegerField(read_only=True)
 
     def get_location(self, obj):
-        location = obj.sample.location
+        sample = obj.sample.first()
+        location = sample.location
         serializer = SamplesSerializerOutut(location, fields=('name', 'box'))
+        return serializer.data
+    
+    def get_sample(self, obj):
+        sample = obj.sample.first()
+        serializer = SampleSerializerOutput(sample)
         return serializer.data
 
 class CustomSampleSerializerOutput(serializers.Serializer):
@@ -45,6 +61,7 @@ class CustomSampleSerializerOutput(serializers.Serializer):
     sampletype = serializers.CharField(max_length=10) #e.g Кровь, ДНК, хорион
     volume = serializers.IntegerField(required=False)
     location = serializers.SerializerMethodField()
+    sample = serializers.SerializerMethodField()
 
     def get_individ(self, obj):
         individ = obj.individ.content_object
@@ -62,12 +79,16 @@ class CustomSampleSerializerOutput(serializers.Serializer):
         return serializer.data
 
     def get_location(self, obj):
-        location = obj.content_object.location
+        
+        sample = obj.sample.first()
+        location = sample.location
         serializer = SamplesSerializerOutut(location, fields=('id', 'name', 'box'))
         return serializer.data
     
     def get_sample(self, obj):
-        location = obj.content_object
+        sample = obj.sample.first()
+        serializer = SampleSerializerOutput(sample)
+        return serializer.data
 
 
 class CustomSampleSerializerInput(serializers.Serializer):
@@ -85,23 +106,88 @@ class DNAInputSerializer(CustomSampleSerializerInput):
     individ_id = serializers.IntegerField(required=False)
 
     def create(self, validated_data: dict):
-        service = dna.DNAService()
-        return service.create_dna(validated_data=validated_data)
+        service = sample.DNAService()
+        return service.create_biospecimen(validated_data=validated_data)
     
     def update(self, instance: DNA, validated_data: dict):
-        service = dna.DNAService()
-        return service.update_dna(instance, validated_data)
+        service = sample.DNAService()
+        return service.update_biospecimen(instance, validated_data)
 
 
 class ChorionOutputSerializer(CustomSampleSerializerOutput):
     pass
 
 class ChorionInputSerializer(CustomSampleSerializerInput):
-    sampletype = serializers.CharField(max_length=10, required=False) 
+    individ_id = serializers.IntegerField(required=False)
+    sample_place = serializers.IntegerField(required=False)
+
+    def create(self, validated_data: dict):
+        service = sample.ChorionService()
+        return service.create_biospecimen(validated_data=validated_data)
+    
+    def update(self, instance: DNA, validated_data: dict):
+        service = sample.ChorionService()
+        return service.update_biospecimen(instance, validated_data)
 
 
 class BloodOutputSerializer(CustomSampleSerializerOutput):
     pass
 
 class BloodInputSerializer(CustomSampleSerializerInput):
-    sampletype = serializers.CharField(max_length=10, required=False)
+    individ_id = serializers.IntegerField(required=False)
+
+    def create(self, validated_data: dict):
+        print(validated_data)
+
+        service = sample.BloodService()
+        return service.create_biospecimen(validated_data=validated_data)
+    
+    def update(self, instance: Blood, validated_data: dict):
+        service = sample.BloodService()
+        return service.update_biospecimen(instance, validated_data)
+    
+
+class EndometriumOutputSerializer(CustomSampleSerializerOutput):
+    pass
+
+class EndometriumInputSerializer(CustomSampleSerializerInput):
+    individ_id = serializers.IntegerField(required=False)
+
+    def create(self, validated_data: dict):
+        service = sample.EndometriumService()
+        return service.create_biospecimen(validated_data=validated_data)
+    
+    def update(self, instance: DNA, validated_data: dict):
+        service = sample.EndometriumService()
+        return service.update_biospecimen(instance, validated_data)
+    
+
+class FetalSacNitrogenOutputSerializer(CustomSampleSerializerOutput):
+    pass
+
+class FetalSacNitrogenInputSerializer(CustomSampleSerializerInput):
+    individ_id = serializers.IntegerField(required=False)
+
+    def create(self, validated_data: dict):
+        service = sample.FetalSacNitrogenService()
+        return service.create_biospecimen(validated_data=validated_data)
+    
+    def update(self, instance: DNA, validated_data: dict):
+        service = sample.FetalSacNitrogenService()
+        return service.update_biospecimen(instance, validated_data)
+    
+
+class FetalSacFreezerOutputSerializer(CustomSampleSerializerOutput):
+    pass
+
+class FetalSacFreezerInputSerializer(CustomSampleSerializerInput):
+    individ_id = serializers.IntegerField(required=False)
+
+    def create(self, validated_data: dict):
+        service = sample.FetalSacFreezerService()
+        return service.create_biospecimen(validated_data=validated_data)
+    
+    def update(self, instance: DNA, validated_data: dict):
+        service = sample.FetalSacFreezerService()
+        return service.update_biospecimen(instance, validated_data)
+    

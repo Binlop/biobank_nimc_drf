@@ -32,8 +32,7 @@ class FamilyMemberListSearchView(IndividViewBase):
     def get(self, request, format=None):
         """Список отфильтрованных индивидов"""
         selector = FamilyMemberListSelector()
-        selector.get_filtered_individ_list(user=request.user, filters=request.query_params)
-        members = selector.get_individ_list(user=request.user)      
+        members = selector.get_filtered_individ_list(user=request.user, filters=request.query_params)
         serializer = serializers.IndividSerializerListOutput(members, many=True)
         return Response(serializer.data)
     
@@ -116,3 +115,27 @@ class AnotherMemberCreateView(FamilyMemberCreateView):
 class AnotherMemberUpdateView(FamilyMemberUpdateView):
     selector_class = FamilyMemberDetailSelector
     serializer_class = serializers.AnotherMemberSerializerInput
+
+class MotherPregnancyView(APIView):
+    
+    def get(self, request, pk):
+        selector = FamilyMemberDetailSelector()
+        pregnancy = selector.get_mother_pregnancy(mother_id=pk)
+        serializer = serializers.MotherPregnancySerializer(pregnancy, many=True)
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        selector = self.get_selector_class()
+        member = selector.get_individ_detail(user=request.user, pk=pk)
+        serializer = self.get_serializer_class()(member, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        selector = FamilyMemberDetailSelector()
+        member = selector.get_individ_detail(user=request.user, pk=pk)
+        member.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

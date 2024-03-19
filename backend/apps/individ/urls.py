@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('mother/create/', views.MotherCreateView.as_view()),
     path('mother/<int:pk>/update/', views.MotherUpdateView.as_view()),
+    path('mother/<int:pk>/pregnancy/', views.MotherPregnancyView.as_view()),
 
     path('another_member/create/', views.AnotherMemberCreateView.as_view()),
     path('another_member/<int:pk>/update/', views.AnotherMemberUpdateView.as_view()),
