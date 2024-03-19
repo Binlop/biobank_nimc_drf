@@ -1,25 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import AuthContext from '../../context/AuthContext'
+import { handleDelete, refreshObjectDetail } from "../../components/API/GetListOrDelete";
 import "./laboratory.css"
 
 export default function LabDetail() {
     const { id } = useParams();
     const [laboratoryDetail, setLaboratoryDetail] = useState(null);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        refreshList();
-        document.title = 'Лаборатории';
+        refreshObjectDetail(setLaboratoryDetail, `/api/laboratory/${id}`, authTokens)  
     }, []);
-
-    const refreshList = () => {
-        axios
-            .get(`/api/laboratory/${id}`)
-            .then((res) => {
-                setLaboratoryDetail(res.data);
-            })
-            .catch((err) => console.log(err));
-    };   
 
     return (
         <main className="container">

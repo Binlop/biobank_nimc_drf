@@ -1,17 +1,39 @@
 import axios from 'axios';
 
-export const handleDelete = (apiPathDelete, setIndividList, apiPathList) => {
+export function handleDelete(apiPathDelete, setIndividList, apiPathList, authTokens) {
     axios
         .delete(`${apiPathDelete}`)
-        .then((res) => refreshList(setIndividList, apiPathList))
+        .then((res) => refreshObjectList(setIndividList, apiPathList, authTokens))
         .catch((err) => console.log(err));
-};
+}
 
-export const refreshList = (setIndividList, apiPathList) => {
+export function refreshObjectList(setObjectList, apiPathList, authTokens) {
+    console.log(authTokens)
     axios
-        .get(`${apiPathList}`)
+        .get(`${apiPathList}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(authTokens.access)
+            }
+        })
         .then((res) => {
-            setIndividList(res.data);
+            setObjectList(res.data);
         })
         .catch((err) => console.log(err));
-};
+}
+
+export function refreshObjectDetail(setObjectDetail, apiPathList, authTokens) {
+    axios
+        .get(`${apiPathList}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(authTokens.access)
+            }
+        })
+        .then((res) => {
+            setObjectDetail(res.data);
+            document.title = res.data.name;
+        })
+        .catch((err) => console.log(err));
+}
+

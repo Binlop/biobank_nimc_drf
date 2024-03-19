@@ -1,6 +1,7 @@
 import axios from "axios";
 import "./individ.css"
-import React, { useState, useEffect } from "react";
+import AuthContext from '../../context/AuthContext'
+import React, { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom';
 import NestedMenu from './NestedMenu'; // Импортируем компонент NestedMenu
 import EmbryoFilterForm from "./FilterComponents/EmbryoFilter";
@@ -8,7 +9,8 @@ import FatherFilterForm from "./FilterComponents/FatherFilter";
 import MotherFilterForm from "./FilterComponents/MotherFilter";
 
 
-function FilterBlock({ setIndividList }) {  
+function FilterBlock({ setIndividList }) { 
+  const { authTokens, logoutUser } = useContext(AuthContext);
   const [isOpenEmbryo, setIsOpenEmbryo] = useState(false);
   const [isOpenFather, setIsOpenFather] = useState(false);
   const [isOpenMother, setisOpenMother] = useState(false);
@@ -111,9 +113,13 @@ function FilterBlock({ setIndividList }) {
     event.preventDefault();
     
     const formData = uniteAllFormData();
+    console.log(authTokens)
     try {
       axios
-        .get(`/api/individ/search/`, { params: formData })
+        .get(`/api/individ/search/`, { params: formData, headers:{
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+      }})
         .then((res) => {
           setIndividList(res.data);
         }) 
@@ -170,6 +176,7 @@ function FilterBlock({ setIndividList }) {
 
 export default function IndividList() {
     const [IndividList, setIndividList] = useState([]);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
@@ -191,7 +198,10 @@ export default function IndividList() {
       };
     const refreshList = () => {
         axios
-          .get("/api/individ/")
+          .get(`/api/individ/`, {headers:{
+            'Content-Type': 'application/json',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }})
           .then((res) => {
             setIndividList(res.data)
         })

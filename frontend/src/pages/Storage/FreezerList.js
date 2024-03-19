@@ -1,17 +1,19 @@
 import axios from "axios";
 import "./storage.css"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from 'react-router-dom';
-import { handleDelete, refreshList } from "../../components/API/GetListOrDelete";
+import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
 import NestedMenu from "./NestedMenu";
+import AuthContext from '../../context/AuthContext'
 
 export default function FreezerList() {
     const [FreezerList, seFreezerList] = useState([]);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
         axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshList(seFreezerList, `/api/storage/`)
+        refreshObjectList(seFreezerList, `/api/storage/`, authTokens)
         document.title = 'Морозильники';
       }, []);
     
@@ -21,7 +23,7 @@ export default function FreezerList() {
       }
     
     const handleDeleteClick = (obj_id) => {
-        handleDelete(`/api/storage/freezer/${obj_id}/delete/`, seFreezerList, `/api/storage/`);
+        handleDelete(`/api/storage/freezer/${obj_id}/delete/`, seFreezerList, `/api/storage/`, authTokens);
     };
 
     return (

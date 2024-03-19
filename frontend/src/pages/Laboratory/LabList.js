@@ -3,9 +3,11 @@ import axios from "axios";
 import "./laboratory.css"
 import { Routes,     BrowserRouter as Router,
   Route, Outlet, Link } from 'react-router-dom';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import AuthContext from '../../context/AuthContext'
 
 export default function LabList() {
+    const { authTokens, logoutUser } = useContext(AuthContext);
     const [viewCompleted, setViewCompleted] = useState(false);
     const [laboratoryList, setLaboratoryList] = useState([]);
     const [modal, setModal] = useState(false);
@@ -31,7 +33,10 @@ export default function LabList() {
 
     const refreshList = () => {
         axios
-          .get("/api/laboratory/")
+          .get("/api/laboratory/", {headers:{
+            'Content-Type': 'application/json',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }})
           .then((res) => {
             setLaboratoryList(res.data)
         })

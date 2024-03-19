@@ -1,16 +1,18 @@
 import axios from "axios";
 import "./sample.css"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from 'react-router-dom';
-import { handleDelete, refreshList } from "../../components/API/GetListOrDelete";
+import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
+import AuthContext from '../../context/AuthContext'
 
 export default function SampleList() {
     const [IndividList, seIndividList] = useState([]);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
         axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshList(seIndividList, `/api/sample/`)
+        refreshObjectList(seIndividList, `/api/sample/`, authTokens)
         document.title = 'Образцы';
       }, []);
     
@@ -21,7 +23,7 @@ export default function SampleList() {
 
     const handleDeleteClick = (sample_id) => {
         console.log(sample_id)
-        handleDelete(`/api/sample/${sample_id}/delete/`, seIndividList, `/api/sample/`);
+        handleDelete(`/api/sample/${sample_id}/delete/`, seIndividList, `/api/sample/`, authTokens);
     };
 
     return (

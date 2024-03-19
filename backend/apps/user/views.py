@@ -13,6 +13,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 @permission_classes([IsAuthenticated])
 def get_profile(request):
     user = request.user
+    print(user)
     profile = user.profile
-    serializer = ProfileSerializer(profile, many=False)
+    serializer = ProfileSerializer(profile)
     return Response(serializer.data)

@@ -22,6 +22,7 @@ class IndividViewBase(APIView):
 class FamilyMemberListView(IndividViewBase):
 
     def get(self, request, format=None):
+        print(request.user)
         selector = FamilyMemberListSelector()
         members = selector.get_individ_list(user=request.user)      
         serializer = serializers.IndividSerializerListOutput(members, many=True)

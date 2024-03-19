@@ -1,45 +1,23 @@
-import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect, useContext } from "react";
+import AuthContext from '../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../components/API/GetListOrDelete";
 import "./family.css"
+
 
 export default function FamilyDetail() {
     const { id } = useParams();
     const [familyDetail, setFamilyDetail] = useState(null);
-    const [individList, setindividList] = useState([]);
+    const [individList, setindividList] = useState(null);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        refreshList();
-        getFamilyIndivids();
+        refreshObjectDetail(setFamilyDetail, `/api/family/${id}`, authTokens)  
+        refreshObjectList(setindividList, `/api/individ/family_${id}_individs/`, authTokens)      
     }, []);
 
-    const refreshList = () => {
-        axios
-            .get(`/api/family/${id}`)
-            .then((res) => {
-                setFamilyDetail(res.data);
-                console.log(res.data)
-                if (res.data) {
-                    document.title = res.data.name;
-                }
-            })
-            .catch((err) => console.log(err));
-    };   
-
-    const getFamilyIndivids = () => {
-        axios
-        .get(`/api/individ/family_${id}_individs/`)
-        .then((res) => {
-            setindividList(res.data);
-        })
-        .catch((err) => {
-            console.log(err)});
-    };  
-
-    const handleDelete = (item) => {
-        axios
-          .delete(`/api/individ/${item.individ.id}/delete`)
-          .then((res) => refreshList());
+    const handleDeleteClick = (object_id) => {
+        handleDelete(`/api/individ/${object_id}/delete`, setindividList, `/api/individ/family_${id}_individs/`, authTokens);
     };
 
     return (
@@ -101,7 +79,7 @@ export default function FamilyDetail() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDelete(item)}
+                                        onClick={() => handleDeleteClick(item.individ.id)}
                                     >
                                         Удалить
                                     </button>

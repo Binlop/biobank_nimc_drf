@@ -3,21 +3,18 @@ import axios from "axios";
 import "./family.css"
 import { Routes,     BrowserRouter as Router,
   Route, Outlet, Link } from 'react-router-dom';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import AuthContext from '../../context/AuthContext'
+import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
 
 export default function FamilyList() {
-    const [viewCompleted, setViewCompleted] = useState(false);
-    const [familyList, setLaboratoryList] = useState([]);
-    const [modal, setModal] = useState(false);
-    const [activeItem, setActiveItem] = useState({
-        name: '',
-        description: '',
-      });
+    const [familyList, setFamilyList] = useState([]);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
         const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
         axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshList()
+        refreshObjectList(setFamilyList, `/api/family/`, authTokens)
         document.title = 'Семьи';
       }, []);
     
@@ -26,52 +23,10 @@ export default function FamilyList() {
         return cookieValue ? cookieValue.pop() : '';
       }
     
-    const handleDelete = (item) => {
-        axios
-          .delete(`/api/family/${item.id}/`)
-          .then((res) => refreshList());
-      };
-
-    const toggle = () => {
-        setModal(!modal);      
-    };
-
-    const refreshList = () => {
-        axios
-          .get("/api/family/")
-          .then((res) => {
-            setLaboratoryList(res.data)
-        })
-          .catch((err) => console.log(err));
-      };    
-
-    const handleSubmit = (item) => {
-        toggle();
-        if (item.id) {
-          axios
-            .put(`/api/family/${item.id}/`, item)
-            .then((res) => refreshList());
-          return;
-        }
-        axios
-          .post("/api/family/", item)
-          .then((res) => refreshList());
-      };
+    const handleDeleteClick = (item) => {
+        handleDelete(`/api/family/${item.id}/`, setFamilyList,`/api/family/`, authTokens)
+      };;
     
-    const createItem = () => {
-        const item = { name: "", description: ""};
-        setActiveItem(item);
-        setModal(!modal);      
-    };
-    
-    const editItem = (item) => {
-        setActiveItem(item);
-        setModal(!modal);  
-      };
-    
-    const displayCompleted = (status) => {
-        setViewCompleted(status);
-      };
     
     return (
         <main className="container">
@@ -100,7 +55,7 @@ export default function FamilyList() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDelete(item)}
+                                        onClick={() => handleDeleteClick(item.id)}
                                     >
                                         Удалить
                                     </button>
@@ -110,13 +65,6 @@ export default function FamilyList() {
                     </tbody>
                 </table>
             </div>
-            {modal ? (
-                <Modal
-                    activeItem={activeItem}
-                    toggle={toggle}
-                    onSave={handleSubmit}
-                />
-            ) : null}
         </main>
     )
 }

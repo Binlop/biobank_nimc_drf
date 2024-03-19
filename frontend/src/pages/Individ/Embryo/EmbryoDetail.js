@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import AuthContext from '../../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../individ.css"
 import AddSampleToEmbryo from "./AddSampleEmbryo.js";
 
@@ -9,10 +11,11 @@ export default function EmbryoDetail() {
     const { id } = useParams();
     const [embryoDetail, setEmbryoDetail] = useState(null);
     const [samplesList, seSampleList] = useState([]);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        refreshList();
-        getIndividSamples();
+        refreshObjectDetail(setEmbryoDetail, `/api/individ/${id}`, authTokens)  
+        refreshObjectList(seSampleList, `/api/sample/individ_${id}_samples/`, authTokens)
     }, []);
 
     const refreshList = () => {
