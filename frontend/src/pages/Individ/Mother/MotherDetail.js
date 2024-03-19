@@ -3,15 +3,24 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "../individ.css"
 import AddSampleToAdult from "../AddSample";
+import ModalToPregnancy from "./ModalToPregnancy";
+
 
 export default function MotherDetail() {
     const { id } = useParams();
     const [individDetail, setIndividDetail] = useState(null);
     const [samplesList, seSampleList] = useState([]);
+    const [motherPregnacies, setmotherPregnacies] = useState([]);
+    const [modal, setModal] = useState(false);
+    const [activeItem, setActiveItem] = useState({
+        pregnancy_year: '',
+        diagnosis: '',
+      });
 
     useEffect(() => {
         refreshList();
         getIndividSamples();
+        getMotherPregnancy();
     }, []);
 
     const refreshList = () => {
@@ -42,10 +51,33 @@ export default function MotherDetail() {
               .delete(`/api/sample/${item.sample.id}/delete`)
               .then((res) => refreshList());
         };
-    const editItem = (item) => {
-            axios
-              .delete(`/api/sample/${item.sample.id}/delete`)
-              .then((res) => refreshList());
+
+    const getMotherPregnancy = () => {
+        axios
+        .get(`api/individ/mother/${id}/pregnancy/`)
+        .then((res) => {
+            setmotherPregnacies(res.data);
+        })
+        .catch((err) => {
+            console.log(err)});
+    }
+
+    const editPregnancy = (item) => {
+        setActiveItem(item);
+        console.log(activeItem)
+        setModal(!modal);  
+        };
+
+    const togglePregnancy = () => {
+        setModal(!modal);      
+    };
+
+    const handleSubmitPregnancy = (item) => {
+        togglePregnancy();
+          axios
+            .put(`/api/individ/mother/pregnancy/${item.id}/`, item)
+            .then((res) => getMotherPregnancy());
+          return;
         };
 
     return (
@@ -210,7 +242,7 @@ export default function MotherDetail() {
                 )}
             </div>
             <div className="features">
-            {individDetail && individDetail.pregnancy && (
+            {motherPregnacies && (
                 <div>
                     <h5>Беременности</h5>
                     <table>
@@ -228,7 +260,7 @@ export default function MotherDetail() {
                                     <td className="table_list_value">
                                     <button
                                         className="btn btn-primary mr-2"
-                                        onClick={() => editItem(item)}
+                                        onClick={() => editPregnancy(item)}
                                     >
                                         Изменить
                                     </button>
@@ -243,7 +275,13 @@ export default function MotherDetail() {
                             ))}
                         </tbody>
                     </table>
-    
+                    {modal ? (
+                    <ModalToPregnancy
+                        activeItem={activeItem}
+                        toggle={togglePregnancy}
+                        onSave={handleSubmitPregnancy}
+                    />
+                ) : null}
                 </div>
             )}
         </div>
