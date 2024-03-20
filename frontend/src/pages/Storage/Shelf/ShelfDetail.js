@@ -1,29 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import AuthContext from '../../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../storage.css"
 
 export default function ShelfDetail() {
-    const { id } = useParams();
-    const [storageDetail, setStorageDetail] = useState(null);
+  const { id } = useParams();
+  const [storageDetail, setStorageDetail] = useState(null);
+  const { authTokens, logoutUser } = useContext(AuthContext);
+  
+  useEffect(() => {
+    refreshObjectDetail(setStorageDetail, `/api/storage/shelf/${id}`, authTokens)  
+  }, []);
 
-    useEffect(() => {
-        refreshList();
-    }, []);
-
-    const refreshList = () => {
-        axios
-            .get(`/api/storage/shelf/${id}`)
-            .then((res) => {
-                setStorageDetail(res.data);
-                if (res.data) {
-                    document.title = res.data.name;
-                }
-            })
-            .catch((err) => {
-                console.log(err)});
-    };   
-    
     return (
         <main className="container">
         {storageDetail && (

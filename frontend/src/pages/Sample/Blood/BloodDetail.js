@@ -1,28 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import AuthContext from '../../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../sample.css"
 
 export default function DNADetail() {
     const { id } = useParams();
     const [sampleDetail, setSampleDetail] = useState(null);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        refreshList();
+      refreshObjectDetail(setSampleDetail, `/api/sample/${id}`, authTokens)  
     }, []);
-
-    const refreshList = () => {
-        axios
-            .get(`/api/sample/${id}`)
-            .then((res) => {
-                setSampleDetail(res.data);
-                if (res.data) {
-                    document.title = res.data.name;
-                }
-            })
-            .catch((err) => {
-                console.log(err)});
-    };   
 
     return (
         <main className="container">
@@ -32,7 +22,7 @@ export default function DNADetail() {
               <p>
                 <>
                   <span className="larger-text">{sampleDetail.name}</span>
-                  <Link to={`/samples/dna/${id}/update`} className="btn btn-primary">
+                  <Link to={`/samples/${sampleDetail.sampletype}/${id}/update`} className="btn btn-primary">
                     Изменить образец
                   </Link>
                 </>

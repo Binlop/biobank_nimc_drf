@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import AuthContext from '../../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../individ.css"
 import AddSampleToAdult from "../AddSample";
 import ModalToPregnancy from "./ModalToPregnancy";
@@ -10,61 +12,16 @@ export default function MotherDetail() {
     const { id } = useParams();
     const [individDetail, setIndividDetail] = useState(null);
     const [samplesList, seSampleList] = useState([]);
-    const [motherPregnacies, setmotherPregnacies] = useState([]);
+    const [motherPregnacies, setMotherPregnacies] = useState([]);
     const [modal, setModal] = useState(false);
+    const { authTokens, logoutUser } = useContext(AuthContext);
     const [activeItem, setActiveItem] = useState({
         pregnancy_year: '',
         diagnosis: '',
       });
 
-    useEffect(() => {
-        refreshList();
-        getIndividSamples();
-        getMotherPregnancy();
-    }, []);
-
-    const refreshList = () => {
-        axios
-            .get(`/api/individ/${id}`)
-            .then((res) => {
-                setIndividDetail(res.data);
-                if (res.data) {
-                    document.title = res.data.name;
-                }
-            })
-            .catch((err) => {
-                console.log(err)});
-    };   
-    
-    const getIndividSamples = () => {
-        axios
-        .get(`/api/sample/individ_${id}_samples/`)
-        .then((res) => {
-            seSampleList(res.data);
-        })
-        .catch((err) => {
-            console.log(err)});
-        };   
-
-    const handleDelete = (item) => {
-            axios
-              .delete(`/api/sample/${item.sample.id}/delete`)
-              .then((res) => refreshList());
-        };
-
-    const getMotherPregnancy = () => {
-        axios
-        .get(`api/individ/mother/${id}/pregnancy/`)
-        .then((res) => {
-            setmotherPregnacies(res.data);
-        })
-        .catch((err) => {
-            console.log(err)});
-    }
-
     const editPregnancy = (item) => {
         setActiveItem(item);
-        console.log(activeItem)
         setModal(!modal);  
         };
 
@@ -76,9 +33,19 @@ export default function MotherDetail() {
         togglePregnancy();
           axios
             .put(`/api/individ/mother/pregnancy/${item.id}/`, item)
-            .then((res) => getMotherPregnancy());
+            .then((res) => refreshObjectList(setMotherPregnacies, `api/individ/mother/${id}/pregnancy/`, authTokens));
           return;
         };
+
+    useEffect(() => {
+        refreshObjectDetail(setIndividDetail, `/api/individ/${id}`, authTokens)  
+        refreshObjectList(seSampleList, `/api/sample/individ_${id}_samples/`, authTokens)
+        refreshObjectList(setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`, authTokens)
+    }, []);
+
+    const handleDeleteClick = (object_id) => {
+        handleDelete(`/api/sample/${object_id}/delete`, seSampleList, `/api/sample/individ_${id}_samples/`, authTokens);
+    };
 
     return (
         <main className="container">
@@ -229,14 +196,6 @@ export default function MotherDetail() {
                                 <td className="table_detail_property">Примечание</td>
                                 <td className="table_detail_value">{individDetail.menstrual_note}</td>
                             </tr>
-                            <tr>
-                                <td className="table_detail_property">Беременности</td>
-                                <td className="table_detail_value">
-                                    {individDetail.pregnancy && individDetail.pregnancy.map(item => (
-                                        item.pregnancy_year, item.diagnosis
-                                    ))}
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 )}
@@ -250,10 +209,11 @@ export default function MotherDetail() {
                             <tr>
                                 <th className="table_list_property">Год</th>
                                 <th className="table_list_property">Диагноз</th>
+                                <th className="table_list_property">Действия</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {individDetail.pregnancy.map(item => (
+                            {motherPregnacies.map(item => (
                                 <tr key={item.id}>
                                     <td className="table_list_value">{item.pregnancy_year}</td>
                                     <td className="table_list_value">{item.diagnosis}</td>
@@ -305,7 +265,7 @@ export default function MotherDetail() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDelete(item)}
+                                        onClick={() => handleDeleteClick(item.sample.id)}
                                     >
                                         Удалить
                                     </button>

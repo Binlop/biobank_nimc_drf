@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
 import AuthContext from '../../../context/AuthContext'
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../individ.css"
@@ -18,34 +17,10 @@ export default function EmbryoDetail() {
         refreshObjectList(seSampleList, `/api/sample/individ_${id}_samples/`, authTokens)
     }, []);
 
-    const refreshList = () => {
-        axios
-            .get(`/api/individ/${id}`)
-            .then((res) => {
-                setEmbryoDetail(res.data);
-                if (res.data) {
-                    document.title = res.data.family_member.name;
-                }
-            })
-            .catch((err) => {
-                console.log(err)});
-    };   
+    const handleDeleteClick = (object_id) => {
+        handleDelete(`/api/sample/${object_id}/delete`, seSampleList, `/api/sample/individ_${id}_samples/`, authTokens);
+    };
 
-    const getIndividSamples = () => {
-        axios
-        .get(`/api/sample/individ_${id}_samples/`)
-        .then((res) => {
-            seSampleList(res.data);
-        })
-        .catch((err) => {
-            console.log(err)});
-        };   
-
-    const handleDelete = (item) => {
-            axios
-              .delete(`/api/sample/${item.sample.id}/delete`)
-              .then((res) => refreshList());
-        };
 
     return (
         <main className="container">
@@ -294,7 +269,7 @@ export default function EmbryoDetail() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDelete(item)}
+                                        onClick={() => handleDeleteClick(item.sample.id)}
                                     >
                                         Удалить
                                     </button>

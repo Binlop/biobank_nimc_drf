@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SampleList from './SampleList';
+import SampleDetail from './SampleDetail';
 
 import DNACreate from './DNA/DNACreate';
 import DNADetail from './DNA/DNADetail';
@@ -26,21 +27,21 @@ export default function Sample() {
           <Route path="/dna/:id/" element={<DNADetail />} />
           <Route path="/dna/:id/update/" element={<DNAUpdate />} />
 
-          <Route path="/chorion/:id/" element={<DNADetail />} />
+          <Route path="/chorion/:id/" element={<SampleDetail />} />
           <Route path="/chorion/create/" element={<ChorionCreate />} />
 
-          <Route path="/blood/:id/" element={<DNADetail />} />
+          <Route path="/blood/:id/" element={<SampleDetail />} />
           <Route path="/blood/create/" element={<BloodCreate />} />
 
-          <Route path="/endometrium/:id/" element={<DNADetail />} />
+          <Route path="/endometrium/:id/" element={<SampleDetail />} />
           <Route path="/endometrium/create/" element={<EndometriumCreate />} />
 
 
-          <Route path="/fetal_sac_nitrogen/:id/" element={<DNADetail />} />
+          <Route path="/fetal_sac_nitrogen/:id/" element={<SampleDetail />} />
           <Route path="/fetal_sac_nitrogen/create/" element={<FetalSacNitrogenCreate />} />
 
 
-          <Route path="/fetal_sac_freezer/:id/" element={<DNADetail />} />
+          <Route path="/fetal_sac_freezer/:id/" element={<SampleDetail />} />
           <Route path="/fetal_sac_freezer/create/" element={<FetalSacFreezerCreate />} />
 
         </Routes>

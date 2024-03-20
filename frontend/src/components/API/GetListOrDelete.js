@@ -2,7 +2,12 @@ import axios from 'axios';
 
 export function handleDelete(apiPathDelete, setIndividList, apiPathList, authTokens) {
     axios
-        .delete(`${apiPathDelete}`)
+        .delete(`${apiPathDelete}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(authTokens.access)
+            }
+        })
         .then((res) => refreshObjectList(setIndividList, apiPathList, authTokens))
         .catch((err) => console.log(err));
 }

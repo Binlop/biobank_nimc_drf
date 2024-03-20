@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
-import AuthContext from '../../../context/AuthContext'
-import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
-import "../sample.css"
+import AuthContext from '../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../components/API/GetListOrDelete";
+import "./sample.css"
 
-export default function DNADetail() {
-  const { id } = useParams();
-  const [sampleDetail, setSampleDetail] = useState(null);
-  const { authTokens, logoutUser } = useContext(AuthContext);
+export default function SampleDetail() {
+    const { id } = useParams();
+    const [sampleDetail, setSampleDetail] = useState(null);
+    const { authTokens, logoutUser } = useContext(AuthContext);
 
-  useEffect(() => {
-    refreshObjectDetail(setSampleDetail, `/api/sample/${id}`, authTokens)  
-  }, []);
+    useEffect(() => {
+      refreshObjectDetail(setSampleDetail, `/api/sample/${id}`, authTokens)  
+    }, []);
 
     return (
         <main className="container">
@@ -50,10 +49,6 @@ export default function DNADetail() {
                 </tr>
                 <tr>
                   <td className="table_detail_property">Количество</td>
-                  <td className="table_list_value">{sampleDetail.volume}</td>
-                </tr>
-                <tr>
-                  <td className="table_detail_property">Концентрация</td>
                   <td className="table_list_value">{sampleDetail.volume}</td>
                 </tr>
               </tbody>

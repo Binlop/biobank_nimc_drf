@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import AuthContext from '../../../context/AuthContext'
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../individ.css"
 import AddSampleToAdult from "../AddSample";
 
@@ -9,40 +10,18 @@ export default function FatherDetail() {
     const { id } = useParams();
     const [individDetail, setIndividDetail] = useState(null);
     const [samplesList, seSampleList] = useState([]);
+    const { authTokens, logoutUser } = useContext(AuthContext);
+
 
     useEffect(() => {
-        refreshList();
-        getIndividSamples();
+        refreshObjectDetail(setIndividDetail, `/api/individ/${id}`, authTokens)  
+        refreshObjectList(seSampleList, `/api/sample/individ_${id}_samples/`, authTokens)
     }, []);
 
-    const refreshList = () => {
-        axios
-            .get(`/api/individ/${id}`)
-            .then((res) => {
-                setIndividDetail(res.data);
-                if (res.data) {
-                    document.title = res.data.name;
-                }
-            })
-            .catch((err) => {
-                console.log(err)});
-    };   
-
-    const getIndividSamples = () => {
-        axios
-        .get(`/api/sample/individ_${id}_samples/`)
-        .then((res) => {
-            seSampleList(res.data);
-        })
-        .catch((err) => {
-            console.log(err)});
-        };   
-
-    const handleDelete = (item) => {
-            axios
-              .delete(`/api/sample/${item.sample.id}/delete`)
-              .then((res) => refreshList());
-        };
+    const handleDeleteClick = (object_id) => {
+        console.log(authTokens)
+        handleDelete(`/api/sample/${object_id}/delete`, seSampleList, `/api/sample/individ_${id}_samples/`, authTokens);
+    };
 
     return (
         <main className="container">
@@ -175,7 +154,7 @@ export default function FatherDetail() {
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDelete(item)}
+                                        onClick={() => handleDeleteClick(item.sample.id)}
                                     >
                                         Удалить
                                     </button>
