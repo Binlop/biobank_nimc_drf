@@ -1,42 +1,24 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
-
+import { handlePost, setCSRFToken } from "../../components/API/CreateUpdate";
 
 function LabCreate() {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState({})
   const navigate = useNavigate();
+  const [errors, setError] = useState({}); 
 
   useEffect(() => {
+    setCSRFToken()
     document.title = 'Добавить направление';
-    const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
   }, []);
 
-  const getCSRFToken = (name) => {
-    const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return cookieValue ? cookieValue.pop() : '';
-  }
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    if (name === "name") setName(value);
-    else if (name === "description") setDescription(value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const newItem = { name, description };
-    axios
-      .post("/api/laboratory/create", newItem)
-      .then(() => {
-        console.log("Отправляемый объект", newItem);
-        navigate('/laboratories');
-      })
-      .catch((error) => {
-        console.error("Ошибка при отправке данных:", error);
-      });
+    handlePost(event, formData, `/api/laboratory/create`, `/laboratories`, setError, navigate)
   };
 
   return (
@@ -49,7 +31,7 @@ function LabCreate() {
             type="text"
             id="name"
             name="name"
-            value={name}
+            value={formData.name}
             onChange={handleChange}
           />
         </div>
@@ -59,7 +41,7 @@ function LabCreate() {
             type="text"
             id="description"
             name="description"
-            value={description}
+            value={formData.description}
             onChange={handleChange}
           />
         </div>

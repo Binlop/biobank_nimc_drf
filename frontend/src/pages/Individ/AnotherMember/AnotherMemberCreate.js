@@ -2,10 +2,16 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "../individ.css"
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
+import {
+  FormGroup,
+  Input,
+  Label,
+} from "reactstrap";
+import { handlePost, setCSRFToken } from "../../../components/API/CreateUpdate";
+
+
 
 export default function AnotherMemberCreate() {
   const [formData, setFormData] = useState({
@@ -13,21 +19,16 @@ export default function AnotherMemberCreate() {
     });
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
-  const [date_of_birth, setDatebirth] = useState(new Date());
   const [errors, setError] = useState(null); 
 
 
   useEffect(() => {
     document.title = 'Добавить иного члена семьи';
-    const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
     fetchLaboratories();
+    setCSRFToken()
     }, []);
 
-  const getCSRFToken = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-  }
+
 
   const fetchLaboratories = () => {
     axios
@@ -72,6 +73,7 @@ export default function AnotherMemberCreate() {
         setError(error.response.data);
       }
   };
+  
   const makeEmbryoForm = () => {
     const formEmbryo = new FormData();
     for (const key in formData) {
@@ -97,11 +99,6 @@ export default function AnotherMemberCreate() {
     setFormData({ ...formData, [name]: updatedLaboratories });
   };
 
-  const handleChangeDate = (date) => {
-    const formattedDate = date.toISOString().split('T')[0];
-    setFormData(prevFormData => ({ ...prevFormData, date_of_birth: formattedDate }));    
-    setDatebirth(date)
-  };
 
   return (
     <div className="features">
@@ -173,13 +170,21 @@ export default function AnotherMemberCreate() {
             onChange={handleChange}
             errors={errors}
           />
-          <div className="form-group">
-          <label htmlFor="date_of_birth">Дата рождения:</label>
-          <DatePicker selected={date_of_birth} dateFormat="yyyy/MM/dd" onChange={handleChangeDate} />
-          {errors && errors.date_of_birth &&
-          <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
-          }
-          </div>
+           <FormGroup>
+            <Label>
+             Дата рождения
+            </Label>
+            <Input
+              name="date_of_birth"
+              type="date"
+              onChange={handleChange}
+              value={formData.date_of_birth}
+
+            />
+              {errors && errors.date_of_birth &&
+              <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
+              }
+          </FormGroup>
           <CharFieldWithError
             label="Возраст на момент взятия, лет"
             name="age_at_sampling"

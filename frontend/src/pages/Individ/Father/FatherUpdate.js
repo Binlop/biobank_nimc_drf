@@ -1,38 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
-import "../individ.css"
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { useParams, useNavigate } from "react-router-dom";
+import { FormGroup, Input, Label } from "reactstrap";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
+import { handleUpdate, setCSRFToken } from "../../../components/API/CreateUpdate";
+import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import "../individ.css"
+
 
 export default function FatherUpdate() {
-    const { id } = useParams();
-
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     laboratory: [],
-    pregnancy: [],
     });
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
-  const [date_of_birth, setDatebirth] = useState(new Date());
   const [errors, setError] = useState(null); 
-
 
   useEffect(() => {
     refreshIndividData();
-    document.title = 'Изменить мать';
-    const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-    fetchLaboratories();
+    document.title = 'Изменить отца';
+    setCSRFToken();
+    refreshObjectList(setAllLaboratories,`/api/laboratory`)
     }, []);
-
-  const getCSRFToken = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-  }
 
   const refreshIndividData = () => {
     axios
@@ -50,50 +41,18 @@ export default function FatherUpdate() {
         .catch((err) => console.log(err));
   };
 
-  const fetchLaboratories = () => {
-    axios
-      .get(`/api/laboratory`)
-      .then((res) => {
-      setAllLaboratories(res.data);
-      console.log(res.data)
-    })
-      .catch((err) => console.log(err));
-  };   
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const hasChecked = formData.laboratory.length > 0;
-
-    if (!hasChecked) {
-      alert('Выберите хотя бы одну лабораторию');
-      }
-
-    try {
-      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-      const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-
-      const formFather = makeFatherForm();
-
-      await axios.put(`/api/individ/${formData.individ_type}/${id}/update/`, formFather, {
-      headers: {
-      "Content-Type": contentTypeHeader,
-      },
-      });
-      navigate('/individs');
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой индивида:', error);
-        setError(error.response.data);
-      }
+    const formIndivid = makeIndividForm();
+    handleUpdate(e, formIndivid, `/api/individ/${formData.individ_type}/${id}/update/`, `/individs/${formData.individ_type}/${id}/`, setError, navigate)
   };
-  const makeFatherForm = () => {
+
+  const makeIndividForm = () => {
     const formFather = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
@@ -116,12 +75,6 @@ export default function FatherUpdate() {
       updatedLaboratories = formData.laboratory.filter(id => id !== labId);
     }
     setFormData({ ...formData, [name]: updatedLaboratories });
-  };
-
-  const handleChangeDate = (date) => {
-    const formattedDate = date.toISOString().split('T')[0];
-    setFormData(prevFormData => ({ ...prevFormData, date_of_birth: formattedDate }));    
-    setDatebirth(date)
   };
 
   return (
@@ -202,13 +155,18 @@ export default function FatherUpdate() {
             onChange={handleChange}
             errors={errors}
           />
-          <div className="form-group">
-          <label htmlFor="date_of_birth">Дата рождения:</label>
-          <DatePicker selected={date_of_birth} dateFormat="yyyy/MM/dd" onChange={handleChangeDate} />
-          {errors && errors.date_of_birth &&
-          <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
-          }
-          </div>
+          <FormGroup>
+            <Label>Дата рождения</Label>
+            <Input
+              name="date_of_birth"
+              type="date"
+              onChange = {handleChange}
+              value = {formData.date_of_birth}
+            />
+            {errors && errors.date_of_birth &&
+            <div className="alert alert-danger mt-3 mb-0">{errors.date_of_birth}</div>
+            }
+          </FormGroup>
           <CharFieldWithError
             label="Возраст на момент взятия, лет"
             name="age_at_sampling"

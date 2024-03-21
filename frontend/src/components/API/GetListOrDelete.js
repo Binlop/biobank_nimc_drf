@@ -1,24 +1,25 @@
 import axios from 'axios';
 
-export function handleDelete(apiPathDelete, setIndividList, apiPathList, authTokens) {
+export function handleDelete(apiPathDelete, setIndividList, apiPathList) {
+    const token = JSON.parse(localStorage.authTokens)
     axios
         .delete(`${apiPathDelete}`, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + String(authTokens.access)
+                'Authorization': 'Bearer ' + String(token.access)
             }
         })
-        .then((res) => refreshObjectList(setIndividList, apiPathList, authTokens))
+        .then((res) => refreshObjectList(setIndividList, apiPathList, token))
         .catch((err) => console.log(err));
 }
 
-export function refreshObjectList(setObjectList, apiPathList, authTokens) {
-    console.log(authTokens)
+export function refreshObjectList(setObjectList, apiPathList) {
+    const token = JSON.parse(localStorage.authTokens)
     axios
         .get(`${apiPathList}`, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + String(authTokens.access)
+                'Authorization': 'Bearer ' + String(token.access)
             }
         })
         .then((res) => {
@@ -27,12 +28,13 @@ export function refreshObjectList(setObjectList, apiPathList, authTokens) {
         .catch((err) => console.log(err));
 }
 
-export function refreshObjectDetail(setObjectDetail, apiPathList, authTokens) {
+export function refreshObjectDetail(setObjectDetail, apiPathList) {
+    const token = JSON.parse(localStorage.authTokens)
     axios
         .get(`${apiPathList}`, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + String(authTokens.access)
+                'Authorization': 'Bearer ' + String(token.access)
             }
         })
         .then((res) => {
@@ -41,4 +43,3 @@ export function refreshObjectDetail(setObjectDetail, apiPathList, authTokens) {
         })
         .catch((err) => console.log(err));
 }
-

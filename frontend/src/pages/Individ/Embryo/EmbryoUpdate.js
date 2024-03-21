@@ -3,9 +3,11 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "../individ.css"
 import React, { useState, useEffect } from "react";
+import { Form, FormGroup, Input, Label } from "reactstrap";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
-import DatePicker from "react-datepicker";
+import { handleUpdate, setCSRFToken } from "../../../components/API/CreateUpdate";
+import { refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 
 
 export default function EmbryoUpdate() {
@@ -16,76 +18,35 @@ export default function EmbryoUpdate() {
       laboratory: [],
     });
     const [allLaboratories, setAllLaboratories] = useState([]);
-    const [date_of_receipt, setDate_of_receipt] = useState(new Date());
-    const [last_menstruation, setLast_menstruation] = useState(new Date());
     const [file, setFile] = useState(null);
 
     useEffect(() => {
         refreshIndividData();
-        fetchLaboratories();
-        document.title = 'Изменить направление';
-        const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-        axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
+        setCSRFToken();
+        document.title = 'Изменить пробанда'
+        refreshObjectList(setAllLaboratories,`/api/laboratory`)
+
     }, []);
-    
-    const getCSRFToken = (name) => {
-        const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-        return cookieValue ? cookieValue.pop() : '';
-      }
     
     const refreshIndividData = () => {
       axios
           .get(`/api/individ/${id}`)
           .then((res) => {
             setFormData(res.data);
-            console.log(res.data)
             const laboratoryIds = res.data.laboratory.map(lab => lab.id);
-            console.log(laboratoryIds)
             setFormData(prevState => ({
               ...prevState,
-              laboratory: laboratoryIds
+              laboratory: laboratoryIds,
+              scan_directions: null
             }));            
           })
           .catch((err) => console.log(err));
-    };
-      
-
-    const fetchLaboratories = () => {
-      axios
-          .get(`/api/laboratory`)
-          .then((res) => {
-            setAllLaboratories(res.data);
-          })
-          .catch((err) => console.log(err));
-      };  
-
+    }; 
 
   const handleSubmit = async (e) => {
       e.preventDefault();
-  
-      const hasChecked = formData.laboratory.length > 0;
-  
-      if (!hasChecked) {
-        alert('Выберите хотя бы одну лабораторию');
-        }
-  
-      try {
-        const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-        const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-  
-        const formEmbryo = makeEmbryoForm();
-  
-        await axios.put(`/api/individ/${formData.individ_type}/${id}/update/`, formEmbryo, {
-        headers: {
-        "Content-Type": contentTypeHeader,
-        },
-        });
-        navigate('/individs');
-      } 
-      catch (error) {
-          console.error('Ошибка с отправкой семьи:', error);
-          setError(error.response.data);
-        }
+      const formEmbryo = makeEmbryoForm();
+      handleUpdate(e, formEmbryo, `/api/individ/${formData.individ_type}/${id}/update/`, `/individs/${formData.individ_type}/${id}/`, setError, navigate)
     };
 
     const makeEmbryoForm = () => {
@@ -118,23 +79,6 @@ export default function EmbryoUpdate() {
       setFormData({ ...formData, [name]: updatedLaboratories });
     };
   
-    const handleChangeDateOfReceipt = (date) => {
-      const formattedDate = date.toISOString().split('T')[0];
-      setFormData(prevFormData => ({ ...prevFormData, date_of_receipt: formattedDate }));    
-      setDate_of_receipt(date)
-    };
-  
-    const handleChangeDateLastMenstruation = (date) => {
-      if (date) {
-        const formattedDate = date.toISOString().split('T')[0];
-        setFormData(prevFormData => ({ ...prevFormData, last_menstruation: formattedDate }));
-        setLast_menstruation(date);
-      } else {
-        setFormData(prevFormData => ({ ...prevFormData, last_menstruation: null }));
-        setLast_menstruation(null);
-      }
-    };
-  
     const handleImageChange = (e) => {
     let updatedFormData = { ...formData };
     updatedFormData["scan_directions"] = e.target.files[0];
@@ -164,7 +108,7 @@ export default function EmbryoUpdate() {
                 errors={errors}
               />
               <div className="form-group">
-                <label>Сканы направления:</label>
+                <label>Сканы направления</label>
                 <input 
                 type="file"
                 name="scan_directions"
@@ -174,12 +118,7 @@ export default function EmbryoUpdate() {
                   handleImageChange(e);
                 }}
                 />
-              {formData.scan_directions && typeof formData.scan_directions === 'object' ? (
-                <p>На данный момент загружен файл: {formData.scan_directions.name}</p>
-              ) : (
-                <p>На данный момент загружен файл: {formData.scan_directions ? formData.scan_directions : 'Данные загружаются...'}</p>              )}
-
-                {errors && errors.scan_directions.file && (
+                {/* {errors && errors.scan_directions.file && (
                   <div className="alert alert-danger mt-3 mb-0">
                     <ul>
                       {errors.scan_directions.file.map((error, index) => (
@@ -187,7 +126,7 @@ export default function EmbryoUpdate() {
                       ))}
                     </ul>
                   </div>
-                )}
+                )} */}
               </div>
               <CharFieldWithError
                 label="Тестовое поле:"
@@ -210,6 +149,7 @@ export default function EmbryoUpdate() {
               checked={formData.laboratory.includes(lab.id)}
               />
               <label htmlFor={`lab-${lab.id}`} className="form-check-label">{lab.name}</label>
+
               </div>
               ))}
               </div>
@@ -226,13 +166,18 @@ export default function EmbryoUpdate() {
               <div className="alert alert-danger mt-3 mb-0">{errors.create_family}</div>
               }
               </div>  
-              <div className="form-group">
-              <label htmlFor="date_of_receipt">Дата получения:</label>
-              <DatePicker selected={date_of_receipt} dateFormat="yyyy/MM/dd" onChange={handleChangeDateOfReceipt} />
+              <FormGroup>
+              <Label>Дата получения</Label>
+              <Input
+                name="date_of_receipt"
+                type="date"
+                onChange = {handleChange}
+                value = {formData.date_of_receipt}
+              />
               {errors && errors.date_of_receipt &&
               <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
               }
-              </div>
+              </FormGroup>
               <CharFieldWithError
                 label="Номер семьи"
                 name="family_number"
@@ -269,20 +214,18 @@ export default function EmbryoUpdate() {
                 <div className="alert alert-danger mt-3 mb-0">{errors.diagnosis}</div>
                 }
               </div>
-              <div className="form-group">
-              <label htmlFor="last_menstruation">Дата последней менструации:</label>
-              <DatePicker
-              id="last_menstruation"
-              name="last_menstruation"
-              selected={last_menstruation}
-              onChange={handleChangeDateLastMenstruation}
-              className="form-control mr-sm-2"
-              dateFormat="yyyy/MM/dd"
+              <FormGroup>
+              <Label>Дата последней менструации</Label>
+              <Input
+                name="last_menstruation"
+                type="date"
+                onChange = {handleChange}
+                value = {formData.last_menstruation}
               />
               {errors && errors.last_menstruation &&
               <div className="alert alert-danger mt-3 mb-0">{errors.last_menstruation}</div>
               }
-              </div>
+              </FormGroup>
               <div className="form-group">
               <label>Срок беременности по дате:</label>
               <input 

@@ -70,6 +70,7 @@ class FamilyMemberUpdateView(IndividViewBase):
     Базовый класс для изменения членов семьи.
     """
     def put(self, request, pk):
+        print(request.data)
         selector = self.get_selector_class()
         member = selector.get_individ_detail(user=request.user, pk=pk)
         serializer = self.get_serializer_class()(member, data=request.data)

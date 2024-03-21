@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import "../individ.css"
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { FormGroup, Input, Label } from "reactstrap";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
+import { handlePost, setCSRFToken } from "../../../components/API/CreateUpdate";
+import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import "../individ.css"
+
 
 export default function MotherCreate() {
   const [formData, setFormData] = useState({
@@ -13,66 +14,27 @@ export default function MotherCreate() {
     });
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
-  const [date_of_birth, setDatebirth] = useState(new Date());
   const [errors, setError] = useState(null); 
-
+  const [pregnancies, setPregnancies] = useState([{ pregnancy_year: "", diagnosis: "" }]);
 
   useEffect(() => {
     document.title = 'Добавить мать';
-    const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-    fetchLaboratories();
+    setCSRFToken();
+    refreshObjectList(setAllLaboratories,`/api/laboratory`)
     }, []);
-
-  const getCSRFToken = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-  }
-
-  const fetchLaboratories = () => {
-    axios
-      .get(`/api/laboratory`)
-      .then((res) => {
-      setAllLaboratories(res.data);
-      console.log(res.data)
-    })
-      .catch((err) => console.log(err));
-  };   
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const hasChecked = formData.laboratory.length > 0;
-
-    if (!hasChecked) {
-      alert('Выберите хотя бы одну лабораторию');
-      }
-
-    try {
-      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-      const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-
-      const formEmbryo = makeEmbryoForm();
-
-      await axios.post(`/api/individ/mother/create/`, formEmbryo, {
-      headers: {
-      "Content-Type": contentTypeHeader,
-      },
-      });
-      navigate('/individs');
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой индивида:', error);
-        setError(error.response.data);
-      }
+    const formIndivid = makeIndividForm();
+    handlePost(e, formIndivid, `/api/individ/mother/create/`, `/individs/`, setError, navigate)
   };
-  const makeEmbryoForm = () => {
+
+  const makeIndividForm = () => {
     const formEmbryo = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
@@ -82,7 +44,7 @@ export default function MotherCreate() {
         }
       }
     }
-    formEmbryo.append('pregnancy', JSON.stringify(inputs))
+    formEmbryo.append('pregnancy', JSON.stringify(pregnancies))
     return formEmbryo;
   };
 
@@ -98,34 +60,22 @@ export default function MotherCreate() {
     setFormData({ ...formData, [name]: updatedLaboratories });
   };
 
-  const handleChangeDate = (date) => {
-    const formattedDate = date.toISOString().split('T')[0];
-    setFormData(prevFormData => ({ ...prevFormData, date_of_birth: formattedDate }));    
-    setDatebirth(date)
+  const handleAddPregnancy = () => {
+    setPregnancies([...pregnancies, { pregnancy_year: "", diagnosis: "" }]);
   };
 
-  const [inputs, setInputs] = useState([{ pregnancy_year: "", diagnosis: "" }]);
-
-  const handleAddInput = () => {
-    setInputs([...inputs, { pregnancy_year: "", diagnosis: "" }]);
-  };
-
-  const handleChangePreg = (event, index) => {
+  const handleChangePregnancy = (event, index) => {
     let { name, value } = event.target;
-    let onChangeValue = [...inputs];
+    let onChangeValue = [...pregnancies];
     onChangeValue[index][name] = value;
-    setInputs(onChangeValue);
+    setPregnancies(onChangeValue);
   };
 
-  const handleDeleteInput = (index) => {
-    const newArray = [...inputs];
+  const handleDeletePregnancy = (index) => {
+    const newArray = [...pregnancies];
     newArray.splice(index, 1);
-    setInputs(newArray);
+    setPregnancies(newArray);
   };
-  const handleChangeСheckmark = (e) => {
-    const { name, checked } = e.target;
-    setFormData({ ...formData, [name]: checked });
-  }
 
   return (
     <div className="features">
@@ -133,17 +83,17 @@ export default function MotherCreate() {
       <h2>Добавить мать</h2>
         <form onSubmit={handleSubmit}>
         <div className="container_pregnancy">
-          {inputs.map((item, index) => (
+          {pregnancies.map((item, index) => (
             <div className="input_container" key={index}>
               <input
                 name="pregnancy_year"
                 placeholder="Год беременности"
                 type="text"
                 value={item.pregnancy_year}
-                onChange={(event) => handleChangePreg(event, index)}
+                onChange={(event) => handleChangePregnancy(event, index)}
               />
               <label>Диагноз</label>
-              <select type="text" name="diagnosis" value={item.diagnosis} onChange={(event) => handleChangePreg(event, index)} className="form-control">
+              <select type="text" name="diagnosis" value={item.diagnosis} onChange={(event) => handleChangePregnancy(event, index)} className="form-control">
               <option value="noth">---------------------</option>
               <option value="none">Нет данных</option>
               <option value="spontaneous_abortion">Спонтанный аборт</option>
@@ -157,11 +107,11 @@ export default function MotherCreate() {
               <option value="child_with_developmental_defects">Ребенок с пороками развития</option>
               <option value="child_with_delayed_development">Ребенок с задержкой психо-речевого развития</option>
               </select>
-              {inputs.length > 1 && (
-                <button onClick={() => handleDeleteInput(index)}>Удалить</button>
+              {pregnancies.length > 1 && (
+                <button onClick={() => handleDeletePregnancy(index)}>Удалить</button>
               )}
-              {index === inputs.length - 1 && (
-                <button onClick={() => handleAddInput()}>Добавить</button>
+              {index === pregnancies.length - 1 && (
+                <button onClick={() => handleAddPregnancy()}>Добавить</button>
               )}
             </div>
           ))}
@@ -240,13 +190,18 @@ export default function MotherCreate() {
             onChange={handleChange}
             errors={errors}
           />
-          <div className="form-group">
-          <label htmlFor="date_of_birth">Дата рождения:</label>
-          <DatePicker selected={date_of_birth} dateFormat="yyyy/MM/dd" onChange={handleChangeDate} />
-          {errors && errors.date_of_birth &&
-          <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
-          }
-          </div>
+          <FormGroup>
+            <Label>Дата рождения</Label>
+            <Input
+              name="date_of_birth"
+              type="date"
+              onChange = {handleChange}
+              value = {formData.date_of_birth}
+            />
+            {errors && errors.date_of_birth &&
+            <div className="alert alert-danger mt-3 mb-0">{errors.date_of_birth}</div>
+            }
+          </FormGroup>
           <CharFieldWithError
             label="Возраст на момент взятия, лет"
             name="age_at_sampling"
