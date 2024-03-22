@@ -1,8 +1,16 @@
 import axios from "axios";
-import CharFieldWithError from "../Fields/CharFieldWithError";
+import CharFieldWithError from "../../Fields/CharFieldWithError";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
- export const makeSampleForm = (formData) => {
+export function GetParamFromURL(param_name){
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const individId = searchParams.get(param_name);
+  return individId
+}
+
+ export const makeSampleForm = (formData, individId) => {
     const formSample = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
@@ -12,6 +20,8 @@ import CharFieldWithError from "../Fields/CharFieldWithError";
         }
       }
     }
+    console.log(individId)
+    formSample.append('individ_id', individId)
     return formSample;
   };
 
@@ -57,6 +67,7 @@ export const fetchSamplePlaces = (setSamplePlaces) => {
             className="form-control"
             onChange={handleChange}
             name ="sample_place"
+            value={formData.sample_place}
             >
             {samplePlaces.map((place) => (
                 <option key={place.id} value={place.id}>{place.name}</option>

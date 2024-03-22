@@ -28,10 +28,10 @@ export function refreshObjectList(setObjectList, apiPathList) {
         .catch((err) => console.log(err));
 }
 
-export function refreshObjectDetail(setObjectDetail, apiPathList) {
+export function refreshObjectDetail(setObjectDetail, apiPathDetail) {
     const token = JSON.parse(localStorage.authTokens)
     axios
-        .get(`${apiPathList}`, {
+        .get(`${apiPathDetail}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + String(token.access)

@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import "../individ.css"
+import { FormGroup, Input, Label } from "reactstrap";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
-import {
-  FormGroup,
-  Input,
-  Label,
-} from "reactstrap";
 import { handlePost, setCSRFToken } from "../../../components/API/CreateUpdate";
-
+import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import "../individ.css"
 
 
 export default function AnotherMemberCreate() {
@@ -21,60 +16,24 @@ export default function AnotherMemberCreate() {
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [errors, setError] = useState(null); 
 
-
   useEffect(() => {
-    document.title = 'Добавить иного члена семьи';
-    fetchLaboratories();
-    setCSRFToken()
+    document.title = 'Добавить отца';
+    setCSRFToken();
+    refreshObjectList(setAllLaboratories,`/api/laboratory`)
     }, []);
-
-
-
-  const fetchLaboratories = () => {
-    axios
-      .get(`/api/laboratory`)
-      .then((res) => {
-      setAllLaboratories(res.data);
-      console.log(res.data)
-    })
-      .catch((err) => console.log(err));
-  };   
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const hasChecked = formData.laboratory.length > 0;
-
-    if (!hasChecked) {
-      alert('Выберите хотя бы одну лабораторию');
-      }
-
-    try {
-      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-      const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-
-      const formEmbryo = makeEmbryoForm();
-
-      await axios.post(`/api/individ/another_member/create/`, formEmbryo, {
-      headers: {
-      "Content-Type": contentTypeHeader,
-      },
-      });
-      navigate('/individs');
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой индивида:', error);
-        setError(error.response.data);
-      }
+    const formIndivid = makeIndividForm();
+    handlePost(e, formIndivid, `/api/individ/another_member/create/`, `/individs/`, setError, navigate)
   };
   
-  const makeEmbryoForm = () => {
+  const makeIndividForm = () => {
     const formEmbryo = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
@@ -170,20 +129,17 @@ export default function AnotherMemberCreate() {
             onChange={handleChange}
             errors={errors}
           />
-           <FormGroup>
-            <Label>
-             Дата рождения
-            </Label>
+          <FormGroup>
+            <Label>Дата рождения</Label>
             <Input
               name="date_of_birth"
               type="date"
-              onChange={handleChange}
-              value={formData.date_of_birth}
-
+              onChange = {handleChange}
+              value = {formData.date_of_birth}
             />
-              {errors && errors.date_of_birth &&
-              <div className="alert alert-danger mt-3 mb-0">{errors.date_of_receipt}</div>
-              }
+            {errors && errors.date_of_birth &&
+            <div className="alert alert-danger mt-3 mb-0">{errors.date_of_birth}</div>
+            }
           </FormGroup>
           <CharFieldWithError
             label="Возраст на момент взятия, лет"
