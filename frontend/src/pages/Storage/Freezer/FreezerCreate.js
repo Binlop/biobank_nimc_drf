@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import "../storage.css"
+import { handlePost, setCSRFToken, makeNewForm, handleChangeLaboratoryIds } from "../../../components/API/CreateUpdate";
+import { refreshObjectList } from "../../../components/API/GetListOrDelete";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
+import "../storage.css"
 
 export default function FreezerCreate() {
     const [formData, setFormData] = useState({
@@ -14,76 +15,24 @@ export default function FreezerCreate() {
 
   useEffect(() => {
     document.title = 'Добавить морозильник';
-    const csrftoken = getCSRFToken('csrftoken'); 
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
-    fetchLaboratories();
+    refreshObjectList(setAllLaboratories,`/api/laboratory`)
+    setCSRFToken();
     }, []);
-
-  const getCSRFToken = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
-  const fetchLaboratories = () => {
-    axios
-      .get(`/api/laboratory`)
-      .then((res) => {
-      setAllLaboratories(res.data);
-      console.log(res.data)
-    })
-      .catch((err) => console.log(err));
-  };   
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-      const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-
-      const formStorage = makeStorageForm();
-
-      await axios.post(`/api/storage/freezer/create/`, formStorage, {
-      headers: {
-      "Content-Type": contentTypeHeader,
-      },
-      });
-      navigate('/storage/');
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой образца:', error);
-        setError(error.response.data);
-      }
+    const formStorage = makeNewForm(formData);
+    handlePost(e, formStorage, `/api/storage/freezer/create/`, `/storage/`, setError, navigate)
   };
 
   const handleChangeLaboratory = (e) => {
-    const { name, value, checked } = e.target;
-    const labId = parseInt(value);
-    let updatedLaboratories;
-    if (checked) {
-      updatedLaboratories = [...formData.laboratory, labId];
-    } else {
-      updatedLaboratories = formData.laboratory.filter(id => id !== labId);
-    }
-    setFormData({ ...formData, [name]: updatedLaboratories });
-  };
-
-  const makeStorageForm = () => {
-    const formSample = new FormData();
-    for (const key in formData) {
-      if (formData.hasOwnProperty(key)) {
-        const value = formData[key];
-        if (value) {
-          formSample.append(key, value);
-        }
-      }
-    }
-    return formSample;
+    handleChangeLaboratoryIds(e, formData, setFormData)
   };
 
   return (

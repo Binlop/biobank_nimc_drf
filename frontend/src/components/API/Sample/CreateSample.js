@@ -20,7 +20,6 @@ export function GetParamFromURL(param_name){
         }
       }
     }
-    console.log(individId)
     formSample.append('individ_id', individId)
     return formSample;
   };

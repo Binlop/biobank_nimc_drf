@@ -1,36 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
-import "../storage.css"
+import { useParams, useNavigate } from "react-router-dom";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
+import { handleUpdate, setCSRFToken, makeNewForm, handleChangeLaboratoryIds } from "../../../components/API/CreateUpdate";
+import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import "../storage.css"
+
 
 export default function FreezerUpdate() {
-    const { id } = useParams();
-
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     laboratory: [],
-    pregnancy: [],
     });
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [errors, setError] = useState(null); 
 
-
   useEffect(() => {
-    refreshIndividData();
+    refreshFreezerData();
     document.title = 'Изменить морозильник';
-    const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-    fetchLaboratories();
+    setCSRFToken();
+    refreshObjectList(setAllLaboratories,`/api/laboratory`)
     }, []);
 
-  const getCSRFToken = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-  }
-
-  const refreshIndividData = () => {
+  const refreshFreezerData = () => {
     axios
         .get(`/api/storage/freezer/${id}`)
         .then((res) => {
@@ -44,73 +37,19 @@ export default function FreezerUpdate() {
         .catch((err) => console.log(err));
   };
 
-  const fetchLaboratories = () => {
-    axios
-      .get(`/api/laboratory`)
-      .then((res) => {
-      setAllLaboratories(res.data);
-      console.log(res.data)
-    })
-      .catch((err) => console.log(err));
-  };   
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const hasChecked = formData.laboratory.length > 0;
-
-    if (!hasChecked) {
-      alert('Выберите хотя бы одну лабораторию');
-      }
-
-    try {
-      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-      const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-
-      const formStorage = makeStorageForm();
-
-      await axios.put(`/api/storage/freezer/${id}/update/`, formStorage, {
-      headers: {
-      "Content-Type": contentTypeHeader,
-      },
-      });
-      navigate('/storage/');
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой индивида:', error);
-        setError(error.response.data);
-      }
+    const formStorage = makeNewForm(formData);
+    handleUpdate(e, formStorage, `/api/storage/freezer/${id}/update/`, `/api/storage/freezer/${id}/`, setError, navigate)
   };
 
   const handleChangeLaboratory = (e) => {
-    const { name, value, checked } = e.target;
-    const labId = parseInt(value);
-    let updatedLaboratories;
-    if (checked) {
-      updatedLaboratories = [...formData.laboratory, labId];
-    } else {
-      updatedLaboratories = formData.laboratory.filter(id => id !== labId);
-    }
-    setFormData({ ...formData, [name]: updatedLaboratories });
-  };
-
-  const makeStorageForm = () => {
-    const formSample = new FormData();
-    for (const key in formData) {
-      if (formData.hasOwnProperty(key)) {
-        const value = formData[key];
-        if (value) {
-          formSample.append(key, value);
-        }
-      }
-    }
-    return formSample;
+    handleChangeLaboratoryIds(e, formData, setFormData)
   };
 
 

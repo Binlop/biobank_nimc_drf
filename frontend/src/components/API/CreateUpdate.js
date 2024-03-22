@@ -7,6 +7,31 @@ export function setCSRFToken() {
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
 }
 
+export function makeNewForm(formData) {
+    const formSample = new FormData();
+    for (const key in formData) {
+      if (formData.hasOwnProperty(key)) {
+        const value = formData[key];
+        if (value) {
+          formSample.append(key, value);
+        }
+      }
+    }
+    return formSample;
+}
+
+export function handleChangeLaboratoryIds(e, formData, setFormData) {
+    const { name, value, checked } = e.target;
+    const labId = parseInt(value);
+    let updatedLaboratories;
+    if (checked) {
+        updatedLaboratories = [...formData.laboratory, labId];
+    } else {
+        updatedLaboratories = formData.laboratory.filter(id => id !== labId);
+    }
+    setFormData({ ...formData, [name]: updatedLaboratories });
+}
+
 export function handlePost(event, formData, apiPathCreate, PathToNavigate, setError, navigate) {
     const token = JSON.parse(localStorage.authTokens)
 

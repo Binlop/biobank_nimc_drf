@@ -3,27 +3,19 @@ import "./storage.css"
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from 'react-router-dom';
 import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
+import { setCSRFToken } from "../../components/API/CreateUpdate";
 import NestedMenu from "./NestedMenu";
-import AuthContext from '../../context/AuthContext'
 
 export default function FreezerList() {
     const [FreezerList, seFreezerList] = useState([]);
-    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-        axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshObjectList(seFreezerList, `/api/storage/`, authTokens)
+        refreshObjectList(seFreezerList, `/api/storage/`)
         document.title = 'Морозильники';
       }, []);
     
-    const getCSRFToken = (name) => {
-        const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-        return cookieValue ? cookieValue.pop() : '';
-      }
-    
     const handleDeleteClick = (obj_id) => {
-        handleDelete(`/api/storage/freezer/${obj_id}/delete/`, seFreezerList, `/api/storage/`, authTokens);
+        handleDelete(`/api/storage/freezer/${obj_id}/delete/`, seFreezerList, `/api/storage/`);
     };
 
     return (
