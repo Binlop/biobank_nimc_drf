@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import AuthContext from '../../context/AuthContext'
-import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../components/API/GetListOrDelete";
-import "./sample.css"
+import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
+import "../sample.css"
 
-export default function SampleDetail() {
-    const { id } = useParams();
-    const [sampleDetail, setSampleDetail] = useState(null);
-    const { authTokens, logoutUser } = useContext(AuthContext);
+export default function AliquotDetail() {
+  const { id } = useParams();
+  const [sampleDetail, setSampleDetail] = useState(null);
 
-    useEffect(() => {
-      refreshObjectDetail(setSampleDetail, `/api/sample/${id}`, authTokens)  
-    }, []);
+  useEffect(() => {
+    refreshObjectDetail(setSampleDetail, `/api/sample/${id}`)  
+  }, []);
 
     return (
         <main className="container">
@@ -56,8 +54,7 @@ export default function SampleDetail() {
                 </tr>
                 <tr>
                   <td className="table_detail_property">Концентрация</td>
-                  <td className="table_detail_value">{sampleDetail.concentration !== undefined && sampleDetail.concentration !== null ? 
-                    sampleDetail.concentration : 'Нет данных'}</td>
+                  <td className="table_list_value">{sampleDetail.volume}</td>
                 </tr>
               </tbody>
             </table>

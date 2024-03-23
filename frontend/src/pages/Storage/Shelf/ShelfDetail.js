@@ -1,17 +1,38 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import AuthContext from '../../../context/AuthContext'
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../storage.css"
 
 export default function ShelfDetail() {
   const { id } = useParams();
   const [storageDetail, setStorageDetail] = useState(null);
-  const { authTokens, logoutUser } = useContext(AuthContext);
   
   useEffect(() => {
-    refreshObjectDetail(setStorageDetail, `/api/storage/shelf/${id}`, authTokens)  
+    refreshObjectDetail(setStorageDetail, `/api/storage/shelf/${id}`)  
   }, []);
+
+  const ShowBoxesMap = () => {
+    const nestedList = storageDetail.box
+    const rows = nestedList.map((row, rowIndex) => (
+      <tr key={rowIndex}>
+      {row.map((box_place, columnIndex) => (
+        <td key={columnIndex} className="storage-cell">
+            <div class="green-circle">
+            <Link to={`/storage/box/${box_place.id}`} className="link-style">
+                    {box_place.name}
+            </Link>
+            </div>
+        </td>
+      ))}
+      </tr>
+    ));
+  
+    return (
+      <tbody>
+        {rows}
+      </tbody>
+    );
+  }
 
     return (
         <main className="container">
@@ -46,7 +67,12 @@ export default function ShelfDetail() {
               </tbody>
             </table>
           </div>
-        <div class="table-container">
+          <div className="samples">
+              <table className="table_samples">
+                  <ShowBoxesMap />
+              </table>
+          </div>
+        {/* <div class="table-container">
           <table class="my-table">
               <thead>
                   <tr>
@@ -66,7 +92,7 @@ export default function ShelfDetail() {
             </tr>
           </tbody>
           </table>
-        </div>
+        </div> */}
         </div>
         )}
       </main>

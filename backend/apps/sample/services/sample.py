@@ -3,7 +3,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from individ.models import Individ
 from storage.models import SamplesMap
-from ..models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer
+from ..models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer, Aliquot
 
 class BaseSampleService():
     model = None
@@ -117,3 +117,7 @@ class FetalSacNitrogenService(SampleService):
 class FetalSacFreezerService(SampleService):
     model = FetalSacFreezer
     sampletype = 'fetal_sac_freezer'
+
+class AliquotService(SampleService):
+    model = Aliquot
+    sampletype = 'aliquot'

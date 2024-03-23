@@ -3,7 +3,7 @@ from individ.serializer import EmbryoSerializerOutput, FatherSerializerOutput, M
 from individ.models import Individ, Embryo, Father, Mother, AnotherFamilyMember
 from storage.serializer import SamplesSerializerOutut
 from .services import sample
-from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer
+from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer, Aliquot
 
 
 class SampleSerializerBase(serializers.Serializer):
@@ -26,6 +26,8 @@ class SampleSerializerBase(serializers.Serializer):
             serializer = FetalSacNitrogenOutputSerializer(value)
         elif isinstance(value, FetalSacFreezer):
             serializer = FetalSacFreezerOutputSerializer(value)
+        elif isinstance(value, Aliquot):
+            serializer = AdultSerializerOutput(value)
         else:
             raise Exception('Unexpected type of sample object')
         return serializer.data
@@ -100,7 +102,7 @@ class CustomSampleSerializerInput(serializers.Serializer):
 
 
 class DNAOutputSerializer(CustomSampleSerializerOutput):
-    pass
+    concentration = serializers.IntegerField()
 
 class DNAInputSerializer(CustomSampleSerializerInput):
     individ_id = serializers.IntegerField(required=False)
@@ -191,3 +193,16 @@ class FetalSacFreezerInputSerializer(CustomSampleSerializerInput):
         service = sample.FetalSacFreezerService()
         return service.update_biospecimen(instance, validated_data)
     
+class AliquotOutputSerializer(CustomSampleSerializerInput):
+    pass
+
+class AliquotInputSerializer(CustomSampleSerializerInput):
+    individ_id = serializers.IntegerField(required=False)
+
+    def create(self, validated_data: dict):
+        service = sample.AliquotService()
+        return service.create_biospecimen(validated_data=validated_data)
+    
+    def update(self, instance: DNA, validated_data: dict):
+        service = sample.AliquotService()
+        return service.update_biospecimen(instance, validated_data)

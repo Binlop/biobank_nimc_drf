@@ -1,67 +1,31 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate, useLocation } from 'react-router-dom';
-import "../storage.css"
+import { useNavigate } from 'react-router-dom';
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
+import { GetParamFromURL } from "../../../components/API/Sample/CreateSample";
+import { handlePost, setCSRFToken, makeNewForm } from "../../../components/API/CreateUpdate";
+import "../storage.css"
 
 export default function BoxCreate() {
   const [formData, setFormData] = useState({});  
   const navigate = useNavigate();
   const [errors, setError] = useState(null); 
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const parentStorageId = searchParams.get('shelf_id');
+  const parentStorageId = GetParamFromURL('shelf_id');
 
   useEffect(() => {
     document.title = 'Добавить коробку';
-    const csrftoken = getCSRFToken('csrftoken'); 
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
+    setCSRFToken();
     }, []);
-
-  const getCSRFToken = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };   
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
-      const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
-
-      const formStorage = makeStorageForm();
-
-      await axios.post(`/api/storage/box/create/`, formStorage, {
-      headers: {
-      "Content-Type": contentTypeHeader,
-      },
-      });
-      navigate(`/storage/shelf/${parentStorageId}`);
-    } 
-    catch (error) {
-        console.error('Ошибка с отправкой полки:', error);
-        setError(error.response.data);
-      }
-  };
-
-  const makeStorageForm = () => {
-    const formStorage = new FormData();
-    for (const key in formData) {
-      if (formData.hasOwnProperty(key)) {
-        const value = formData[key];
-        if (value) {
-          formStorage.append(key, value);
-        }
-      }
-    }
+    const formStorage = makeNewForm(formData);
     formStorage.append('shelf_id', parentStorageId)
-    return formStorage;
+    handlePost(e, formStorage, `/api/storage/box/create/`, `/storage/shelf/${parentStorageId}/`, setError, navigate)
   };
 
   return (
@@ -77,7 +41,7 @@ export default function BoxCreate() {
             errors={errors}
           />                           
           <CharFieldWithError
-            label="Кол-во требуемых коробок:"
+            label="Кол-во коробок на полке:"
             name="count_boxes"
             value={formData.count_boxes}
             onChange={handleChange}

@@ -14,6 +14,7 @@ import ShelfUpdate from './Shelf/ShelfUpdate';
 
 import BoxDetail from './Box/BoxDetail';
 import BoxCreate from './Box/BoxCreate';
+import BoxUpdate from './Box/BoxUpdate';
 
 import SampleMapCreate from './SampleMap/SampleMapCreate';
 
@@ -37,7 +38,7 @@ export default function Storage() {
 
           <Route path="/box/:id/" element={<BoxDetail />} />
           <Route path="/box/create/" element={<BoxCreate />} />
-          <Route path="/box/:id/update/" element={<ShelfUpdate />} />
+          <Route path="/box/:id/update/" element={<BoxUpdate />} />
 
           <Route path="/sample_map/create/" element={<SampleMapCreate />} />
 

@@ -106,7 +106,9 @@ class ShelfSerializerOutput(ShelfSerializerInput):
     def get_box(self, obj):
         boxes =  obj.box.all()
         serializer = BoxSerializerOutput(boxes, many=True, fields=('id', 'name'))
-        return serializer.data  
+        box_places = serializer.data
+        boxes_map = [box_places[i:i+obj.len_col] for i in range(0, len(box_places), obj.len_col)]
+        return boxes_map
     
 class BoxSerializerInput(StorageSerializerOutput):
     shelf_id = serializers.IntegerField()
@@ -135,8 +137,8 @@ class BoxSerializerOutput(BoxSerializerInput):
     def get_samples(self, obj):
         sample_places =  obj.samples_map.all()
         serializer = SamplesSerializerOutut(sample_places, many=True)
-        test = serializer.data
-        samples_map = [test[i:i+obj.len_col] for i in range(0, len(test), obj.len_col)]
+        places = serializer.data
+        samples_map = [places[i:i+obj.len_col] for i in range(0, len(places), obj.len_col)]
         return samples_map
     
 class SamplesSerializerInput(StorageSerializerOutput):

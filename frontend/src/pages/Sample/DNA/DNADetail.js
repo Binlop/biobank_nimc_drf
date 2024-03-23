@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
-import AuthContext from '../../../context/AuthContext'
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
 import "../sample.css"
 
 export default function DNADetail() {
   const { id } = useParams();
   const [sampleDetail, setSampleDetail] = useState(null);
-  const { authTokens, logoutUser } = useContext(AuthContext);
 
   useEffect(() => {
-    refreshObjectDetail(setSampleDetail, `/api/sample/${id}`, authTokens)  
+    refreshObjectDetail(setSampleDetail, `/api/sample/${id}`)  
   }, []);
 
     return (
@@ -22,8 +19,11 @@ export default function DNADetail() {
               <p>
                 <>
                   <span className="larger-text">{sampleDetail.name}</span>
-                  <Link to={`/samples/${sampleDetail.sampletype}/${id}/update`} className="btn btn-primary">
+                  <Link to={`/samples/${sampleDetail.sampletype}/${id}/update`} className="btn btn-primary mr-2">
                     Изменить образец
+                  </Link>
+                  <Link to={`/samples/aliquot/create/`} className="btn btn-primary">
+                    Добавить аликвоту
                   </Link>
                 </>
               </p>

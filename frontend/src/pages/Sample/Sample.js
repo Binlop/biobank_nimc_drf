@@ -16,7 +16,7 @@ export default function Sample() {
           <Route path="/" element={<SampleList />} />
 
           <Route path="/dna/create/" element={<DNACreate />} />
-          <Route path="/dna/:id/" element={<DNADetail />} />
+          <Route path="/dna/:id/" element={<SampleDetail />} />
           <Route path="/dna/:id/update/" element={<DNAUpdate />} />
 
           <Route path="/chorion/:id/" element={<SampleDetail />} />
@@ -40,6 +40,10 @@ export default function Sample() {
           <Route path="/fetal_sac_freezer/:id/" element={<SampleDetail />} />
           <Route path="/fetal_sac_freezer/create/" element={<SampleCreate page_title="Добавить плодный мешок(-80)" apiPath="/api/individ/fetal_sac_freezer/create/" />} />
           <Route path="/fetal_sac_freezer/:id/update/" element={<SampleUpdate page_title="Изменить плодный мешок(-80)" />} />
+
+          <Route path="/aliquot/:id/" element={<SampleDetail />} />
+          <Route path="/aliquot/create/" element={<SampleCreate page_title="Добавить аликвоту" apiPath="/api/individ/aliquot/create/" />} />
+          <Route path="/aliquot/:id/update/" element={<SampleUpdate page_title="Изменить аликвоту" />} />
 
         </Routes>
       </main>

@@ -7,7 +7,7 @@ import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import "../sample.css"
 
 
-export default function DNACreate(props) {
+export default function AliquotCreate(props) {
   const { page_title, apiPath } = props;
   const [formData, setFormData] = useState({});
   const individId = GetParamFromURL('individ_id')

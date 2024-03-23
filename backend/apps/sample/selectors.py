@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
-from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer
+from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer, Aliquot
 
 class SampleListSelector:
     """
@@ -21,8 +21,9 @@ class SampleListSelector:
         endometrium_qs = Endometrium.objects.all()
         fetal_sac_freezer_qs = FetalSacFreezer.objects.all()
         fetal_sac_nitrogen_qs = FetalSacNitrogen.objects.all()
+        aliquot_qs = Aliquot.objects.all()
 
-        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs))
+        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs, aliquot_qs))
         
         for sample in samples_list:
             if sample.get_sample_laboratories() & user_laboratory_ids:
@@ -43,6 +44,9 @@ class SampleListSelector:
 
         return samples_list
 
+    def get_sample_aliquots(self, user: User, sample_id: int):
+        aliquots = Aliquot.objects.filter(sample__id=sample_id)
+        return aliquots
 
 class SampleDetailSelector:
     """
@@ -53,7 +57,6 @@ class SampleDetailSelector:
         if sample.content_object.get_sample_laboratories() & user.profile.get_user_laboratories():
             if delete:
                 return sample
-            print('возвращаем: ', sample.content_object)
             return sample.content_object
         else: return None
 

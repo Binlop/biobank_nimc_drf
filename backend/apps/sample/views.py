@@ -106,3 +106,17 @@ class FetalSacFreezerCreateView(SampleCreateView):
     
 class FetalSacFreezerUpdateView(SampleUpdateView):
     serializer = serializers.FetalSacFreezerInputSerializer
+
+class SampleAliquotsListView(APIView):
+    """Список аликвот для конкретного образца"""
+    def get(self, request, pk):
+        selector = SampleListSelector()
+        aliquots = selector.get_sample_aliquots(user=request.user, individ_id=pk)      
+        serializer = serializers.IndividSamplesListSerializer(aliquots, many=True)
+        return Response(serializer.data)
+
+class AliquotCreateView(SampleCreateView):
+    serializer = serializers.FetalSacFreezerInputSerializer
+    
+class AliquotUpdateView(SampleUpdateView):
+    serializer = serializers.FetalSacFreezerInputSerializer

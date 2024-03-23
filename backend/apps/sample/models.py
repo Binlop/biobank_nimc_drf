@@ -77,12 +77,13 @@ class Aliquot(models.Model):
     Модель аликвоты(часть родительского образца). Связана с индивидом, к которому принадлежит
     данная аликвота и с родительским образцом, от которого была отлита аликвота
     """
-
+    sample = GenericRelation(Sample)
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
     location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_aliquot') # Место хранения аликвоты
     name = models.CharField('Название аликвоты', max_length=150)
     volume = models.IntegerField('Кол-во аликвоты', default=0)
     barcode = models.CharField('Баркод', max_length=150, null=True)
+    concentration = models.IntegerField('Концентрация ДНК, нг/нкл', default=0)
 
     class Meta:
         verbose_name = 'алкивота индивида'
