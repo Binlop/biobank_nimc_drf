@@ -12,6 +12,7 @@ export default function BoxDetail() {
   useEffect(() => {
     refreshObjectDetail(setStorageDetail, `/api/storage/box/${id}`, authTokens)  
   }, []);
+  
   const ShowSampleMap = () => {
     const nestedList = storageDetail.samples;
   

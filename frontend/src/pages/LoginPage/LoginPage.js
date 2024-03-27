@@ -1,10 +1,14 @@
-import React, {useContext} from 'react'
+import React, {useContext, useEffect} from 'react'
 import AuthContext from '../../context/AuthContext'
 import "./login.css"
 
 const LoginPage = () => {
 
     let {loginUser} = useContext(AuthContext)
+
+    useEffect(() => {
+        document.title = "Вход"
+      }, []);
 
     return (
         <div className='login-page'>
