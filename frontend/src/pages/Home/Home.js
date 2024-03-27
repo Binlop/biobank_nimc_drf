@@ -12,7 +12,7 @@ const Home = () => {
     }, []);
     
     const getProfile = async() => {
-        let response = await fetch('http://127.0.0.1:8000/user/profile/', {
+        let response = await fetch('http://127.0.0.1:8000/api/user/profile/', {
         method: 'GET',
         headers:{
             'Content-Type': 'application/json',
@@ -20,7 +20,6 @@ const Home = () => {
         }
         })
         let data = await response.json()
-        console.log(data)
         if(response.status === 200){
             setProfile(data)
         } else if(response.statusText === 'Unauthorized'){

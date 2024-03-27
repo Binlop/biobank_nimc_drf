@@ -48,6 +48,7 @@ class SampleCreateView(SampleViewBase):
 class SampleUpdateView(SampleViewBase):
 
     def put(self, request, pk):
+        print(request.data)
         selector = SampleDetailSelector()
         sample = selector.get_sample_detail(user=request.user, pk=pk)
         serializer = self.get_serializer_class()(sample, data=request.data)
@@ -111,12 +112,12 @@ class SampleAliquotsListView(APIView):
     """Список аликвот для конкретного образца"""
     def get(self, request, pk):
         selector = SampleListSelector()
-        aliquots = selector.get_sample_aliquots(user=request.user, individ_id=pk)      
+        aliquots = selector.get_sample_aliquots(user=request.user, sample_id=pk)      
         serializer = serializers.IndividSamplesListSerializer(aliquots, many=True)
         return Response(serializer.data)
 
 class AliquotCreateView(SampleCreateView):
-    serializer = serializers.FetalSacFreezerInputSerializer
+    serializer = serializers.AliquotInputSerializer
     
 class AliquotUpdateView(SampleUpdateView):
-    serializer = serializers.FetalSacFreezerInputSerializer
+    serializer = serializers.AliquotInputSerializer

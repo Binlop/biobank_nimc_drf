@@ -12,39 +12,34 @@ export default function BoxDetail() {
   useEffect(() => {
     refreshObjectDetail(setStorageDetail, `/api/storage/box/${id}`, authTokens)  
   }, []);
-
-    const ShowSampleMap = () => {
-      const nestedList = storageDetail.samples
-
-      const rows = nestedList.map((row, rowIndex) => (
-        <tr key={rowIndex}>
+  const ShowSampleMap = () => {
+    const nestedList = storageDetail.samples;
+  
+    const rows = nestedList.map((row, rowIndex) => (
+      <tr key={rowIndex}>
         {row.map((sample_place, columnIndex) => (
           <td key={columnIndex} className="storage-cell">
-            {sample_place.sample_type === "aliquot" ? (
+            {sample_place.state_location === "occupied" ? (
               <div class="red-circle">
-                {sample_place.name}
+                <Link to={`/samples/${sample_place.sample_type}/${sample_place.sample.id}`} className="link-style">
+                  {sample_place.sample.name}
+                </Link>
               </div>
-            ) : sample_place.sample_type === "dna" || sample_place.sample_type === "blood" || sample_place.sample_type === "chorion" || sample_place.sample_type === "endometrium"
-            || sample_place.sample_type === "fetal_sac_nitrogen" || sample_place.sample_type === "fetal_sac_freezer"? (
-              <div class="red-circle">
-                    <Link to={`/samples/${sample_place.sample_type}/${sample_place.sample.id}`} className="link-style">
-                    {sample_place.sample.name}
-                  </Link>
-              </div>
-            ) : (
+            ) : ( // Здесь добавлен оператор else
               <div class="green-circle"></div>
             )}
           </td>
         ))}
-        </tr>
-      ));
-    
-      return (
-        <tbody>
-          {rows}
-        </tbody>
-      );
-    }
+      </tr>
+    ));
+  
+    return (
+      <tbody>
+        {rows}
+      </tbody>
+    );
+  }
+  
     return (
         <main className="container">
         {storageDetail && (

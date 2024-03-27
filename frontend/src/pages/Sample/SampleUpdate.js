@@ -23,7 +23,8 @@ export default function SampleUpdate(props) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const formSample = makeSampleForm(formData, formData.individ.individ.id);
+        const sampleId = formData.sampletype !== 'aliquot' ? formData.sample.id : formData.original_sample.sample.id;
+        const formSample = makeSampleForm(formData, formData.individ.individ.id, formData.sample.id);
         handleUpdate(e, formSample, `/api/sample/${formData.sampletype}/${id}/update/`, `/samples/`, setError, navigate)
     };
 

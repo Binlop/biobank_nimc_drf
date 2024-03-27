@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import AuthContext from '../../context/AuthContext'
 import { handleDelete, refreshObjectDetail } from "../../components/API/GetListOrDelete";
 import "./laboratory.css"
 
 export default function LabDetail() {
     const { id } = useParams();
     const [laboratoryDetail, setLaboratoryDetail] = useState(null);
-    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        refreshObjectDetail(setLaboratoryDetail, `/api/laboratory/${id}`, authTokens)  
+        refreshObjectDetail(setLaboratoryDetail, `/api/laboratory/${id}`)  
     }, []);
 
     return (

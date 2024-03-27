@@ -174,6 +174,4 @@ class SamplesSerializerOutut(StorageSerializerOutput):
         if obj.sample_id:
             sample = get_object_or_404(Sample, id=obj.sample_id)
             serializer = SampleSerializer(sample)
-            print(sample)
             return serializer.data
-        return None

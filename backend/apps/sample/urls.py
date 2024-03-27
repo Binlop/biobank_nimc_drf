@@ -27,7 +27,7 @@ urlpatterns = [
     path('fetal_sac_freezer/create/', views.FetalSacFreezerCreateView.as_view()),
     path('fetal_sac_freezer/<int:pk>/update/', views.FetalSacFreezerUpdateView.as_view()),
 
-    path('aliquots/', views.SampleAliquotsListView.as_view()),
+    path('aliquot/<int:pk>/', views.SampleAliquotsListView.as_view()),
     path('aliquot/create/', views.AliquotCreateView.as_view()),
     path('aliquot/<int:pk>/update/', views.AliquotUpdateView.as_view()),
 ]

@@ -10,7 +10,7 @@ export function GetParamFromURL(param_name){
   return individId
 }
 
- export const makeSampleForm = (formData, individId) => {
+ export const makeSampleForm = (formData, individId, originalSampleId) => {
     const formSample = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
@@ -21,6 +21,7 @@ export function GetParamFromURL(param_name){
       }
     }
     formSample.append('individ_id', individId)
+    formSample.append('original_sample_id', originalSampleId)
     return formSample;
   };
 
@@ -57,6 +58,13 @@ export const fetchSamplePlaces = (setSamplePlaces) => {
             label="Кол-во:"
             name="volume"
             value={formData.volume}
+            onChange={handleChange}
+            errors={errors}
+            />       
+            <CharFieldWithError
+            label="Концентрация(для ДНК), нг/нл:"
+            name="concentration"
+            value={formData.concentration}
             onChange={handleChange}
             errors={errors}
             />       

@@ -11,7 +11,7 @@ class AsideBar extends Component {
         <div className="instruments">
           <p><span className="name_instruments">Разделы биобанка</span></p>
           <ul>
-          <li><Link to="/laboratories/" className="instruments-link"><FaHouseChimney /> Лаборатории</Link></li>
+          <li><Link to="/laboratories/" className="instruments-link"><FaHouseChimney /> Направления</Link></li>
           <li><Link to="/families/" className="instruments-link"><FaChildren /> Семьи</Link></li>
           <li><Link to="/individs/" className="instruments-link"><FaPerson />Индивиды</Link></li>
           <li><Link to="/samples/" className="instruments-link"><FaFlask />Образцы</Link></li>

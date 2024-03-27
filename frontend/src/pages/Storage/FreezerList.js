@@ -1,10 +1,8 @@
-import axios from "axios";
-import "./storage.css"
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
-import { setCSRFToken } from "../../components/API/CreateUpdate";
 import NestedMenu from "./NestedMenu";
+import "./storage.css"
 
 export default function FreezerList() {
     const [FreezerList, seFreezerList] = useState([]);

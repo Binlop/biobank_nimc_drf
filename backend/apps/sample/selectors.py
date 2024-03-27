@@ -22,7 +22,6 @@ class SampleListSelector:
         fetal_sac_freezer_qs = FetalSacFreezer.objects.all()
         fetal_sac_nitrogen_qs = FetalSacNitrogen.objects.all()
         aliquot_qs = Aliquot.objects.all()
-
         samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs, aliquot_qs))
         
         for sample in samples_list:
@@ -45,7 +44,7 @@ class SampleListSelector:
         return samples_list
 
     def get_sample_aliquots(self, user: User, sample_id: int):
-        aliquots = Aliquot.objects.filter(sample__id=sample_id)
+        aliquots = Aliquot.objects.filter(original_sample_id=sample_id)
         return aliquots
 
 class SampleDetailSelector:

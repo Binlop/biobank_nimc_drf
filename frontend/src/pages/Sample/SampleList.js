@@ -1,29 +1,18 @@
-import axios from "axios";
-import "./sample.css"
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from 'react-router-dom';
 import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
-import AuthContext from '../../context/AuthContext'
+import "./sample.css"
 
 export default function SampleList() {
-    const [IndividList, seIndividList] = useState([]);
-    const { authTokens, logoutUser } = useContext(AuthContext);
+    const [sampleList, setSampleList] = useState([]);
 
     useEffect(() => {
-        const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-        axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshObjectList(seIndividList, `/api/sample/`, authTokens)
+        refreshObjectList(setSampleList, `/api/sample/`)
         document.title = 'Образцы';
       }, []);
-    
-    const getCSRFToken = (name) => {
-        const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-        return cookieValue ? cookieValue.pop() : '';
-      }
 
     const handleDeleteClick = (sample_id) => {
-        console.log(sample_id)
-        handleDelete(`/api/sample/${sample_id}/delete/`, seIndividList, `/api/sample/`, authTokens);
+        handleDelete(`/api/sample/${sample_id}/delete/`, setSampleList, `/api/sample/`);
     };
 
     return (
@@ -38,14 +27,16 @@ export default function SampleList() {
                         <tr>
                             <th className="table_list_property">Название</th>
                             <th className="table_list_property">Индивид</th>
+                            <th className="table_list_property">Место хранения</th>
                             <th className="table_list_property">Действия</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {IndividList && IndividList.map(item => (
+                        {sampleList && sampleList.map(item => (
                             <tr key={item.id}>
                                 <td className="table_list_value"><Link to={`/samples/${item.sampletype}/${item.sample.id}/`} className="link-style">{item.name}</Link></td>
                                 <td className="table_list_value"><Link to={`/individs/${item.individ.individ_type}/${item.individ.individ.id}`} className="link-style">{item.individ.name}</Link></td>
+                                <td className="table_list_value"><Link to={`/storage/box/${item.location.box}/`} className="link-style">{item.location.name}</Link></td>
                                 <td className="table_list_value">
                                     <button
                                         className="btn btn-danger"

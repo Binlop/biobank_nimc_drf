@@ -10,6 +10,7 @@ export default function SampleCreate(props) {
   const { page_title, apiPath } = props;
   const [formData, setFormData] = useState({});
   const individId = GetParamFromURL('individ_id')
+  const originalSampleId = GetParamFromURL('original_sample_id')
   const [samplePlaces, setSamplePlaces] = useState([]); 
   const navigate = useNavigate();
   const [errors, setError] = useState({}); 
@@ -21,8 +22,9 @@ export default function SampleCreate(props) {
     }, []);
 
     const handleSubmit = (e) => {
+        console.log(apiPath)
         e.preventDefault();
-        const formSample = makeSampleForm(formData, individId);
+        const formSample = makeSampleForm(formData, individId, originalSampleId);
         handlePost(e, formSample, apiPath, `/samples/`, setError, navigate)
     };
 

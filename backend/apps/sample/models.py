@@ -12,6 +12,9 @@ class Sample(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_sample') # Место хранения образца
 
+    def __str__(self):
+        return str(self.name)
+    
 class CustomSampleType(models.Model):
     """
     Абстрактный класс для описания общих свойств образца
@@ -78,12 +81,14 @@ class Aliquot(models.Model):
     данная аликвота и с родительским образцом, от которого была отлита аликвота
     """
     sample = GenericRelation(Sample)
+    original_sample = models.ForeignKey(Sample,  on_delete=models.CASCADE)
     individ = models.ForeignKey(Individ, on_delete=models.CASCADE) #Донор данного образца(индивид)
     location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_aliquot') # Место хранения аликвоты
     name = models.CharField('Название аликвоты', max_length=150)
     volume = models.IntegerField('Кол-во аликвоты', default=0)
     barcode = models.CharField('Баркод', max_length=150, null=True)
     concentration = models.IntegerField('Концентрация ДНК, нг/нкл', default=0)
+    sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
 
     class Meta:
         verbose_name = 'алкивота индивида'

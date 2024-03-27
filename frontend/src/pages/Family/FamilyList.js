@@ -1,30 +1,18 @@
-import Modal from "../Modal";
-import axios from "axios";
-import "./family.css"
-import { Routes,     BrowserRouter as Router,
-  Route, Outlet, Link } from 'react-router-dom';
-import React, { useState, useEffect, useContext } from "react";
-import AuthContext from '../../context/AuthContext'
+import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
 import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
+import "./family.css"
 
 export default function FamilyList() {
     const [familyList, setFamilyList] = useState([]);
-    const { authTokens, logoutUser } = useContext(AuthContext);
 
     useEffect(() => {
-        const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-        axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-        refreshObjectList(setFamilyList, `/api/family/`, authTokens)
+        refreshObjectList(setFamilyList, `/api/family/`)
         document.title = 'Семьи';
       }, []);
     
-    const getCSRFToken = (name) => {
-        const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-        return cookieValue ? cookieValue.pop() : '';
-      }
-    
     const handleDeleteClick = (item) => {
-        handleDelete(`/api/family/${item.id}/`, setFamilyList,`/api/family/`, authTokens)
+        handleDelete(`/api/family/${item.id}/`, setFamilyList,`/api/family/`)
       };;
     
     

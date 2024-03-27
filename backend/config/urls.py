@@ -9,7 +9,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/', include('user.urls')),
+    path('api/user/', include('user.urls')),
     path('api/laboratory/', include('laboratory.urls')),
     path('api/family/', include('family.urls')),
     path('api/individ/', include('individ.urls')),

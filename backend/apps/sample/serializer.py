@@ -27,14 +27,14 @@ class SampleSerializerBase(serializers.Serializer):
         elif isinstance(value, FetalSacFreezer):
             serializer = FetalSacFreezerOutputSerializer(value)
         elif isinstance(value, Aliquot):
-            serializer = AdultSerializerOutput(value)
+            serializer = AliquotOutputSerializer(value)
         else:
             raise Exception('Unexpected type of sample object')
         return serializer.data
     
 class SampleSerializerOutput(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-
+    name = serializers.CharField(max_length=256)
 
 class IndividSamplesListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -56,6 +56,21 @@ class IndividSamplesListSerializer(serializers.Serializer):
         return serializer.data
 
 class CustomSampleSerializerOutput(serializers.Serializer):
+
+    def __init__(self, *args, **kwargs):
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
+
+        # Instantiate the superclass normally
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=150)
     individ = serializers.SerializerMethodField()
@@ -81,11 +96,13 @@ class CustomSampleSerializerOutput(serializers.Serializer):
         return serializer.data
 
     def get_location(self, obj):
-        
         sample = obj.sample.first()
-        location = sample.location
-        serializer = SamplesSerializerOutut(location, fields=('id', 'name', 'box'))
-        return serializer.data
+        try:
+            location = sample.location
+            serializer = SamplesSerializerOutut(location, fields=('id', 'name', 'box'))
+            return serializer.data
+        except AttributeError:
+            return None
     
     def get_sample(self, obj):
         sample = obj.sample.first()
@@ -106,6 +123,7 @@ class DNAOutputSerializer(CustomSampleSerializerOutput):
 
 class DNAInputSerializer(CustomSampleSerializerInput):
     individ_id = serializers.IntegerField(required=False)
+    concentration = serializers.IntegerField()
 
     def create(self, validated_data: dict):
         service = sample.DNAService()
@@ -121,7 +139,6 @@ class ChorionOutputSerializer(CustomSampleSerializerOutput):
 
 class ChorionInputSerializer(CustomSampleSerializerInput):
     individ_id = serializers.IntegerField(required=False)
-    sample_place = serializers.IntegerField(required=False)
 
     def create(self, validated_data: dict):
         service = sample.ChorionService()
@@ -139,8 +156,6 @@ class BloodInputSerializer(CustomSampleSerializerInput):
     individ_id = serializers.IntegerField(required=False)
 
     def create(self, validated_data: dict):
-        print(validated_data)
-
         service = sample.BloodService()
         return service.create_biospecimen(validated_data=validated_data)
     
@@ -193,11 +208,32 @@ class FetalSacFreezerInputSerializer(CustomSampleSerializerInput):
         service = sample.FetalSacFreezerService()
         return service.update_biospecimen(instance, validated_data)
     
-class AliquotOutputSerializer(CustomSampleSerializerInput):
-    pass
+class AliquotOutputSerializer(CustomSampleSerializerOutput):
+    concentration = serializers.IntegerField()
+    original_sample = serializers.SerializerMethodField()
+    
+    def get_original_sample(self, obj):
+        original_sample = obj.original_sample.content_object
+        if isinstance(original_sample, Blood):
+            serializer = BloodOutputSerializer(original_sample, fields=('name', 'sampletype', 'sample'))
+        elif isinstance(original_sample, DNA):
+            serializer = DNAOutputSerializer(original_sample, fields=('name', 'sampletype', 'sample'))
+        elif isinstance(original_sample, Chorion):
+            serializer = ChorionOutputSerializer(original_sample, fields=('name', 'sampletype', 'sample'))
+        elif isinstance(original_sample, Endometrium):
+            serializer = EmbryoSerializerOutput(original_sample, fields=('name', 'sampletype', 'sample'))
+        elif isinstance(original_sample, FetalSacNitrogen):
+            serializer = FetalSacNitrogenOutputSerializer(original_sample, fields=('name', 'sampletype', 'sample'))
+        elif isinstance(original_sample, FetalSacFreezer):
+            serializer = FetalSacFreezerOutputSerializer(original_sample, fields=('name', 'sampletype', 'sample'))
+        else:
+            raise Exception('Unexpected type of sample object')
+
+        return serializer.data
 
 class AliquotInputSerializer(CustomSampleSerializerInput):
     individ_id = serializers.IntegerField(required=False)
+    original_sample_id = serializers.IntegerField(required=False)
 
     def create(self, validated_data: dict):
         service = sample.AliquotService()

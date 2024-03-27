@@ -20,6 +20,10 @@ import Storage from "./pages/Storage/Storage";
 import "./App.css"; // Подключаем стили
 import PrivateRoute from './utils/PrivateRoute'
 
+import SampleDetail from "./pages/Sample/SampleDetail";
+import SampleCreate from "./pages/Sample/SampleCreate";
+import SampleUpdate from "./pages/Sample/SampleUpdate";
+
 function App() {
     return (
         <div className="all_page">
@@ -34,6 +38,11 @@ function App() {
                         <Route path="/laboratories/*" element={<PrivateRoute><Laboratory/></PrivateRoute>} />
                         <Route path="/families/*" element={<PrivateRoute><Family/></PrivateRoute>} />
                         <Route path="/individs/*" element={<PrivateRoute><Individ/></PrivateRoute>} />
+
+                        <Route path="/samples/aliquot/:id/" element={<SampleDetail />} />
+                        <Route path="/samples/aliquot/create/" element={<SampleCreate page_title="Добавить аликвоту" apiPath="/api/sample/aliquot/create/" />} />
+                        <Route path="/samples/aliquot/:id/update/" element={<SampleUpdate page_title="Изменить аликвоту" />} />
+
                         <Route path="/samples/*" element={<PrivateRoute><Sample/></PrivateRoute>} />
                         <Route path="/storage/*" element={<PrivateRoute><Storage/></PrivateRoute>} />
 

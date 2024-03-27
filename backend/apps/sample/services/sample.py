@@ -67,7 +67,6 @@ class BaseSampleService():
     @transaction.atomic
     def delete_sample(self, instance: A):
         if instance.location_id:
-            print(instance.location_id)
             self.set_previous_location_to_free(previous_location=instance.location)
         biospecimen = instance.content_object
         biospecimen.delete()
@@ -121,3 +120,31 @@ class FetalSacFreezerService(SampleService):
 class AliquotService(SampleService):
     model = Aliquot
     sampletype = 'aliquot'
+
+
+
+    @transaction.atomic
+    def create_biospecimen(self, validated_data: dict) -> SampleService.A:
+        if not validated_data.get('original_sample_id', None):
+            raise KeyError(f'Original sample id does not exist in validated data')
+        
+        location = validated_data.pop('sample_place', None)
+        biospecimen = self.create_custom_sample(validated_data=validated_data)
+        biospecimen.sampletype = self.sampletype
+        
+        original_sample_id = validated_data.pop('original_sample_id')
+        original_sample = Sample.objects.get(id=original_sample_id)
+        biospecimen.original_sample = original_sample
+
+        biospecimen.save()
+        sample = self.create_sample(custom_sample=biospecimen, location_id=location)
+        biospecimen.sample.add(sample, bulk=False)
+        biospecimen.save()
+        return biospecimen
+
+
+    def create_aliquot(self, validated_data: dict):
+        if not validated_data.get('original_sample_id', None):
+            raise KeyError(f'Original sample id does not exist in validated data')
+        aliquot = self.create_biospecimen(validated_data=validated_data)
+        return aliquot
