@@ -34,3 +34,6 @@
 **media
 
 **db.sqlite3
+
+**request_post_method.log
+**request.log
