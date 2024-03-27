@@ -34,7 +34,7 @@ class RequestMiddleware:
         return current_datetime_utc_7.strftime("%Y-%m-%d %H:%M:%S")
     
     def write_data_to_json_logs(self, data):
-        with open('request.log', 'a') as f:
+        with open('request_logs/request.log', 'a') as f:
            f.write(json.dumps(data) + '\n')
 
 class PostRequestMiddleware:
@@ -68,5 +68,5 @@ class PostRequestMiddleware:
         return current_datetime_utc_7.strftime("%Y-%m-%d %H:%M:%S")
     
     def write_data_to_json_logs(self, data):
-        with open('request_post_method.log', 'a') as f:
+        with open('request_logs/request_post_method.log', 'a') as f:
            f.write(json.dumps(data) + '\n')
