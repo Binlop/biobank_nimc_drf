@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import AuthContext from '../../../context/AuthContext'
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
+import { handleUpdate, setCSRFToken } from "../../../components/API/CreateUpdate";
 import "../individ.css"
 import AddSampleToAdult from "../AddSample";
 import ModalToPregnancy from "./ModalToPregnancy";
@@ -14,14 +14,17 @@ export default function MotherDetail() {
     const [samplesList, seSampleList] = useState([]);
     const [motherPregnacies, setMotherPregnacies] = useState([]);
     const [modal, setModal] = useState(false);
-    const { authTokens, logoutUser } = useContext(AuthContext);
-    const [activeItem, setActiveItem] = useState({
-        pregnancy_year: '',
-        diagnosis: '',
-      });
+    const [pregnancy, setPregnancy] = useState({});
+
+    useEffect(() => {
+        refreshObjectDetail(setIndividDetail, `/api/individ/${id}`)  
+        refreshObjectList(seSampleList, `/api/sample/individ_${id}_samples/`)
+        refreshObjectList(setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`)
+        setCSRFToken()
+    }, []);
 
     const editPregnancy = (item) => {
-        setActiveItem(item);
+        setPregnancy(item);
         setModal(!modal);  
         };
 
@@ -31,20 +34,18 @@ export default function MotherDetail() {
 
     const handleSubmitPregnancy = (item) => {
         togglePregnancy();
+        console.log(item)
           axios
-            .put(`/api/individ/mother/pregnancy/${item.id}/`, item)
-            .then((res) => refreshObjectList(setMotherPregnacies, `api/individ/mother/${id}/pregnancy/`, authTokens));
-          return;
+            .put(`/api/individ/mother/pregnancy/${item.id}/update/`, item)
+            .then((res) => refreshObjectList(setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`));
         };
 
-    useEffect(() => {
-        refreshObjectDetail(setIndividDetail, `/api/individ/${id}`, authTokens)  
-        refreshObjectList(seSampleList, `/api/sample/individ_${id}_samples/`, authTokens)
-        refreshObjectList(setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`, authTokens)
-    }, []);
+    const handleDeletePregnancy = (object_id) => {
+        handleDelete(`/api/individ/mother/pregnancy/${object_id}/delete/`, setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`);
+    };
 
     const handleDeleteClick = (object_id) => {
-        handleDelete(`/api/sample/${object_id}/delete`, seSampleList, `/api/sample/individ_${id}_samples/`, authTokens);
+        handleDelete(`/api/sample/${object_id}/delete`, seSampleList, `/api/sample/individ_${id}_samples/`);
     };
 
     return (
@@ -226,7 +227,7 @@ export default function MotherDetail() {
                                     </button>
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDelete(item)}
+                                        onClick={() => handleDeletePregnancy(item.id)}
                                     >
                                         Удалить
                                     </button>
@@ -237,7 +238,7 @@ export default function MotherDetail() {
                     </table>
                     {modal ? (
                     <ModalToPregnancy
-                        activeItem={activeItem}
+                        pregnancy={pregnancy}
                         toggle={togglePregnancy}
                         onSave={handleSubmitPregnancy}
                     />

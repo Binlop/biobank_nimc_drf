@@ -5,6 +5,7 @@ import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
 import { handlePost, setCSRFToken } from "../../../components/API/CreateUpdate";
 import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import { GetParamFromURL } from "../../../components/API/Sample/CreateSample";
 import "../individ.css"
 
 
@@ -15,6 +16,7 @@ export default function FatherCreate() {
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [errors, setError] = useState(null); 
+  const familyId = GetParamFromURL('family_id')
 
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function FatherCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formIndivid = makeIndividForm();
+    formIndivid.append('family_id', familyId)
     handlePost(e, formIndivid, `/api/individ/father/create/`, `/individs/`, setError, navigate)
   };
 

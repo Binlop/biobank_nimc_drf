@@ -37,8 +37,14 @@ class MotherService():
         mother_id = validated_data.pop('mother_preg_id', None)
         if mother_id:
             mother = get_object_or_404(Mother, id=mother_id)
-            validated_data['mother'] = mother
+            validated_data['mother_id'] = mother.individ.id
             pregnancy = MotherPregnancy.objects.create(**validated_data)
             pregnancy.save()
             return pregnancy
     
+    @transaction.atomic
+    def update_mother_pregnancy(self, instance: MotherPregnancy, validated_data: dict):
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance

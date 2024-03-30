@@ -7,16 +7,18 @@ import NestedMenu from './NestedMenu'; // Импортируем компоне�
 import EmbryoFilterForm from "./FilterComponents/EmbryoFilter";
 import FatherFilterForm from "./FilterComponents/FatherFilter";
 import MotherFilterForm from "./FilterComponents/MotherFilter";
-
+import AnotherMemberFilterForm from "./FilterComponents/AnotherMemberFilter";
 
 function FilterBlock({ setIndividList }) { 
   const { authTokens, logoutUser } = useContext(AuthContext);
   const [isOpenEmbryo, setIsOpenEmbryo] = useState(false);
   const [isOpenFather, setIsOpenFather] = useState(false);
   const [isOpenMother, setisOpenMother] = useState(false);
+  const [isOpenAnotherMember, setisOpenAnotherMember] = useState(false);
   const [embryoData, setEmbryoData] = useState({});
   const [fatherData, setFatherData] = useState({});    
   const [motherData, setMotherData] = useState({});  
+  const [anotherMemberData, setAnotherMemberData] = useState({});  
   const [errors, setError] = useState({});
   let formData = {}
 
@@ -30,6 +32,9 @@ function FilterBlock({ setIndividList }) {
 
   const toggleMother = () => {
     setisOpenMother(!isOpenMother);
+  };
+  const toggleAnotherMember = () => {
+    setisOpenAnotherMember(!isOpenAnotherMember);
   };
 
   const handleChangeEmbryo = (event) => {
@@ -90,6 +95,11 @@ function FilterBlock({ setIndividList }) {
     const value = checked ? 'on' : ''; // Если чекбокс отмечен, установить значение 'on', иначе пустую строку
     setMotherData({ ...motherData, [name]: value });
   };
+  const handleChangeAnotherMemberCheckMark = (event) => {
+    const { name, checked } = event.target;
+    const value = checked ? 'on' : ''; // Если чекбокс отмечен, установить значение 'on', иначе пустую строку
+    setAnotherMemberData({ ...anotherMemberData, [name]: value });
+  };
 
   const handleChangeMother = (event) => {
     const { name, value } = event.target;
@@ -99,11 +109,21 @@ function FilterBlock({ setIndividList }) {
     }
     setMotherData(updatedParentData);
   };
+
+  const handleChangeAnotherMember = (event) => {
+    const { name, value } = event.target;
+    const updatedParentData = { ...anotherMemberData, [name]: value };
+    if (value.trim() === '') {
+      delete updatedParentData[name];
+    }
+    setAnotherMemberData(updatedParentData);
+  };
+
   const uniteAllFormData = () => {
-    console.log(motherData)
     formData["embryo"] = embryoData
     formData["father"] = fatherData
     formData["mother"] = motherData
+    formData["another_member"] = anotherMemberData
     return formData
   };
   
@@ -164,6 +184,15 @@ function FilterBlock({ setIndividList }) {
                 toggleMother = {toggleMother}
                 handleChangeMotherCheckMark = {handleChangeMotherCheckMark}
                 isOpenMother = {isOpenMother}
+
+        />
+      <AnotherMemberFilterForm
+                anotherMemberData={anotherMemberData}
+                handleChangeAnotherMember={handleChangeAnotherMember}
+                errors={errors}
+                handleChangeAnotherMemberCheckMark = {handleChangeFatherCheckMark}
+                toggleAnotherMember = {toggleAnotherMember}
+                isOpenAnotherMember = {isOpenAnotherMember}
 
         />
       <button type="submit">Применить</button>

@@ -54,9 +54,7 @@
     text-align: left;
     margin-left: 10px;
     margin-top: 10px;
-    margin-bottom: 30px;
-    gap: 15px;
-    position: absolute;
+    position: flex;
     font-family:'Times New Roman', Times, serif
 }
 
@@ -64,7 +62,6 @@
 .larger-text {
     /* position:absolute; */
     font-size: 24px;
-    margin-left: 0px;
 }
 
 .user_form{
@@ -78,4 +75,11 @@
 .form-check{
     text-align: left;
     margin-left: 10%;
+}
+
+.searchSampleByBarcode{
+    width: 200px;
+    margin-left: 150px;
+    position: absolute;
+    margin-top: 10px;
 }

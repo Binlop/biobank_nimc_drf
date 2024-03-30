@@ -23,4 +23,7 @@ urlpatterns = [
     path('another_member/create/', views.AnotherMemberCreateView.as_view()),
     path('another_member/<int:pk>/update/', views.AnotherMemberUpdateView.as_view()),
 
+    path('mother/<int:pk>/pregnancy/', views.MotherPregnancyListView.as_view()),
+    path('mother/pregnancy/<int:pk>/update/', views.MotherPregnancyView.as_view()),
+    path('mother/pregnancy/<int:pk>/delete/', views.MotherPregnancyView.as_view()),
 ]

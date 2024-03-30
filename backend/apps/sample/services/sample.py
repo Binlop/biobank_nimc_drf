@@ -21,11 +21,12 @@ class BaseSampleService():
         return sample
 
     @transaction.atomic
-    def update_sample(self, sample: Sample, location_id: int) -> Sample:
+    def update_sample(self, sample: Sample, location_id: int, sample_name) -> Sample:
         if location_id:
             if sample.location:
                 self.set_previous_location_to_free(previous_location=sample.location)
             sample.location = self.set_new_location_to_occupied(location_id=location_id, sample=sample)
+        sample.name = sample_name
         sample.save()
         return sample
 
@@ -61,7 +62,7 @@ class BaseSampleService():
         for field, value in validated_data.items():
             setattr(instance, field, value)
         instance.sample.name = instance.name
-        self.update_sample(instance.sample.first(), location_id=location)
+        self.update_sample(instance.sample.first(), location_id=location, sample_name=instance.name)
         return instance
 
     @transaction.atomic

@@ -15,20 +15,14 @@ export default class ModalToPregnancy extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeItem: this.props.activeItem,
+      pregnancy: this.props.pregnancy,
     };
   }
 
   handleChange = (e) => {
     let { name, value } = e.target;
-
-    // if (e.target.type === "checkbox") {
-    //   value = e.target.checked;
-    // }
-
-    const activeItem = { ...this.state.activeItem, [name]: value };
-
-    this.setState({ activeItem });
+    const pregnancy = { ...this.state.pregnancy, [name]: value };
+    this.setState({ pregnancy });
   };
 
   render() {
@@ -44,7 +38,7 @@ export default class ModalToPregnancy extends Component {
               <Input
                 type="text"
                 name="pregnancy_year"
-                value={this.state.activeItem.pregnancy_year}
+                value={this.state.pregnancy.pregnancy_year}
                 onChange={this.handleChange}
                 placeholder="Год беременности"
               />
@@ -57,7 +51,7 @@ export default class ModalToPregnancy extends Component {
                 id="exampleSelect"
                 name="select"
                 type="select"
-                value={this.state.activeItem.diagnosis}
+                value={this.state.pregnancy.diagnosis}
                 onChange={this.handleChange}
             >
               <option value="noth">---------------------</option>
@@ -79,7 +73,7 @@ export default class ModalToPregnancy extends Component {
         <ModalFooter>
           <Button
             color="success"
-            onClick={() => onSave(this.state.activeItem)}
+            onClick={() => onSave(this.state.pregnancy)}
           >
             Изменить
           </Button>

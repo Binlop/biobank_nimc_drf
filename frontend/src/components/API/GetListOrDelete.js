@@ -28,6 +28,22 @@ export function refreshObjectList(setObjectList, apiPathList) {
         .catch((err) => console.log(err));
 }
 
+export function refreshObjectListSearch(setObjectList, apiPathList, params) {
+    const token = JSON.parse(localStorage.authTokens)
+    axios
+        .get(`${apiPathList}`, {
+            params: params, 
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(token.access)
+            }
+        })
+        .then((res) => {
+            setObjectList(res.data);
+        })
+        .catch((err) => console.log(err));
+}
+
 export function refreshObjectDetail(setObjectDetail, apiPathDetail) {
     const token = JSON.parse(localStorage.authTokens)
     axios

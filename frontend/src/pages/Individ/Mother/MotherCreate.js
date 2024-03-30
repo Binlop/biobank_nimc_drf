@@ -5,6 +5,7 @@ import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
 import { handlePost, setCSRFToken } from "../../../components/API/CreateUpdate";
 import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import { GetParamFromURL } from "../../../components/API/Sample/CreateSample";
 import "../individ.css"
 
 
@@ -16,6 +17,7 @@ export default function MotherCreate() {
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [errors, setError] = useState(null); 
   const [pregnancies, setPregnancies] = useState([{ pregnancy_year: "", diagnosis: "" }]);
+  const familyId = GetParamFromURL('family_id')
 
   useEffect(() => {
     document.title = 'Добавить мать';
@@ -31,6 +33,7 @@ export default function MotherCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formIndivid = makeIndividForm();
+    formIndivid.append('family_id', familyId)
     handlePost(e, formIndivid, `/api/individ/mother/create/`, `/individs/`, setError, navigate)
   };
 

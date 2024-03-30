@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from 'react-router-dom';
-import { handleDelete, refreshObjectList } from "../../components/API/GetListOrDelete";
+import { handleDelete, refreshObjectList, refreshObjectDetail, refreshObjectListSearch } from "../../components/API/GetListOrDelete";
+import {
+    Form,
+    FormGroup,
+    Input,
+    Label,
+  } from "reactstrap";
 import "./sample.css"
 
 export default function SampleList() {
     const [sampleList, setSampleList] = useState([]);
+    const [barcode, setBarcode] = useState();
 
     useEffect(() => {
         refreshObjectList(setSampleList, `/api/sample/`)
@@ -15,11 +22,35 @@ export default function SampleList() {
         handleDelete(`/api/sample/${sample_id}/delete/`, setSampleList, `/api/sample/`);
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        refreshObjectDetail(setSampleList, `/api/sample/find_by_barcode/${barcode}`)
+    };
+
+    const handleChange = (e) => {
+        const value = e.target.value;
+        setBarcode(value)
+    };
+
     return (
         <main className="container">
                <div className="title_object">
                 <p>
-                <span className="larger-text">Образцы</span></p>
+                <span className="larger-text">Образцы</span>
+                </p>
+                </div>
+                <div className="searchSampleByBarcode">
+                <Form onSubmit={handleSubmit}>
+                <FormGroup>
+                <Input
+                    type="text"
+                    name="barcode"
+                    value={barcode}
+                    onChange={handleChange}
+                    placeholder="Баркод"
+                />
+                </FormGroup>
+                </Form>
                 </div>
             <div className="features">
                 <table className="table">

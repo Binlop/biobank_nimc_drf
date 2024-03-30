@@ -46,6 +46,19 @@ class SampleListSelector:
     def get_sample_aliquots(self, user: User, sample_id: int):
         aliquots = Aliquot.objects.filter(original_sample_id=sample_id)
         return aliquots
+    
+    def get_sample_by_barcode(self, user: User, barcode: int) -> QuerySet:
+        dna_qs = DNA.objects.filter(barcode=barcode)
+        chorion_qs = Chorion.objects.filter(individ_id=barcode)
+        blood_qs = Blood.objects.filter(barcode=barcode)
+        endometrium_qs = Endometrium.objects.filter(barcode=barcode)
+        fetal_sac_freezer_qs = FetalSacFreezer.objects.filter(barcode=barcode)
+        fetal_sac_nitrogen_qs = FetalSacNitrogen.objects.filter(barcode=barcode)
+        aliquot_qs = Aliquot.objects.filter(barcode=barcode)
+
+        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs, aliquot_qs))
+
+        return samples_list
 
 class SampleDetailSelector:
     """

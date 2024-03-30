@@ -36,15 +36,19 @@ class FamilyMemberListSelector:
         embryo_data = json.loads(filters.get('embryo', None)[0])
         father_data = json.loads(filters.get('father', None)[0])
         mother_data = json.loads(filters.get('mother', None)[0])
+        another_member_data = json.loads(filters.get('another_member', None)[0])
 
         embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all() if embryo_data else Embryo.objects.none())
         father_filter = FatherFilter(father_data, queryset=Father.objects.all() if father_data else Father.objects.none())
         mother_filter = MotherFilter(mother_data, queryset=Mother.objects.all() if mother_data else Mother.objects.none())
+        another_member_filter = FatherFilter(another_member_data, queryset=AnotherFamilyMember.objects.all() if another_member_data else AnotherFamilyMember.objects.none())
+        
         embryo_qs = embryo_filter.qs 
         father_qs = father_filter.qs 
         mother_qs = mother_filter.qs
+        another_member_qs = another_member_filter.qs
 
-        individ_list = list(chain(embryo_qs, father_qs, mother_qs))
+        individ_list = list(chain(embryo_qs, father_qs, mother_qs, another_member_qs))
         return individ_list
     
     def filter_individs_by_family(self, user: User, family_id: int) -> QuerySet[Embryo, Father, Mother]:
@@ -67,6 +71,14 @@ class FamilyMemberDetailSelector:
         member = get_object_or_404(Individ, pk=pk)
         return self.check_user_acces_to_family_member(member=member, user=user, delete=delete)
 
-    def get_mother_pregnancy(self, mother_id):
-        pregnancy = MotherPregnancy.objects.filter(mother_id=mother_id)
+class MotherPregnancySelector:
+
+    def get_mother_pregnancy_list(self, pk):
+        individ = Individ.objects.get(id=pk)
+        pregnancy = MotherPregnancy.objects.filter(mother_id=individ.object_id)
+        return pregnancy
+
+    def get_mother_pregnancy_detail(self, user: User, pk) -> MotherPregnancy:
+        individ = Individ.objects.get(id=pk)
+        pregnancy = MotherPregnancy.objects.get(id=individ.object_id)
         return pregnancy

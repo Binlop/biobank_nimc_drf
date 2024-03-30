@@ -1,40 +1,21 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import Multiselect from 'react-select'
+import { handlePost, setCSRFToken, makeNewForm } from "../../components/API/CreateUpdate";
+import { refreshObjectList } from "../../components/API/GetListOrDelete";
+
 
 export default function FamilyCreate() {
-  const [formData, setFormData] = useState({
-      name: '',
-      description: '',
-      laboratory: []
-  });
+  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [errors, setError] = useState(null); // Состояние для сообщения об ошибке
 
 
   useEffect(() => {
-    document.title = 'Добавить семью';
-    const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-    fetchLaboratories();
+    setCSRFToken();
+    document.title = 'Добавить семью'
+    refreshObjectList(setAllLaboratories,`/api/laboratory`)
   }, []);
-
-  const getCSRFToken = (name) => {
-    const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return cookieValue ? cookieValue.pop() : '';
-  }
-
-  const fetchLaboratories = () => {
-    axios
-        .get(`/api/laboratory`)
-        .then((res) => {
-          setAllLaboratories(res.data);
-            console.log(res.data)
-        })
-        .catch((err) => console.log(err));
-    };   
 
   const handleChange = (e) => {
       const { name, value, checked } = e.target;
@@ -52,17 +33,11 @@ export default function FamilyCreate() {
       }
     };
   
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-        await axios.post('/api/family/create', formData);
-        navigate('/families');
-    } catch (error) {
-        console.error('Ошибка с отправкой семьи:', error);
-        setError(error.response.data);
-
-    }
-};
+    const formFamily = makeNewForm(formData)
+    handlePost(e, formFamily, '/api/family/create', `/families/`, setError, navigate)
+  };
 
   return (
     <div className="features">

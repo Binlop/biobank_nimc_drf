@@ -78,6 +78,8 @@ class FamilyMemberSerializerOutput(serializers.Serializer):
     laboratory = LaboratorySerializer(read_only=True, many=True)
     individ = serializers.SerializerMethodField()
     
+    family_id = serializers.IntegerField(required=False)
+
     def get_individ(self, obj):
         individ_instance = obj.individ.first()  # Получаем первый связанный объект Individ
         if individ_instance:
@@ -170,7 +172,6 @@ class EmbryoSerializerOutput(FamilyMemberSerializerOutput):
 class EmbryoSerializerInput(EmbryoSerializerOutput):
     create_family = serializers.BooleanField(required=False)
     laboratory = serializers.ListField(child=serializers.IntegerField(), write_only=True)
-
     scan_directions = serializers.FileField(required=False)
 
     def create(self, validated_data: dict):
@@ -230,9 +231,15 @@ class MotherPregnancySerializer(serializers.Serializer):
         'child_with_developmental_defects': 'Ребенок с пороками развития',
         'child_with_delayed_development': 'Ребенок с задержкой психо-речевого развития',
     }
+    id = serializers.IntegerField()
     mother_id = serializers.IntegerField()
     diagnosis = serializers.ChoiceField(choices=DIAGNOSIS_CHOICES, default='none')
     pregnancy_year = serializers.IntegerField(required=False)
+
+    def update(self, instance: MotherPregnancy, validated_data: dict) -> MotherPregnancy:
+        service = mother.MotherService()
+        return service.update_mother_pregnancy(instance, validated_data)
+    
 
 class MotherSerializerOutput(AdultSerializerOutput):
     test_field = serializers.CharField(max_length=250, required=False)
@@ -267,7 +274,6 @@ class PregnancySerializer(serializers.Serializer):
         'child_with_developmental_defects': 'Ребенок с пороками развития',
         'child_with_delayed_development': 'Ребенок с задержкой психо-речевого развития',
     }
-
     mother_preg_id = serializers.IntegerField(required=False)
     pregnancy_year = serializers.IntegerField()
     diagnosis = serializers.ChoiceField(choices=DIAGNOSIS_CHOICES, default='none')

@@ -4,8 +4,9 @@ import "../individ.css"
 import { Form, FormGroup, Input, Label } from "reactstrap";
 import CharFieldWithError from "../../../components/Fields/CharFieldWithError";
 import CheckMarkWithError from "../../../components/Fields/CheckMarkWithError";
-import { handlePost, setCSRFToken } from "../../../components/API/CreateUpdate";
-import { refreshObjectList } from "../../../components/API/GetListOrDelete";
+import { handlePost, setCSRFToken, makeNewForm } from "../../../components/API/CreateUpdate";
+import { refreshObjectList,  } from "../../../components/API/GetListOrDelete";
+import { GetParamFromURL } from "../../../components/API/Sample/CreateSample";
 
 
 export default function EmbryoCreate() {
@@ -16,6 +17,7 @@ export default function EmbryoCreate() {
   const [allLaboratories, setAllLaboratories] = useState([]);
   const [errors, setError] = useState(null); 
   const [file, setFile] = useState(null);
+  const familyId = GetParamFromURL('family_id')
 
 
   useEffect(() => {
@@ -30,23 +32,12 @@ export default function EmbryoCreate() {
     setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const formEmbryo = makeEmbryoForm();
+    const formEmbryo = makeNewForm(formData);
+    formEmbryo.append('family_id', familyId)
+    console.log(formEmbryo)
     handlePost(e, formEmbryo, `/api/individ/embryo/create/`, `/individs/`, setError, navigate)
-  };
-
-  const makeEmbryoForm = () => {
-    const formEmbryo = new FormData();
-    for (const key in formData) {
-      if (formData.hasOwnProperty(key)) {
-        const value = formData[key];
-        if (value) {
-          formEmbryo.append(key, value);
-        }
-      }
-    }
-    return formEmbryo;
   };
 
   const handleChangeLaboratory = (e) => {
@@ -69,6 +60,7 @@ export default function EmbryoCreate() {
   };
 
   const handleChangeСheckmark = (e) => {
+    // console.log(name, checked)
     const { name, checked } = e.target;
     setFormData({ ...formData, [name]: checked });
   }
@@ -129,7 +121,24 @@ export default function EmbryoCreate() {
           </div>
           ))}
           </div>
-          <div className="form-group">
+          <FormGroup
+            check
+            inline
+          >
+            <Input 
+            type="checkbox" 
+            name="create_family"
+            onChange = {handleChangeСheckmark}
+            value = {formData.create_family}
+            />
+          <Label check>
+            Создать семью
+          </Label>
+          {errors && errors.create_family &&
+          <div className="alert alert-danger mt-3 mb-0">{errors.create_family}</div>
+          }
+          </FormGroup>
+          {/* <div className="form-group">
           <label>Создать семью:</label>
           <input
           type="checkbox"
@@ -141,7 +150,7 @@ export default function EmbryoCreate() {
           {errors && errors.create_family &&
           <div className="alert alert-danger mt-3 mb-0">{errors.create_family}</div>
           }
-          </div>  
+          </div>   */}
           <FormGroup>
             <Label>Дата получения</Label>
             <Input

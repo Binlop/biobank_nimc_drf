@@ -3,32 +3,24 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "./family.css"
 import React, { useState, useEffect } from "react";
-import Multiselect from 'react-select'
+import { handleUpdate, setCSRFToken, ChangeLabObjectsToLabIds, makeNewForm } from "../../components/API/CreateUpdate";
+import { refreshObjectList, refreshObjectDetail } from "../../components/API/GetListOrDelete";
+
 
 export default function FamilyUpdate() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [errors, setError] = useState(null);
-    const [formData, setFormData] = useState({
-      name: '',
-      description: '',
-      laboratory: []
-    });
+    const [formData, setFormData] = useState(null);
     const [allLaboratories, setAllLaboratories] = useState([]);
     
     useEffect(() => {
-        refreshLaboratoryData();
-        fetchLaboratories();
-        document.title = 'Изменить направление';
-        const csrftoken = getCSRFToken('csrftoken'); // Получаем CSRF токен из кук
-        axios.defaults.headers.common['X-CSRFToken'] = csrftoken; // Устанавливаем CSRF токен в заголовок запроса
-    }, []);
+      setCSRFToken();
+      refreshObjectList(setAllLaboratories, '/api/laboratory');
+      refreshLaboratoryData();
     
-    const getCSRFToken = (name) => {
-        const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-        return cookieValue ? cookieValue.pop() : '';
-      }
-    
+  }, []);
+  
     const refreshLaboratoryData = () => {
       axios
           .get(`/api/family/${id}`)
@@ -42,29 +34,12 @@ export default function FamilyUpdate() {
           })
           .catch((err) => console.log(err));
     };
-      
 
-    const fetchLaboratories = () => {
-      axios
-          .get(`/api/laboratory`)
-          .then((res) => {
-            setAllLaboratories(res.data);
-          })
-          .catch((err) => console.log(err));
-      };  
     
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios
-          .put(`/api/family/${id}/update/`, formData)
-          .then(() => {
-            navigate('/families');
-          })
-          .catch((error) => {
-            if (error.response) {
-              setError(error.response.data);
-            }
-        });
+        const formFamily = makeNewForm(formData)
+        handleUpdate(event, formFamily, `/api/family/${id}/update/`, `/families/${id}/`, navigate, setError)
     };
 
     const handleChange = (event) => {
@@ -82,8 +57,6 @@ export default function FamilyUpdate() {
         setFormData(prevFormData => ({ ...prevFormData, [name]: value }));
       }
     };
-    
-    
 
     return (
         <div className="features">

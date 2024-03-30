@@ -154,8 +154,15 @@ table td {
     color: inherit; /* Наследование цвета текста от родителя */
 }
 
-.samples {
+/* .samples {
     width: 600px;
+} */
+.samples {
+    float: left;
+    color: #fff;
+    margin-top: 40px;
+    text-align: center;
+    width: 62%;
 }
 
 

@@ -25,7 +25,6 @@ export default function EmbryoUpdate() {
         setCSRFToken();
         document.title = 'Изменить пробанда'
         refreshObjectList(setAllLaboratories,`/api/laboratory`)
-
     }, []);
     
     const refreshIndividData = () => {

@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('individ_<int:pk>_samples/', views.IndividSampleList.as_view()),
+    path('find_by_barcode/<int:barcode>', views.SampleListViewByBarcode.as_view()),
 
     path('', views.SampleListView.as_view()),
     path('<int:pk>/', views.SampleDetailView.as_view()),

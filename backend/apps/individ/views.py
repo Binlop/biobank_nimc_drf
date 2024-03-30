@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from . import serializer as serializers
-from .selectors import FamilyMemberListSelector, FamilyMemberDetailSelector
+from .selectors import FamilyMemberListSelector, FamilyMemberDetailSelector, MotherPregnancySelector
 
 class IndividViewBase(APIView):
     serializer_class = None
@@ -58,7 +58,6 @@ class FamilyMemberCreateView(IndividViewBase):
     Базовый класс для создания семейных участников.
     """ 
     def post(self, request):
-        print(request.data)
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -118,18 +117,27 @@ class AnotherMemberUpdateView(FamilyMemberUpdateView):
     selector_class = FamilyMemberDetailSelector
     serializer_class = serializers.AnotherMemberSerializerInput
 
+class MotherPregnancyListView(APIView):
+    
+    def get(self, request, pk):
+        selector = MotherPregnancySelector()
+        pregnancy = selector.get_mother_pregnancy_list(mother_id=pk)
+        serializer = serializers.MotherPregnancySerializer(pregnancy, many=True)
+        print(serializer.data)
+        return Response(serializer.data)
+    
 class MotherPregnancyView(APIView):
     
     def get(self, request, pk):
-        selector = FamilyMemberDetailSelector()
-        pregnancy = selector.get_mother_pregnancy(mother_id=pk)
+        selector = MotherPregnancySelector()
+        pregnancy = selector.get_mother_pregnancy_list(pk=pk)
         serializer = serializers.MotherPregnancySerializer(pregnancy, many=True)
         return Response(serializer.data)
     
     def put(self, request, pk):
-        selector = self.get_selector_class()
-        member = selector.get_individ_detail(user=request.user, pk=pk)
-        serializer = self.get_serializer_class()(member, data=request.data)
+        selector = MotherPregnancySelector()
+        pregnancy = selector.get_mother_pregnancy_detail(user=request.user, pk=pk)
+        serializer = serializers.MotherPregnancySerializer(pregnancy, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
@@ -137,7 +145,7 @@ class MotherPregnancyView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk):
-        selector = FamilyMemberDetailSelector()
-        member = selector.get_individ_detail(user=request.user, pk=pk)
-        member.delete()
+        selector = MotherPregnancySelector()
+        pregnancy = selector.get_mother_pregnancy_detail(user=request.user, pk=pk)
+        pregnancy.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

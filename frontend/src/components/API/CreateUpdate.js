@@ -8,17 +8,25 @@ export function setCSRFToken() {
 }
 
 export function makeNewForm(formData) {
-    const formSample = new FormData();
+    const newForm = new FormData();
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
         const value = formData[key];
         if (value) {
-          formSample.append(key, value);
+            newForm.append(key, value);
         }
       }
     }
-    return formSample;
+    return newForm;
 }
+
+export const ChangeLabObjectsToLabIds = (formData, setFormData) => {
+    const laboratoryIds = formData.laboratory.map(lab => lab.id);
+    setFormData(prevState => ({
+        ...prevState,
+        laboratory: laboratoryIds
+      }));   
+  };
 
 export function handleChangeLaboratoryIds(e, formData, setFormData) {
     const { name, value, checked } = e.target;

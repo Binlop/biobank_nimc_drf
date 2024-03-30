@@ -22,7 +22,6 @@ export default function SampleCreate(props) {
     }, []);
 
     const handleSubmit = (e) => {
-        console.log(apiPath)
         e.preventDefault();
         const formSample = makeSampleForm(formData, individId, originalSampleId);
         handlePost(e, formSample, apiPath, `/samples/`, setError, navigate)

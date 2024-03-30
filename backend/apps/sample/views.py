@@ -26,6 +26,14 @@ class IndividSampleList(SampleViewBase):
         samples = selector.get_individ_samples(user=request.user, individ_id=pk)      
         serializer = serializers.IndividSamplesListSerializer(samples, many=True)
         return Response(serializer.data)
+    
+class SampleListViewByBarcode(SampleViewBase):
+
+    def get(self, request, barcode):
+        selector = SampleListSelector()
+        samples = selector.get_sample_by_barcode(user=request.user, barcode=barcode)      
+        serializer = serializers.CustomSampleSerializerOutput(samples, many=True)
+        return Response(serializer.data)
 
 class SampleDetailView(SampleViewBase):
 

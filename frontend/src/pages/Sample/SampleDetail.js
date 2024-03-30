@@ -1,20 +1,47 @@
 import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../components/API/GetListOrDelete";
+import { handleUpdate, setCSRFToken } from "../../components/API/CreateUpdate";
+import ModalToAliquot from "./ModalToAliquot";
 import "./sample.css"
 
 export default function SampleDetail() {
     const { id } = useParams();
     const [sampleDetail, setSampleDetail] = useState(null);
     const [AliquotList, setAliquotList] = useState([]);
+    const [modal, setModal] = useState(false);
+    const [aliquot, setAliquot] = useState({
+        name: '',
+        location: '',
+        volume: '',
+      });
 
     useEffect(() => {
       refreshObjectDetail(setSampleDetail, `/api/sample/${id}`)  
       refreshObjectList(setAliquotList, `/api/sample/aliquot/${id}/`)
+      setCSRFToken()
     }, []);
 
     const handleDeleteClick = (object_id) => {
       handleDelete(`/api/sample/${object_id}/delete`, setSampleDetail, `/api/sample/${id}/`);
+    };
+
+    const editAliquot = (item) => {
+      setAliquot(item);
+      setModal(!modal);  
+      };
+
+    const toggleAliquot = () => {
+        setModal(!modal);      
+    };
+
+    const handleSubmitAliquot = (item) => {
+      toggleAliquot();
+          axios
+            .put(`/api/sample/aliquot/${item.sample.id}/update/`, item)
+            .then((res) => refreshObjectList(setAliquotList, `/api/sample/aliquot/${id}/`));
+          return;
     };
 
     return (
@@ -95,6 +122,12 @@ export default function SampleDetail() {
                                 </td>                                
                                 <td className="table_list_value">{item.volume}</td>
                                 <td className="table_list_value">
+                                <button
+                                        className="btn btn-primary mr-2"
+                                        onClick={() => editAliquot(item)}
+                                    >
+                                        Изменить
+                                    </button>
                                     <button
                                         className="btn btn-danger"
                                         onClick={() => handleDeleteClick(item.sample.id)}
@@ -106,6 +139,13 @@ export default function SampleDetail() {
                         ))}
                     </tbody>
                 </table>
+                {modal ? (
+                    <ModalToAliquot
+                        aliquot={aliquot}
+                        toggle={toggleAliquot}
+                        onSave={handleSubmitAliquot}
+                    />
+                ) : null}
                 </div>
                 )}
             </div>
