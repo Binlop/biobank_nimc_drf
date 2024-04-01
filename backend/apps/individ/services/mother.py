@@ -34,10 +34,10 @@ class MotherService():
     
     @transaction.atomic
     def create_mother_pregnancy(self, validated_data: dict):
-        mother_id = validated_data.pop('mother_preg_id', None)
+        mother_id = validated_data.pop('mother_id', None)
         if mother_id:
             mother = get_object_or_404(Mother, id=mother_id)
-            validated_data['mother_id'] = mother.individ.id
+            validated_data['mother_id'] = mother.individ.first().id
             pregnancy = MotherPregnancy.objects.create(**validated_data)
             pregnancy.save()
             return pregnancy

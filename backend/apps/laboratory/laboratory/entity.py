@@ -1,6 +1,8 @@
 from typing import Optional
 from datetime import datetime
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
+from pydantic import BaseModel
+
 
 @dataclass(frozen=True)
 class Laboratory:
@@ -27,4 +29,4 @@ class Laboratory:
             raise EntityValidationException(validator.errors)
         
     def to_dict(self):
-        return {"id": self.id, 'name': self.name, 'description': self.description}
+        return {k: str(v) for k, v in asdict(self).items()}

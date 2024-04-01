@@ -20,9 +20,8 @@ class FamilyMember(models.Model):
     """
     Описывает сущность индивида
     """
-    individ = GenericRelation(Individ, on_delete=models.CASCADE)
     name = models.CharField('Имя индивида', max_length=256)
-    individ_type = models.CharField('Тип индивида', max_length=10)
+    individ_type = models.CharField('Тип индивида', max_length=20)
     laboratory = models.ManyToManyField(Laboratory)
     family = models.ForeignKey(Family, on_delete=models.CASCADE, null=True)
     count_blood = models.IntegerField('Кол-во крови', default=0)
@@ -72,6 +71,7 @@ class Embryo(FamilyMember):
     ]
 
     """Класс характеризует модель эмбрион"""
+    individ = GenericRelation(Individ, on_delete=models.CASCADE, related_query_name="embryo")
     test_field = models.CharField('Тестовое поле эмбрион', max_length=250, null=True)
     family_number = models.IntegerField()
     abortus_id = models.IntegerField()
@@ -140,6 +140,7 @@ class Adult(FamilyMember):
 
 class Father(Adult): 
     """Класс характеризует модель отец"""
+    individ = GenericRelation(Individ, on_delete=models.CASCADE, related_query_name="father")
     father_id = models.IntegerField(null=True)
     test_field = models.CharField('Тестовое поле отец', max_length=250, null=True)
 
@@ -157,7 +158,7 @@ class Mother(Adult):
         ('second', 'Вторичное'),
         ('no_PNB', 'Нет ПНБ'),
     ]
-    test_field = models.CharField('Тестовое поле мать', max_length=250, null=True)
+    individ = GenericRelation(Individ, on_delete=models.CASCADE, related_query_name="mother")
     mother_id = models.IntegerField('ID матери', null=True)
     number_of_pregnancies = models.IntegerField('Число беременностей',null=True)
     habitual_miscarriage = models.CharField('Привычное невынашивание', choices=MISCARRIAGE_CHOICES, default='none', max_length=100, null=True)
@@ -198,11 +199,10 @@ class MotherPregnancy(models.Model):
         verbose_name_plural = 'Беременности матерей'
 
 
-
 class AnotherFamilyMember(Adult):
     """Класс характеризует иного возможного члена семьи"""
     another_member_user_id = models.IntegerField('ID члена семьи')
-    test_field = models.CharField('Тестовое поле иной член семьи', max_length=250, null=True)
+    individ = GenericRelation(Individ, on_delete=models.CASCADE, related_query_name="another_member")
 
     class Meta: 
         verbose_name = 'Иной член семьи'

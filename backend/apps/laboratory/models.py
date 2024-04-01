@@ -1,5 +1,6 @@
 from django.db import models
-from .laboratory.domain import Laboratory as LaboratoryBase
+from .laboratory.entity import Laboratory as LaboratoryBase
+
 
 class Laboratory(models.Model):
     name = models.CharField('Название', max_length=256)

@@ -94,6 +94,12 @@ class SampleService(BaseSampleService):
         instance.save()
         return instance
     
+    @transaction.atomic
+    def change_sample_status(self, instance, validated_data: dict):
+        instance.sample_in_work = validated_data.get('sample_in_work', False)
+        instance.save()
+        return instance
+    
 class DNAService(SampleService):
     model = DNA
     sampletype = 'dna'

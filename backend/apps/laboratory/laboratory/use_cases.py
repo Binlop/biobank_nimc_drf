@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from .repositories import DjangoLaboratoryRepository
-from .domain import Laboratory
+from .entity import Laboratory
 
 class CreateProductUseCase:
     def __init__(self, laboratory_repository: DjangoLaboratoryRepository) -> None:

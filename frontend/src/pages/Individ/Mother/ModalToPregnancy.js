@@ -48,8 +48,7 @@ export default class ModalToPregnancy extends Component {
             Select
             </Label>
             <Input
-                id="exampleSelect"
-                name="select"
+                name="diagnosis"
                 type="select"
                 value={this.state.pregnancy.diagnosis}
                 onChange={this.handleChange}
@@ -75,7 +74,7 @@ export default class ModalToPregnancy extends Component {
             color="success"
             onClick={() => onSave(this.state.pregnancy)}
           >
-            Изменить
+            Сохранить
           </Button>
         </ModalFooter>
       </Modal>

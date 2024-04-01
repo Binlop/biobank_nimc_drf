@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../../components/API/GetListOrDelete";
-import { handleUpdate, setCSRFToken } from "../../../components/API/CreateUpdate";
+import { handleUpdate, setCSRFToken, makeNewForm } from "../../../components/API/CreateUpdate";
 import "../individ.css"
 import AddSampleToAdult from "../AddSample";
 import ModalToPregnancy from "./ModalToPregnancy";
@@ -13,7 +13,8 @@ export default function MotherDetail() {
     const [individDetail, setIndividDetail] = useState(null);
     const [samplesList, seSampleList] = useState([]);
     const [motherPregnacies, setMotherPregnacies] = useState([]);
-    const [modal, setModal] = useState(false);
+    const [modalToCreate, setModalToCreate] = useState(false);
+    const [modalToUpdate, setModalToUpdate] = useState(false);
     const [pregnancy, setPregnancy] = useState({});
 
     useEffect(() => {
@@ -25,16 +26,28 @@ export default function MotherDetail() {
 
     const editPregnancy = (item) => {
         setPregnancy(item);
-        setModal(!modal);  
+        setModalToUpdate(!modalToUpdate);  
         };
 
-    const togglePregnancy = () => {
-        setModal(!modal);      
+    const togglePregnancyCreate = () => {
+        setModalToCreate(!modalToCreate);      
     };
 
-    const handleSubmitPregnancy = (item) => {
-        togglePregnancy();
-        console.log(item)
+    const togglePregnancyUpdate = () => {
+        setModalToUpdate(!modalToUpdate);      
+    };
+
+    const handleCreatePregnancy = (item) => {
+        togglePregnancyCreate();
+        const pregnancyForm = makeNewForm(item)
+        pregnancyForm.append('mother_id', id)
+          axios
+            .post(`/api/individ/mother/pregnancy/create/`, pregnancyForm)
+            .then((res) => refreshObjectList(setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`));
+        };
+
+    const handleUpdatePregnancy = (item) => {
+        togglePregnancyUpdate();
           axios
             .put(`/api/individ/mother/pregnancy/${item.id}/update/`, item)
             .then((res) => refreshObjectList(setMotherPregnacies, `/api/individ/mother/${id}/pregnancy/`));
@@ -55,7 +68,7 @@ export default function MotherDetail() {
                     {individDetail && (
                         <>
                         <span className="larger-text">{individDetail.name}</span>
-                        <Link to={`/individs/mother/${id}/update/`} className="btn btn-primary">
+                        <Link to={`/individs/mother/${id}/update/`} className="btn btn-primary mr-2">
                             Изменить индивида
                         </Link>
                         </>
@@ -204,7 +217,14 @@ export default function MotherDetail() {
             <div className="features">
             {motherPregnacies && (
                 <div>
-                    <h5>Беременности</h5>
+                    <h5>Беременности
+                    <button
+                        className="btn btn-primary mr-2"
+                        onClick={() => togglePregnancyCreate()}
+                    >
+                        Добавить беременность
+                    </button>
+                    </h5>
                     <table>
                         <thead>
                             <tr>
@@ -236,11 +256,18 @@ export default function MotherDetail() {
                             ))}
                         </tbody>
                     </table>
-                    {modal ? (
+                    {modalToCreate ? (
                     <ModalToPregnancy
                         pregnancy={pregnancy}
-                        toggle={togglePregnancy}
-                        onSave={handleSubmitPregnancy}
+                        toggle={togglePregnancyCreate}
+                        onSave={handleCreatePregnancy}
+                    />
+                ) : null}
+                    {modalToUpdate ? (
+                    <ModalToPregnancy
+                        pregnancy={pregnancy}
+                        toggle={togglePregnancyUpdate}
+                        onSave={handleUpdatePregnancy}
                     />
                 ) : null}
                 </div>

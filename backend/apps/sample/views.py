@@ -7,9 +7,13 @@ from rest_framework import status
 
 class SampleViewBase(APIView):
     serializer = None
-    
+    selector = None
+
     def get_serializer_class(self):
         return self.serializer
+    
+    def get_selector_class(self):
+        return self.selector
 
 class SampleListView(SampleViewBase):
 
@@ -24,7 +28,7 @@ class IndividSampleList(SampleViewBase):
     def get(self, request, pk):
         selector = SampleListSelector()
         samples = selector.get_individ_samples(user=request.user, individ_id=pk)      
-        serializer = serializers.IndividSamplesListSerializer(samples, many=True)
+        serializer = serializers.SamplesToIndividSerializer(samples, many=True)
         return Response(serializer.data)
     
 class SampleListViewByBarcode(SampleViewBase):
@@ -56,7 +60,6 @@ class SampleCreateView(SampleViewBase):
 class SampleUpdateView(SampleViewBase):
 
     def put(self, request, pk):
-        print(request.data)
         selector = SampleDetailSelector()
         sample = selector.get_sample_detail(user=request.user, pk=pk)
         serializer = self.get_serializer_class()(sample, data=request.data)
@@ -121,7 +124,7 @@ class SampleAliquotsListView(APIView):
     def get(self, request, pk):
         selector = SampleListSelector()
         aliquots = selector.get_sample_aliquots(user=request.user, sample_id=pk)      
-        serializer = serializers.IndividSamplesListSerializer(aliquots, many=True)
+        serializer = serializers.SamplesToIndividSerializer(aliquots, many=True)
         return Response(serializer.data)
 
 class AliquotCreateView(SampleCreateView):
@@ -129,3 +132,15 @@ class AliquotCreateView(SampleCreateView):
     
 class AliquotUpdateView(SampleUpdateView):
     serializer = serializers.AliquotInputSerializer
+
+class SampleChageStatusView(APIView):
+    """Меняет статус образца(в работе/свободен)"""
+    def put(self, request, pk):
+        selector = SampleDetailSelector()
+        sample = selector.get_sample_detail(user=request.user, pk=pk, delete=True)
+        serializer =serializers.SampleSerializerOutput(sample, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

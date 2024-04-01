@@ -1,9 +1,10 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from individ.models import Individ
 from storage.models import SamplesMap
-
+from laboratory.models import Laboratory
 
 class Sample(models.Model):
     name = models.CharField('Имя образца', max_length=256)
@@ -11,10 +12,24 @@ class Sample(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     location = models.OneToOneField(SamplesMap, on_delete=models.PROTECT, null=True, related_name='related_sample') # Место хранения образца
+    sample_in_work = models.BooleanField('Статус образца', default=False)
 
     def __str__(self):
         return str(self.name)
-    
+
+class AllSamplesManager(models.Manager):
+    pass
+
+class UserSamplesManager(models.Manager):
+
+    def filter_user(self, user):
+        user_laboratories = user.profile.get_user_laboratories()
+        user_laboratory_ids = user_laboratories.values_list('id', flat=True)
+        return super(UserSamplesManager, self).get_queryset().filter(Q(individ__embryo__laboratory__id__in=user_laboratory_ids) | 
+                                                                     Q(individ__father__laboratory__id__in=user_laboratory_ids) |
+                                                                     Q(individ__mother__laboratory__id__in=user_laboratory_ids) |
+                                                                     Q(individ__another_member__laboratory__id__in=user_laboratory_ids))
+
 class CustomSampleType(models.Model):
     """
     Абстрактный класс для описания общих свойств образца
@@ -25,6 +40,8 @@ class CustomSampleType(models.Model):
     name = models.CharField('Название образца', max_length=150) # e.g кровь Василия Пупкина
     barcode = models.CharField('Баркод', max_length=150, null=True)
     volume = models.IntegerField('Кол-во данного типа образца днк', default=0)
+    objects = AllSamplesManager()
+    user_samples = UserSamplesManager()
 
     class Meta:
         abstract = True
@@ -40,7 +57,7 @@ class CustomSampleType(models.Model):
 
 class DNA(CustomSampleType):
     concentration = models.IntegerField('Концентрация ДНК, нг/нкл', default=0)
-    
+
     class Meta:
         verbose_name = 'ДНК индивида'
         verbose_name_plural = 'ДНК индивидов'
@@ -89,6 +106,8 @@ class Aliquot(models.Model):
     barcode = models.CharField('Баркод', max_length=150, null=True)
     concentration = models.IntegerField('Концентрация ДНК, нг/нкл', default=0)
     sampletype = models.CharField('Тип образца', max_length=150) #e.g Кровь, ДНК, хорион
+    objects = AllSamplesManager()
+    user_samples = UserSamplesManager()
 
     class Meta:
         verbose_name = 'алкивота индивида'

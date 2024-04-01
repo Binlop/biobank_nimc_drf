@@ -217,7 +217,7 @@ class FatherSerializerInput(FatherSerializerOutput):
         service = father.FatherService()
         return service.update_father(instance, validated_data)
 
-class MotherPregnancySerializer(serializers.Serializer):
+class MotherPregnancySerializerOutput(serializers.Serializer):
     DIAGNOSIS_CHOICES = {
         'none': 'Нет данных',
         'spontaneous_abortion': 'Спонтанный аборт',
@@ -236,10 +236,17 @@ class MotherPregnancySerializer(serializers.Serializer):
     diagnosis = serializers.ChoiceField(choices=DIAGNOSIS_CHOICES, default='none')
     pregnancy_year = serializers.IntegerField(required=False)
 
+    def create(self, validated_data: dict) -> MotherPregnancy:
+        service = mother.MotherService()
+        return service.create_mother_pregnancy(validated_data)
+
     def update(self, instance: MotherPregnancy, validated_data: dict) -> MotherPregnancy:
         service = mother.MotherService()
         return service.update_mother_pregnancy(instance, validated_data)
-    
+
+class MotherPregnancySerializerInput(MotherPregnancySerializerOutput):
+    id = serializers.IntegerField(required=False)
+
 
 class MotherSerializerOutput(AdultSerializerOutput):
     test_field = serializers.CharField(max_length=250, required=False)

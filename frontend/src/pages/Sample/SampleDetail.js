@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import { handleDelete, refreshObjectList, refreshObjectDetail } from "../../components/API/GetListOrDelete";
 import { handleUpdate, setCSRFToken } from "../../components/API/CreateUpdate";
 import ModalToAliquot from "./ModalToAliquot";
+import { Form, FormGroup, Input, Label } from "reactstrap";
 import "./sample.css"
 
 export default function SampleDetail() {
@@ -11,6 +12,7 @@ export default function SampleDetail() {
     const [sampleDetail, setSampleDetail] = useState(null);
     const [AliquotList, setAliquotList] = useState([]);
     const [modal, setModal] = useState(false);
+    const [sampleInWork, setSampleInWork] = useState({id: id})
     const [aliquot, setAliquot] = useState({
         name: '',
         location: '',
@@ -44,6 +46,17 @@ export default function SampleDetail() {
           return;
     };
 
+    const handleChange = (e) => {
+      const { name, checked } = e.target;
+      setSampleInWork(prevFormData => {
+        const updatedFormData = { ...prevFormData, [name]: checked };
+        axios.put(`/api/sample/change_status/${id}/`, updatedFormData)
+             .then((res) => refreshObjectDetail(setSampleDetail, `/api/sample/${id}`));
+        return updatedFormData;
+      });
+    };
+    
+
     return (
         <main className="container">
         {sampleDetail && (
@@ -58,10 +71,22 @@ export default function SampleDetail() {
                   <Link to={`/samples/aliquot/create/?individ_id=${sampleDetail.individ.individ.id}&original_sample_id=${sampleDetail.sample.id}`} className="btn btn-primary">
                     Добавить аликвоту
                   </Link>
+                  <div className="switch_status mr-2 d-inline">
+                  <Form>
+                    <FormGroup check inline>
+                      <Input type="checkbox" name="sample_in_work" checked={sampleDetail.sample.sample_in_work} onChange={handleChange} />
+                      <Label check className="ml-2">
+                        Образец в работе
+                      </Label>
+                    </FormGroup>
+                  </Form>
+                </div>
+
+
                 </>
               </p>
             </div>
-      
+
           <div className="features">
             <table>
               <tbody>

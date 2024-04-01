@@ -2,6 +2,7 @@ from rest_framework import serializers
 from individ.serializer import EmbryoSerializerOutput, FatherSerializerOutput, MotherSerializerOutput, AdultSerializerOutput
 from individ.models import Individ, Embryo, Father, Mother, AnotherFamilyMember
 from storage.serializer import SamplesSerializerOutut
+from .validators import check_not_gaps, check_not_cyrillic, check_only_upper_letters
 from .services import sample
 from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer, Aliquot
 
@@ -34,9 +35,15 @@ class SampleSerializerBase(serializers.Serializer):
     
 class SampleSerializerOutput(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(max_length=256)
+    name = serializers.CharField(max_length=256, required=False)
+    sample_in_work = serializers.BooleanField()
 
-class IndividSamplesListSerializer(serializers.Serializer):
+    def update(self, instance: Sample, validated_data: dict):
+        service = sample.SampleService()
+        return service.change_sample_status(instance, validated_data)
+
+
+class SamplesToIndividSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=150)
     sample = serializers.SerializerMethodField()
@@ -112,7 +119,7 @@ class CustomSampleSerializerOutput(serializers.Serializer):
 
 class CustomSampleSerializerInput(serializers.Serializer):
     name = serializers.CharField(max_length=150)
-    barcode = serializers.CharField(max_length=150, required=False)
+    barcode = serializers.CharField(max_length=150, required=False, validators=[check_not_gaps, check_only_upper_letters])
     volume = serializers.IntegerField(required=False)
     individ_id = serializers.IntegerField()
     sample_place = serializers.IntegerField(required=False)

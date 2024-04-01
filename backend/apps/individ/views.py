@@ -123,7 +123,6 @@ class MotherPregnancyListView(APIView):
         selector = MotherPregnancySelector()
         pregnancy = selector.get_mother_pregnancy_list(mother_id=pk)
         serializer = serializers.MotherPregnancySerializer(pregnancy, many=True)
-        print(serializer.data)
         return Response(serializer.data)
     
 class MotherPregnancyView(APIView):
@@ -131,13 +130,21 @@ class MotherPregnancyView(APIView):
     def get(self, request, pk):
         selector = MotherPregnancySelector()
         pregnancy = selector.get_mother_pregnancy_list(pk=pk)
-        serializer = serializers.MotherPregnancySerializer(pregnancy, many=True)
+        serializer = serializers.MotherPregnancySerializerOutput(pregnancy, many=True)
         return Response(serializer.data)
     
+    def post(self, request):
+        print(request.data)
+        serializer = serializers.MotherPregnancySerializerInput(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def put(self, request, pk):
         selector = MotherPregnancySelector()
         pregnancy = selector.get_mother_pregnancy_detail(user=request.user, pk=pk)
-        serializer = serializers.MotherPregnancySerializer(pregnancy, data=request.data)
+        serializer = serializers.MotherPregnancySerializerOutput(pregnancy, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)

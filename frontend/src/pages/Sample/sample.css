@@ -83,3 +83,10 @@
     position: absolute;
     margin-top: 10px;
 }
+
+.switch_status{
+    position: absolute;
+    width: 200px;
+    align-items: center;
+    margin-top: 10px;
+}

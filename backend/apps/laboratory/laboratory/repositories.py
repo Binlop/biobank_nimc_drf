@@ -1,4 +1,4 @@
-from .domain import Laboratory
+from .entity import Laboratory
 from laboratory.models import Laboratory as LaboratoryModel
 
 

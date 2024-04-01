@@ -12,23 +12,16 @@ class SampleListSelector:
     """
 
     def get_samples_list(self, user: User, filters=None) -> QuerySet[DNA, Chorion]:
-        user_laboratories = user.profile.get_user_laboratories()
-        user_laboratory_ids = user_laboratories.values_list('id', flat=True)
 
-        dna_qs = DNA.objects.all()
-        chorion_qs = Chorion.objects.all()
-        blood_qs = Blood.objects.all()
-        endometrium_qs = Endometrium.objects.all()
-        fetal_sac_freezer_qs = FetalSacFreezer.objects.all()
-        fetal_sac_nitrogen_qs = FetalSacNitrogen.objects.all()
-        aliquot_qs = Aliquot.objects.all()
-        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs, aliquot_qs))
+        dna_qs = DNA.user_samples.filter_user(user=user)
+        chorion_qs = Chorion.user_samples.filter_user(user=user)
+        blood_qs = Blood.user_samples.filter_user(user=user)
+        endometrium_qs = Endometrium.user_samples.filter_user(user=user)
+        fetal_sac_freezer_qs = FetalSacFreezer.user_samples.filter_user(user=user)
+        fetal_sac_nitrogen_qs = FetalSacNitrogen.user_samples.filter_user(user=user)
+        aliquot_qs = Aliquot.user_samples.filter_user(user=user)
         
-        for sample in samples_list:
-            if sample.get_sample_laboratories() & user_laboratory_ids:
-                continue
-            else:
-                samples_list.remove(sample)
+        samples_list = list(chain(dna_qs, chorion_qs, blood_qs, endometrium_qs, fetal_sac_freezer_qs, fetal_sac_nitrogen_qs, aliquot_qs))
         return samples_list
     
     def get_individ_samples(self, user: User, individ_id: int):

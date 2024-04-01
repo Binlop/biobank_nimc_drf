@@ -14,10 +14,8 @@ class FamilyMemberListSelector:
     Класс отвечает за получение списка индивидов из бд
     """
 
-    def filter_individs_by_q(self, user: User, individ_q: Q) -> QuerySet[Embryo, Father, Mother]:
-        user_laboratories = user.profile.get_user_laboratories()
-        user_laboratory_ids = user_laboratories.values_list('id', flat=True)
-        individ_q = Q(laboratory__in=user_laboratory_ids) & individ_q 
+    def filter_individs_by_q(self, individ_q: Q) -> QuerySet[Embryo, Father, Mother, AnotherFamilyMember]:
+
         embryo_qs = Embryo.objects.filter(individ_q).distinct()
         father_qs = Father.objects.filter(individ_q).distinct()
         mother_qs = Mother.objects.filter(individ_q).distinct()
@@ -27,20 +25,28 @@ class FamilyMemberListSelector:
         
         return individ_list
     
+    def make_individ_q_from_user(self, user: User) -> Q:
+        user_laboratories = user.profile.get_user_laboratories()
+        user_laboratory_ids = user_laboratories.values_list('id', flat=True)
+        return Q(laboratory__in=user_laboratory_ids)
+
     def get_individ_list(self, user: User, filters=None) -> QuerySet[Embryo, Father, Mother]:
-        individ_q = Q()
-        return self.filter_individs_by_q(user=user, individ_q=individ_q)
+        individ_q = self.make_individ_q_from_user(user=user)
+        return self.filter_individs_by_q(individ_q=individ_q)
 
     def get_filtered_individ_list(self, user: User, filters: dict = {}) -> QuerySet[Embryo, Father, Mother]:
+        individ_q = self.make_individ_q_from_user(user=user)
+
+
         filters = dict(filters)
         embryo_data = json.loads(filters.get('embryo', None)[0])
         father_data = json.loads(filters.get('father', None)[0])
         mother_data = json.loads(filters.get('mother', None)[0])
         another_member_data = json.loads(filters.get('another_member', None)[0])
 
-        embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.all() if embryo_data else Embryo.objects.none())
-        father_filter = FatherFilter(father_data, queryset=Father.objects.all() if father_data else Father.objects.none())
-        mother_filter = MotherFilter(mother_data, queryset=Mother.objects.all() if mother_data else Mother.objects.none())
+        embryo_filter = EmbryoFilter(embryo_data, queryset=Embryo.objects.filter(individ_q).distinct() if embryo_data else Embryo.objects.none())
+        father_filter = FatherFilter(father_data, queryset=Father.objects.filter(individ_q).distinct() if father_data else Father.objects.none())
+        mother_filter = MotherFilter(mother_data, queryset=Mother.objects.filter(individ_q).distinct() if mother_data else Mother.objects.none())
         another_member_filter = FatherFilter(another_member_data, queryset=AnotherFamilyMember.objects.all() if another_member_data else AnotherFamilyMember.objects.none())
         
         embryo_qs = embryo_filter.qs 

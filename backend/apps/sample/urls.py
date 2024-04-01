@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.SampleListView.as_view()),
     path('<int:pk>/', views.SampleDetailView.as_view()),
     path('<int:pk>/delete/', views.SampleDeleteView.as_view()),
+    path('change_status/<int:pk>/', views.SampleChageStatusView.as_view()),
 
     path('dna/create/', views.DNACreateView.as_view()),
     path('dna/<int:pk>/update/', views.DNAUpdateView.as_view()),

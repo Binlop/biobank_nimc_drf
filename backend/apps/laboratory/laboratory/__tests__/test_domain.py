@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 
-from ..domain import Laboratory
+from ..entity import Laboratory
 
 class TestLaboratoryUnit(unittest.TestCase):
     def test_constructor(self):
