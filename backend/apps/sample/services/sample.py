@@ -8,6 +8,7 @@ from ..models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen,
 class BaseSampleService():
     model = None
     A = TypeVar('A', DNA, Chorion)
+    sampletype = None
 
     @transaction.atomic
     def create_sample(self, custom_sample: A, location_id: int) -> Sample:
@@ -69,13 +70,30 @@ class BaseSampleService():
     def delete_sample(self, instance: A):
         if instance.location_id:
             self.set_previous_location_to_free(previous_location=instance.location)
+        self.change_individ_count_samples(individ=instance.content_object.individ.content_object, biospecimen=instance.content_object, increment=False)
         biospecimen = instance.content_object
         biospecimen.delete()
         instance.delete()
 
+    def change_individ_count_samples(self, individ, biospecimen, increment: bool = True):
+        if biospecimen.sampletype == 'dna':
+            individ.count_dna += 1 if increment else - 1
+        elif biospecimen.sampletype == 'blood':
+            individ.count_blood += 1 if increment else - 1
+        elif biospecimen.sampletype == 'chorion':
+            individ.count_chorion += 1 if increment else - 1
+        elif biospecimen.sampletype == 'endometrium':
+            individ.count_endometrium += 1 if increment else - 1
+        elif biospecimen.sampletype == 'fetal_sac_nitrogen':
+            individ.count_fetal_sac_nitrogen += 1 if increment else - 1
+        elif biospecimen.sampletype == 'fetal_sac_freezer':
+            individ.count_fetal_sac_freezer += 1 if increment else - 1
+        individ.save()
+
 class SampleService(BaseSampleService):
     model = None
     A = TypeVar('A', DNA, Chorion)
+    sampletype = None
 
     @transaction.atomic
     def create_biospecimen(self, validated_data: dict) -> A:
@@ -85,6 +103,7 @@ class SampleService(BaseSampleService):
         biospecimen.save()
         sample = self.create_sample(custom_sample=biospecimen, location_id=location)
         biospecimen.sample.add(sample, bulk=False)
+        self.change_individ_count_samples(individ=biospecimen.individ.content_object, biospecimen=biospecimen, increment=True)
         biospecimen.save()
         return biospecimen
     

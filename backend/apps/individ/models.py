@@ -24,9 +24,6 @@ class FamilyMember(models.Model):
     individ_type = models.CharField('Тип индивида', max_length=20)
     laboratory = models.ManyToManyField(Laboratory)
     family = models.ForeignKey(Family, on_delete=models.CASCADE, null=True)
-    count_blood = models.IntegerField('Кол-во крови', default=0)
-    count_dna = models.IntegerField('Кол-во ДНК', default=0)
-    count_chorion = models.IntegerField('Кол-во хориона', default=0)
 
     class Meta:
         abstract = True
@@ -113,6 +110,11 @@ class Embryo(FamilyMember):
     сonflict_between_different_methods = models.BooleanField('Конфликт между различными методами ', default=False)
     essence_conflict = models.CharField('essence_conflict', max_length=256, null=True)
 
+    count_dna = models.IntegerField('Кол-во ДНК', default=0)
+    count_chorion = models.IntegerField('Кол-во хориона', default=0)
+    count_endometrium = models.IntegerField('Кол-во эндометрия', default=0)
+    count_fetal_sac_nitrogen = models.IntegerField('Кол-во плодного мешка(азот)', default=0)
+    count_fetal_sac_freezer = models.IntegerField('Кол-во плодного мешка(-80)', default=0)
 
     class Meta:
         verbose_name = 'эмбрион'
@@ -134,6 +136,10 @@ class Adult(FamilyMember):
     nationality = models.CharField('Национальность', max_length=100, null=True)
     place_of_birth = models.CharField('Место рождения', max_length=255,null=True)
     hereditary_burden_in_the_family = models.CharField('Наследственная отягощенность в семье', max_length=255, null=True)
+
+    count_dna = models.IntegerField('Кол-во ДНК', default=0)
+    count_blood = models.IntegerField('Кол-во крови', default=0)
+
 
     class Meta:
         abstract = True
