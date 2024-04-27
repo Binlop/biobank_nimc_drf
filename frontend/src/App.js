@@ -17,6 +17,7 @@ import Individ from "./pages/Individ/Individ";
 import Sample from "./pages/Sample/Sample";
 import Storage from "./pages/Storage/Storage";
 
+
 import "./App.css"; // Подключаем стили
 import PrivateRoute from './utils/PrivateRoute'
 

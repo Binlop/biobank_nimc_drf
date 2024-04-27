@@ -33,7 +33,9 @@ export default function MotherCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formIndivid = makeIndividForm();
-    formIndivid.append('family_id', familyId)
+    if (familyId){
+      formIndivid.append('family_id', familyId)
+    }
     handlePost(e, formIndivid, `/api/individ/mother/create/`, `/individs/`, setError, navigate)
   };
 
@@ -127,14 +129,7 @@ export default function MotherCreate() {
             value={formData.name}
             onChange={handleChange}
             errors={errors}
-          />
-          <CharFieldWithError
-            label="Тестовое поле:"
-            name="test_field"
-            value={formData.test_field}
-            onChange={handleChange}
-            errors={errors}
-          />                              
+          />                         
           <div className="form-group">
           <label>Лаборатории:</label>
           {allLaboratories.map(lab => (
@@ -244,13 +239,6 @@ export default function MotherCreate() {
             label="Наследственная отягощенность в семье"
             name="hereditary_burden_in_the_family"
             value={formData.hereditary_burden_in_the_family}
-            onChange={handleChange}
-            errors={errors}
-          />
-          <CharFieldWithError
-            label="Тестовое поле мать"
-            name="test_field"
-            value={formData.test_field}
             onChange={handleChange}
             errors={errors}
           />

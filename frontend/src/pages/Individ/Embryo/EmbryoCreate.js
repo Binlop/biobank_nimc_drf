@@ -35,8 +35,9 @@ export default function EmbryoCreate() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formEmbryo = makeNewForm(formData);
-    formEmbryo.append('family_id', familyId)
-    console.log(formEmbryo)
+    if (familyId){
+      formEmbryo.append('family_id', familyId)
+    }
     handlePost(e, formEmbryo, `/api/individ/embryo/create/`, `/individs/`, setError, navigate)
   };
 

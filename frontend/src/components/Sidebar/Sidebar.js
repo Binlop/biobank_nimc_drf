@@ -16,6 +16,7 @@ class AsideBar extends Component {
           <li><Link to="/individs/" className="instruments-link"><FaPerson />Индивиды</Link></li>
           <li><Link to="/samples/" className="instruments-link"><FaFlask />Образцы</Link></li>
           <li><Link to="/storage/" className="instruments-link"><FaGift />Хранилище</Link></li>
+          <li><Link to="/reagents/" className="instruments-link"><FaGift />Реагенты</Link></li>
           </ul>
         </div>
       </aside>

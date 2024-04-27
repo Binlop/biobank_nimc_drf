@@ -6,6 +6,9 @@ import { handleUpdate, setCSRFToken } from "../../components/API/CreateUpdate";
 import ModalToAliquot from "./ModalToAliquot";
 import { Form, FormGroup, Input, Label } from "reactstrap";
 import "./sample.css"
+import AuthContext from '../../context/AuthContext'
+
+
 
 export default function SampleDetail() {
     const { id } = useParams();
@@ -18,11 +21,13 @@ export default function SampleDetail() {
         location: '',
         volume: '',
       });
+    let { user, logoutUser } = useContext(AuthContext)
 
     useEffect(() => {
       refreshObjectDetail(setSampleDetail, `/api/sample/${id}`)  
       refreshObjectList(setAliquotList, `/api/sample/aliquot/${id}/`)
       setCSRFToken()
+      console.log(user)
     }, []);
 
     const handleDeleteClick = (object_id) => {
@@ -47,10 +52,20 @@ export default function SampleDetail() {
     };
 
     const handleChange = (e) => {
+      const token = JSON.parse(localStorage.authTokens)
+
       const { name, checked } = e.target;
       setSampleInWork(prevFormData => {
-        const updatedFormData = { ...prevFormData, [name]: checked };
-        axios.put(`/api/sample/change_status/${id}/`, updatedFormData)
+        const updatedFormData = { ...prevFormData, [name]: checked, user: user.user_id };
+
+        const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
+        const contentTypeHeader = `multipart/form-data; boundary=${boundary}`;
+        const headers = {
+          'Content-Type': contentTypeHeader,
+          'Authorization': 'Bearer ' + String(token.access)
+      };
+        console.log(updatedFormData)
+        axios.put(`/api/sample/change_status/${id}/`, updatedFormData,  { headers })
              .then((res) => refreshObjectDetail(setSampleDetail, `/api/sample/${id}`));
         return updatedFormData;
       });

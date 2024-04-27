@@ -2,6 +2,7 @@ from rest_framework import serializers
 from individ.serializer import EmbryoSerializerOutput, FatherSerializerOutput, MotherSerializerOutput, AdultSerializerOutput
 from individ.models import Individ, Embryo, Father, Mother, AnotherFamilyMember
 from storage.serializer import SamplesSerializerOutut
+from user.serializer import ProfileSerializer
 from .validators import check_not_gaps, check_not_cyrillic, check_only_upper_letters
 from .services import sample
 from .models import Sample, DNA, Chorion, Blood, Endometrium, FetalSacNitrogen, FetalSacFreezer, Aliquot
@@ -33,12 +34,17 @@ class SampleSerializerBase(serializers.Serializer):
             raise Exception('Unexpected type of sample object')
         return serializer.data
     
+class SampleInWorkSerializer(serializers.Serializer):
+    in_work = serializers.BooleanField()
+    user = ProfileSerializer()
+
 class SampleSerializerOutput(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=256, required=False)
     sample_in_work = serializers.BooleanField()
 
     def update(self, instance: Sample, validated_data: dict):
+        print(validated_data)
         service = sample.SampleService()
         return service.change_sample_status(instance, validated_data)
 
@@ -249,3 +255,5 @@ class AliquotInputSerializer(CustomSampleSerializerInput):
     def update(self, instance: DNA, validated_data: dict):
         service = sample.AliquotService()
         return service.update_biospecimen(instance, validated_data)
+
+

@@ -33,7 +33,9 @@ export default function FatherCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formIndivid = makeIndividForm();
-    formIndivid.append('family_id', familyId)
+    if (familyId){
+      formIndivid.append('family_id', familyId)
+    }    
     handlePost(e, formIndivid, `/api/individ/father/create/`, `/individs/`, setError, navigate)
   };
 

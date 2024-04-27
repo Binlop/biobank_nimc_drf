@@ -58,10 +58,12 @@ class FamilyMemberCreateView(IndividViewBase):
     Базовый класс для создания семейных участников.
     """ 
     def post(self, request):
+        print(request.data)
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FamilyMemberUpdateView(IndividViewBase):

@@ -5,6 +5,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from individ.models import Individ
 from storage.models import SamplesMap
 from laboratory.models import Laboratory
+from user.models import Profile
+
 
 class Sample(models.Model):
     name = models.CharField('Имя образца', max_length=256)
@@ -118,3 +120,9 @@ class Aliquot(models.Model):
 
     def __str__(self):
         return str(self.name)
+    
+
+class SampleInWork(models.Model):
+    sample = models.OneToOneField(Sample, on_delete=models.CASCADE, related_name="sample_work", null=True)
+    in_work = models.BooleanField('Образец в работе', default=False)
+    user = models.ForeignKey(Profile, verbose_name='Пользователь, взявший образец', on_delete=models.PROTECT)

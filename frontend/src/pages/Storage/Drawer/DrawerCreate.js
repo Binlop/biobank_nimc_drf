@@ -25,7 +25,7 @@ export default function DrawerCreate() {
     e.preventDefault();
     const formStorage = makeNewForm(formData);
     formStorage.append('freezer_id', parentStorageId)
-    handlePost(e, formStorage, `/api/storage/drawer/create/`, `storage/freezer/${parentStorageId}/`, setError, navigate)
+    handlePost(e, formStorage, `/api/storage/drawer/create/`, `/storage/freezer/${parentStorageId}/`, setError, navigate)
   };
 
   return (

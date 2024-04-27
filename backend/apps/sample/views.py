@@ -137,6 +137,7 @@ class SampleChageStatusView(APIView):
     """Меняет статус образца(в работе/свободен)"""
     def put(self, request, pk):
         selector = SampleDetailSelector()
+        print(request.user)
         sample = selector.get_sample_detail(user=request.user, pk=pk, delete=True)
         serializer =serializers.SampleSerializerOutput(sample, data=request.data)
         if serializer.is_valid():
